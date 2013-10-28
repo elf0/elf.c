@@ -17,7 +17,7 @@ typedef struct{
  Byte *pBegin;
  Byte *pEnd;
  Byte *pLast;
- MPool_Node *pUsedList;
+ MPool_Node *pUsedEntry;
  Byte *pForAlignment;
 }MPool;
 
@@ -31,7 +31,7 @@ static inline void MPool_Initialize(MPool *pPool, Byte *pObjectBegin, Byte *pObj
  pPool->nObjectSize = nObjectSize;
  pPool->pBegin = pPool->pLast = pObjectBegin;
  pPool->pEnd = pObjectEnd;
- pPool->pUsedList = NULL;
+ pPool->pUsedEntry = null;
 }
 
 //memory peak(bytes)
@@ -39,24 +39,45 @@ static inline size_t MPool_Peak(MPool *pPool){
  return pPool->pLast - pPool->pBegin;
 }
 
-static inline void *MPool_Pop(MPool *pPool){
- if(pPool->pUsedList){
-  void *pObject = pPool->pUsedList;
-  pPool->pUsedList = pPool->pUsedList->pNext;
-  return pObject;
- }
- else if(pPool->pLast < pPool->pEnd){
+static inline Bool MPool_UnusedEmpty(MPool *pPool){
+ return pPool->pLast == pPool->pEnd;
+}
+
+static inline Bool MPool_UnusedNotEmpty(MPool *pPool){
+ return pPool->pLast != pPool->pEnd;
+}
+
+static inline void *MPool_PopUnused(MPool *pPool){
   void *pObject = pPool->pLast;
   pPool->pLast += pPool->nObjectSize;
-  return pObject;
- }
+ return pObject;
+}
 
- return NULL;
+static inline Bool MPool_UsedEmpty(MPool *pPool){
+ return pPool->pUsedEntry == null;
+}
+
+static inline Bool MPool_UsedNotEmpty(MPool *pPool){
+ return pPool->pUsedEntry != null;
+}
+
+static inline void *MPool_PopUsed(MPool *pPool){
+  void *pObject = pPool->pUsedEntry;
+  pPool->pUsedEntry = pPool->pUsedEntry->pNext;
+ return pObject;
+}
+
+static inline void *MPool_Pop(MPool *pPool){
+ if(MPool_UsedNotEmpty(pPool))
+  return MPool_PopUsed(pPool);
+ else if(MPool_UnusedNotEmpty(pPool))
+  return MPool_PopUnused(pPool);
+
+ return null;
 }
 
 static inline void MPool_Push(MPool *pPool, void *pObject){
  MPool_Node *pNode = (MPool_Node*)pObject;
- pNode->pNext = pPool->pUsedList;
- pPool->pUsedList = pNode;
+ pNode->pNext = pPool->pUsedEntry;
+ pPool->pUsedEntry = pNode;
 }
-
