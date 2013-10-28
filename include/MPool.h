@@ -67,6 +67,14 @@ static inline void *MPool_PopUsed(MPool *pPool){
  return pObject;
 }
 
+static inline Bool MPool_Empty(MPool *pPool){
+ return MPool_UsedEmpty(pPool) && MPool_UnusedEmpty(pPool);
+}
+
+static inline Bool MPool_NotEmpty(MPool *pPool){
+ return MPool_UsedNotEmpty(pPool) || MPool_UnusedNotEmpty(pPool);
+}
+
 static inline void *MPool_Pop(MPool *pPool){
  if(MPool_UsedNotEmpty(pPool))
   return MPool_PopUsed(pPool);
