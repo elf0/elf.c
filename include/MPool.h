@@ -56,7 +56,7 @@ static inline void *MPool_Pop(MPool *pPool){
 
 static inline void MPool_Push(MPool *pPool, void *pObject){
  MPool_Node *pNode = (MPool_Node*)pObject;
- pNode->pNext = pPool->pUsedList? pPool->pUsedList->pNext: NULL;
+ pNode->pNext = pPool->pUsedList;
  pPool->pUsedList = pNode;
 }
 
