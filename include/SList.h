@@ -30,8 +30,9 @@ static inline void SList_Append(SList_Node *pTarget, SList_Node *pNode){
  pTarget->pNext = pNode;
 }
 
-static inline void SList_Remove(SList_Node *pNode, SList_Node *pPrev){
+static inline SList_Node *SList_Remove(SList_Node *pNode, SList_Node *pPrev){
  pPrev->pNext = pNode->pNext;
+ return pNode->pNext;
 }
 
 static inline SList_Node *SList_Pop(SList_Node *pEntry){
