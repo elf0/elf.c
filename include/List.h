@@ -28,13 +28,7 @@ static inline void List_Remove(List_Node *pNode){
  pNode->pNext->pPrev = pNode->pPrev;
 }
 
-static inline List_Node *List_Pop(List_Node *pEntry){
- List_Node *pNode = pEntry->pPrev;
- List_Remove(pNode);
- return pNode;
-}
-
-static inline void List_Push(List_Node *pPosition, List_Node *pNode){
+static inline void List_Insert(List_Node *pPosition, List_Node *pNode){
  pNode->pPrev = pPosition->pPrev;
  pNode->pNext = pPosition;
 
@@ -48,4 +42,14 @@ static inline void List_Append(List_Node *pTarget, List_Node *pNode){
 
  pTarget->pNext->pPrev = pNode;
  pTarget->pNext = pNode;
+}
+
+static inline List_Node *List_Pop(List_Node *pEntry){
+ List_Node *pNode = pEntry->pNext;
+ List_Remove(pNode);
+ return pNode;
+}
+
+static inline void List_Push(List_Node *pEntry, List_Node *pNode){
+ List_Append(pEntry, pNode);
 }
