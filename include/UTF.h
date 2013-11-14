@@ -1,5 +1,9 @@
 #pragma once
 
+//License: Public Domain
+//Author: elf
+//EMail: elf198012@gmail.com
+
 #include "UTF8.h"
 #include "UTF16.h"
 

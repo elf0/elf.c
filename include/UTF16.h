@@ -1,5 +1,9 @@
 #pragma once
 
+//License: Public Domain
+//Author: elf
+//EMail: elf198012@gmail.com
+
 typedef U16 UTF16;
 
 //static inline Bool UTF16_IsSurrogate(UTF16 c){

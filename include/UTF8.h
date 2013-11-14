@@ -1,5 +1,9 @@
 #pragma once
 
+//License: Public Domain
+//Author: elf
+//EMail: elf198012@gmail.com
+
 typedef U8  UTF8;
 
 static inline UTF8 *UTF8_GetValidValue(UTF8 *pBegin, UTF8 *pEnd, U32 *pValue){
