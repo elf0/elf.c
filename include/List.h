@@ -36,11 +36,11 @@ static inline void ListNode_Reset(ListNode *pNode){
  pNode->pPrev = pNode->pNext = pNode;
 }
 
-static inline Bool ListNode_Alone(ListNode *pNode){
+static inline Bool ListNode_Alone(const ListNode *pNode){
  return pNode->pNext == pNode;
 }
 
-static inline Bool ListNode_NotAlone(ListNode *pNode){
+static inline Bool ListNode_NotAlone(const ListNode *pNode){
  return pNode->pNext != pNode;
 }
 
