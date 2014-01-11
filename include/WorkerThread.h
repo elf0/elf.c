@@ -7,6 +7,7 @@
 
 #include "Type.h"
 #include "List.h"
+#include "Thread.h"
 #include "ThreadCondition.h"
 
 typedef struct structTask Task;
@@ -26,25 +27,15 @@ static inline void Task_Initialize(Task *pTask, TaskEntry Entry, TaskFinalize Fi
 
 
 typedef struct{
- pthread_t thread;
+ Thread thread;
  ThreadLock lock;
  ThreadCondition condition;
  ListNode tasks;
  ListNode pendingTasks;
 }WorkerThread;
 
-static inline void WorkerThread_Initialize(WorkerThread *pThread){
- ThreadLock_Initialize(&pThread->lock);
- ThreadCondition_Initialize(&pThread->condition);
- ListNode_Reset(&pThread->tasks);
- ListNode_Reset(&pThread->pendingTasks);
-}
-
-static inline void WorkerThread_Finalize(WorkerThread *pThread){
- ThreadCondition_Finalize(&pThread->condition);
- ThreadLock_Finalize(&pThread->lock);
-}
-
+void WorkerThread_Initialize(WorkerThread *pThread);
+void WorkerThread_Finalize(WorkerThread *pThread);
 Bool WorkerThread_Run(WorkerThread *pThread);
 
 static inline void WorkerThread_Post(WorkerThread *pThread, Task *pTask){

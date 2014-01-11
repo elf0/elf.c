@@ -4,6 +4,25 @@
 
 #include "WorkerThread.h"
 
+static void *WorkerThread_Entry(WorkerThread *pThread);
+
+void WorkerThread_Initialize(WorkerThread *pThread){
+ Thread_Initialize((Thread*)pThread, (ThreadEntry)WorkerThread_Entry);
+ ThreadLock_Initialize(&pThread->lock);
+ ThreadCondition_Initialize(&pThread->condition);
+ ListNode_Reset(&pThread->tasks);
+ ListNode_Reset(&pThread->pendingTasks);
+}
+
+void WorkerThread_Finalize(WorkerThread *pThread){
+ ThreadCondition_Finalize(&pThread->condition);
+ ThreadLock_Finalize(&pThread->lock);
+}
+
+Bool WorkerThread_Run(WorkerThread *pThread){
+ return Thread_Run((Thread*)pThread);
+}
+
 static inline Bool HaveTasks(ListNode *pEntry){
  return ListNode_NotAlone(pEntry);
 }
@@ -56,10 +75,3 @@ static void *WorkerThread_Entry(WorkerThread *pThread){
  }
  return null;
 }
-
-Bool WorkerThread_Run(WorkerThread *pThread){
- if(pthread_create(&pThread->thread, null, (void*(*)(void*))WorkerThread_Entry, pThread) != 0)
-  return false;
- return true;
-}
-
