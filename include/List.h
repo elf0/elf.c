@@ -7,7 +7,7 @@
 
 //Node
 typedef struct struct_ListNode ListNode;
-typedef struct struct_ListNode{
+struct struct_ListNode{
  ListNode *pNext;
  ListNode *pPrev;
 };
@@ -66,7 +66,7 @@ static inline void ListNode_SwapBuddies(ListNode *pNode, ListNode *pTargetNode){
 //List
 //If you do not want counting, use ListNode directly.
 typedef struct{
- Node entry;
+ ListNode entry;
  size_t nCount;
 }List;
 
