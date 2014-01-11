@@ -9,18 +9,17 @@
 #include "List.h"
 #include "ThreadCondition.h"
 
-typedef Bool (*TaskEntry)(void *pContext);
-typedef void (*TaskFinalize)(void *pContext);
+typedef struct structTask Task;
+typedef Bool (*TaskEntry)(Task *pTask);
+typedef void (*TaskFinalize)(Task *pTask);
 
-typedef struct{
+struct structTask{
  ListNode node;
- void *pContext;
  TaskEntry Entry;
  TaskFinalize Finalize;
-}Task;
+};
 
-static inline void Task_Initialize(Task *pTask, void *pContext, Bool (*Entry)(void *), void (*Finalize)(void *)){
- pTask->pContext = pContext;
+static inline void Task_Initialize(Task *pTask, TaskEntry Entry, TaskFinalize Finalize){
  pTask->Entry = Entry;
  pTask->Finalize = Finalize;
 }

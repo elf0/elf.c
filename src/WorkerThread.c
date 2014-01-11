@@ -39,10 +39,10 @@ static inline void RunTasks(WorkerThread *pThread){
  Task *pTask;
  while(pNode != pEntry){
   pTask = (Task*)pNode;
-  if(pTask->Entry(pTask->pContext)){
+  if(pTask->Entry(pTask)){
    ListNode_Unlink(pNode);
    pNode = pNode->pNext;
-   pTask->Finalize(pTask->pContext);
+   pTask->Finalize(pTask);
   }
   else
    pNode = pNode->pNext;
