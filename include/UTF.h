@@ -7,7 +7,7 @@
 #include "UTF8.h"
 #include "UTF16.h"
 
-#define UTF16_IsHan(c) (c >= 0x4E00 && c < 0xA000)
+#define UTF_IsHan(c) (c >= 0x4E00 && c < 0xA000)
 
 //Out buffer bytes should >= 2 * In buffer bytes;
 //caller must input valid utf-16 string
