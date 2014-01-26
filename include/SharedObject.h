@@ -13,17 +13,17 @@ public:
  ObjectUser(){};
 
  ObjectUser(SharedObject<T> *pObject): _pObject(pObject){
-  fprintf(stderr, "ObjectUser(SharedObject<T> *pObject)\n");
+//  fprintf(stderr, "ObjectUser(SharedObject<T> *pObject)\n");
  }
 
  ObjectUser(const ObjectUser &other)
   : _pObject(other._pObject){
-  fprintf(stderr, "Copy constructor\n");
+  //fprintf(stderr, "Copy constructor\n");
   Reference();
  }
 
  ObjectUser &operator=(const ObjectUser &other){
-  fprintf(stderr, "operator=()\n");
+  //fprintf(stderr, "operator=()\n");
   if(_pObject == other._pObject)
    return *this;
 
