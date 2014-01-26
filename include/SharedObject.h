@@ -31,17 +31,29 @@ public:
   return _pObject == other._pObject;
  }
 
-//for container
- bool operator<(const ObjectUser &other)const{
-  return Object() < other.Object();
- }
-
  bool operator==(const ObjectUser &other)const{
   return Object() == other.Object();
  }
 
  bool operator!=(const ObjectUser &other)const{
   return Object() != other.Object();
+ }
+
+//for container
+ bool operator<(const ObjectUser &other)const{
+  return Object() < other.Object();
+ }
+
+ bool operator>(const ObjectUser &other)const{
+  return Object() > other.Object();
+ }
+
+ bool operator<=(const ObjectUser &other)const{
+  return Object() <= other.Object();
+ }
+
+ bool operator>=(const ObjectUser &other)const{
+  return Object() >= other.Object();
  }
 
  T &Object()const{
