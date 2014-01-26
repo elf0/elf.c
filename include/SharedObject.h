@@ -27,12 +27,21 @@ public:
   return *this;
  }
 
- bool operator==(const ObjectUser &other)const{
+ bool SameObject(const ObjectUser &other)const{
   return _pObject == other._pObject;
  }
 
+//for container
+ bool operator<(const ObjectUser &other)const{
+  return Object() < other.Object();
+ }
+
+ bool operator==(const ObjectUser &other)const{
+  return Object() == other.Object();
+ }
+
  bool operator!=(const ObjectUser &other)const{
-  return _pObject != other._pObject;
+  return Object() != other.Object();
  }
 
  T &Object()const{
