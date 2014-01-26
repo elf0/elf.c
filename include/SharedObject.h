@@ -8,13 +8,8 @@ class SharedObject;
 
 template<typename T>
 class ObjectUser{
-//protected:
 public:
  ObjectUser(){};
-
- ObjectUser(SharedObject<T> *pObject): _pObject(pObject){
-//  fprintf(stderr, "ObjectUser(SharedObject<T> *pObject)\n");
- }
 
  ObjectUser(const ObjectUser &other)
   : _pObject(other._pObject){
@@ -45,6 +40,10 @@ public:
  }
 
 private:
+ ObjectUser(SharedObject<T> *pObject): _pObject(pObject){
+//  fprintf(stderr, "ObjectUser(SharedObject<T> *pObject)\n");
+ }
+
  void Reference(){
   if(_pObject)
    _pObject->Reference();
@@ -55,6 +54,7 @@ private:
    _pObject->Dereference();
  }
  SharedObject<T> *_pObject = nullptr;
+ friend class SharedObject<T>;
 };
 
 template<typename T>
