@@ -31,6 +31,10 @@ public:
   return _pObject == other._pObject;
  }
 
+ bool NotSameObject(const ObjectUser &other)const{
+  return _pObject != other._pObject;
+ }
+
  bool operator==(const ObjectUser &other)const{
   return Object() == other.Object();
  }
@@ -57,7 +61,7 @@ public:
  }
 
  T &Object()const{
-  return _pObject->Object();
+  return *(T*)_pObject;
  }
 
 private:
@@ -79,7 +83,7 @@ private:
 };
 
 template<typename T>
-class SharedObject{
+class SharedObject: public T{
 public:
  static ObjectUser<T> New(const T &object){
   return ObjectUser<T>(new SharedObject(object));
@@ -96,14 +100,9 @@ public:
    delete this;
  }
 
- T &Object(){
-  return _object;
- }
-
 private:
- SharedObject(const T &object): _object(object){}
+ SharedObject(const T &object): T(object){}
  ~SharedObject(){}
 
- T _object;
  size_t _nCount = 1;
 };
