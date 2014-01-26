@@ -22,18 +22,23 @@ public:
   Reference();
  }
 
+ ~ObjectUser(){Dereference();}
+
  ObjectUser &operator=(const ObjectUser &other){
   //fprintf(stderr, "operator=()\n");
-  if(_pObject == other._pObject)
-   return *this;
-
   Dereference();
   _pObject = other._pObject;
   Reference();
   return *this;
  }
 
- ~ObjectUser(){Dereference();}
+ bool operator==(const ObjectUser &other)const{
+  return _pObject == other._pObject;
+ }
+
+ bool operator!=(const ObjectUser &other)const{
+  return _pObject != other._pObject;
+ }
 
  T &Object()const{
   return _pObject->Object();
