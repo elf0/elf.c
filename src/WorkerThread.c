@@ -2,7 +2,7 @@
 //Author: elf
 //EMail: elf198012@gmail.com
 
-#include "WorkerThread.h"
+#include "elf/WorkerThread.h"
 
 static void *WorkerThread_Entry(WorkerThread *pThread);
 
