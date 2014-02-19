@@ -6,18 +6,16 @@
 #include "CountedList.h"
 
 typedef struct elf_struct_ActiveObject elf_ActiveObject;
-typedef void (*elf_event_ActiveObject_Alarm)(elf_ActiveObject *pSelf);
 struct elf_struct_ActiveObject{
     elf_DoubleNode dnNode;
     U64 nTime;
-    elf_event_ActiveObject_Alarm onAlarm;
 };
 
-static inline void elf_ActiveObject_Initialize(elf_ActiveObject *pObject, elf_event_ActiveObject_Alarm onAlarm){
-    pObject->onAlarm = onAlarm;
-}
+//static inline void elf_ActiveObject_Initialize(elf_ActiveObject *pObject){
+//}
 
 typedef struct elf_struct_ActiveQueue elf_ActiveQueue;
+typedef void (*elf_event_ActiveQueue_Alarm)(void *pContext, elf_ActiveObject *pSelf);
 struct elf_struct_ActiveQueue{
     elf_CountedList lstObjects;
 };
@@ -51,7 +49,7 @@ static inline elf_ActiveObject *elf_ActiveQueue_PopLaziest(elf_ActiveQueue *pQue
     return (elf_ActiveObject*)elf_CountedList_PopBack((elf_CountedList*)pQueue);
 }
 
-static inline elf_ActiveObject *elf_ActiveQueue_AlarmLazyObjects(elf_ActiveQueue *pQueue, U64 nTimeSpan, U64 nNow){
+static inline elf_ActiveObject *elf_ActiveQueue_AlarmLazyObjects(elf_ActiveQueue *pQueue, U64 nTimeSpan, U64 nNow, elf_event_ActiveQueue_Alarm onAlarm, void *pAlarmContext){
     elf_ActiveObject *pFirstLazy = null;
     elf_DoubleNode *pEntryNode = (elf_DoubleNode*)pQueue;
     elf_DoubleNode *pNode = pEntryNode->pPrev;
@@ -60,7 +58,7 @@ static inline elf_ActiveObject *elf_ActiveQueue_AlarmLazyObjects(elf_ActiveQueue
         if(nNow < pObject->nTime + nTimeSpan)
             break;
         pFirstLazy = (elf_ActiveObject*)pNode;
-        pFirstLazy->onAlarm(pFirstLazy);
+        onAlarm(pAlarmContext, pFirstLazy);
         pNode = pNode->pPrev;
     }
     return pFirstLazy;
