@@ -27,6 +27,10 @@ static inline Bool elf_CountedList_NotEmpty(const elf_CountedList *pList){
     return elf_List_NotEmpty((elf_List*)pList);
 }
 
+static inline MU elf_CountedList_GetCount(const elf_CountedList *pList){
+    return pList->nCount;
+}
+
 static inline Bool elf_CountedList_First(const elf_CountedList *pList, const elf_DoubleNode *pNode){
     return elf_List_First((elf_List*)pList, pNode);
 }
