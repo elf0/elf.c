@@ -35,22 +35,22 @@ static inline void elf_List_Remove(elf_DoubleNode *pNode){
 
 //push back
 static inline void elf_List_Push(elf_List *pList, elf_DoubleNode *pNode){
-    elf_DoubleNode_Link(pNode, pList->entry.pPrev, (elf_DoubleNode*)pList);
+    elf_DoubleNode_Link(pNode, ((elf_DoubleNode*)pList)->pPrev, (elf_DoubleNode*)pList);
 }
 
 //pop front
 static inline elf_DoubleNode *elf_List_Pop(elf_List *pList){
-    elf_DoubleNode *pNode = pList->entry.pNext;
+    elf_DoubleNode *pNode = ((elf_DoubleNode*)pList)->pNext;
     elf_DoubleNode_Unlink(pNode);
     return pNode;
 }
 
 static inline void elf_List_PushFront(elf_List *pList, elf_DoubleNode *pNode){
-    elf_DoubleNode_Link(pNode, (elf_DoubleNode*)pList, pList->entry.pNext);
+    elf_DoubleNode_Link(pNode, (elf_DoubleNode*)pList, ((elf_DoubleNode*)pList)->pNext);
 }
 
 static inline elf_DoubleNode *elf_List_PopBack (elf_List *pList){
-    elf_DoubleNode *pNode = pList->entry.pPrev;
+    elf_DoubleNode *pNode = ((elf_DoubleNode*)pList)->pPrev;
     elf_DoubleNode_Unlink(pNode);
     return pNode;
 }
