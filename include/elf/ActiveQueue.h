@@ -11,9 +11,6 @@ struct elf_struct_ActiveObject{
     U64 nTime;
 };
 
-//static inline void elf_ActiveObject_Initialize(elf_ActiveObject *pObject){
-//}
-
 typedef struct elf_struct_ActiveQueue elf_ActiveQueue;
 typedef void (*elf_event_ActiveQueue_Alarm)(void *pContext, elf_ActiveObject *pSelf);
 struct elf_struct_ActiveQueue{
@@ -34,6 +31,11 @@ static inline Bool elf_ActiveQueue_NotEmpty(const elf_ActiveQueue *pQueue){
 
 static inline U elf_ActiveQueue_GetCount(const elf_ActiveQueue *pQueue){
     return elf_CountedList_GetCount((elf_CountedList*)pQueue);
+}
+
+static inline void elf_ActiveQueue_Add(elf_ActiveQueue *pQueue, elf_ActiveObject *pObject, U64 nTime){
+    pObject->nTime = nTime;
+    elf_CountedList_PushFront((elf_CountedList*)pQueue, (elf_DoubleNode*)pObject);
 }
 
 static inline void elf_ActiveQueue_Active(elf_ActiveQueue *pQueue, elf_ActiveObject *pObject, U64 nTime){
