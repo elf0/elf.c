@@ -78,8 +78,7 @@ static inline elf_DoubleNode *CountedList_PopBack(elf_CountedList *pList){
 }
 
 static inline void elf_CountedList_MoveNodeToFront(elf_CountedList *pList, elf_DoubleNode *pNode){
-    elf_List_Remove(pNode);
-    elf_List_PushFront((elf_List*)pList, pNode);
+    elf_List_MoveNodeToFront((elf_List*)pList, pNode);
 }
 //move to back
 static inline void elf_CountedList_MoveTo(elf_CountedList *pList, elf_CountedList *pTargetList){
