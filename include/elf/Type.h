@@ -7,13 +7,13 @@ typedef void* Pointer;
 typedef unsigned char      Byte;
 typedef unsigned char      Char;
 
-typedef unsigned long      MU;
+typedef unsigned long      U;
 typedef unsigned char      U8;
 typedef unsigned short     U16;
 typedef unsigned int       U32;
 typedef unsigned long long U64;
 
-typedef signed long        MI;
+typedef signed long        I;
 typedef signed char        I8;
 typedef signed short       I16;
 typedef signed int         I32;

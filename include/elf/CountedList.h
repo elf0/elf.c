@@ -7,7 +7,7 @@
 
 typedef struct{
     elf_List list;
-    MU nCount;
+    U nCount;
 }elf_CountedList;
 
 static inline void elf_CountedList_Reset(elf_CountedList *pList){
@@ -27,7 +27,7 @@ static inline Bool elf_CountedList_NotEmpty(const elf_CountedList *pList){
     return elf_List_NotEmpty((elf_List*)pList);
 }
 
-static inline MU elf_CountedList_GetCount(const elf_CountedList *pList){
+static inline U elf_CountedList_GetCount(const elf_CountedList *pList){
     return pList->nCount;
 }
 
@@ -75,7 +75,7 @@ static inline void elf_CountedList_PushFront(elf_CountedList *pList, elf_DoubleN
     ++pList->nCount;
 }
 
-static inline elf_DoubleNode *CountedList_PopBack(elf_CountedList *pList){
+static inline elf_DoubleNode *elf_CountedList_PopBack(elf_CountedList *pList){
     elf_DoubleNode *pNode = elf_List_PopBack((elf_List*)pList);
     --pList->nCount;
     return pNode;
@@ -99,7 +99,7 @@ static inline void elf_CountedList_MoveToFront(elf_CountedList *pList, elf_Count
 
 static inline void elf_CountedList_Swap(elf_CountedList *pList, elf_CountedList *pTargetList){
     elf_List_Swap ((elf_List*)pList, (elf_List*)pTargetList);
-    MU nTmp = pList->nCount;
+    U nTmp = pList->nCount;
     pList->nCount = pTargetList->nCount;
     pTargetList->nCount = nTmp;
 }

@@ -34,7 +34,7 @@ static inline Bool elf_ActiveQueue_NotEmpty(const elf_ActiveQueue *pQueue){
     return elf_CountedList_NotEmpty((elf_CountedList*)pQueue);
 }
 
-static inline MU elf_ActiveQueue_GetCount(const elf_ActiveQueue *pQueue){
+static inline U elf_ActiveQueue_GetCount(const elf_ActiveQueue *pQueue){
     return elf_CountedList_GetCount((elf_CountedList*)pQueue);
 }
 
@@ -65,3 +65,4 @@ static inline elf_ActiveObject *elf_ActiveQueue_AlarmLazyObjects(elf_ActiveQueue
     }
     return pFirstLazy;
 }
+
