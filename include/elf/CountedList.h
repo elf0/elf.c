@@ -27,6 +27,22 @@ static inline Bool elf_CountedList_NotEmpty(const elf_CountedList *pList){
     return elf_List_NotEmpty((elf_List*)pList);
 }
 
+static inline Bool elf_CountedList_First(const elf_CountedList *pList, const elf_DoubleNode *pNode){
+    return elf_List_First((elf_List*)pList, pNode);
+}
+
+static inline Bool elf_CountedList_NotFirst(const elf_CountedList *pList, const elf_DoubleNode *pNode){
+    return elf_List_NotFirst((elf_List*)pList, pNode);
+}
+
+static inline Bool elf_CountedList_Last(const elf_CountedList *pList, const elf_DoubleNode *pNode){
+    return elf_List_Last((elf_List*)pList, pNode);
+}
+
+static inline Bool elf_CountedList_NotLast(const elf_CountedList *pList, const elf_DoubleNode *pNode){
+    return elf_List_NotLast((elf_List*)pList, pNode);
+}
+
 static inline void elf_CountedList_Insert(elf_CountedList *pList, elf_DoubleNode *pNode, elf_DoubleNode *pPrev, elf_DoubleNode *pNext){
     elf_List_Insert(pNode, pPrev, pNext);
     ++pList->nCount;
@@ -61,6 +77,10 @@ static inline elf_DoubleNode *CountedList_PopBack(elf_CountedList *pList){
     return pNode;
 }
 
+static inline void elf_CountedList_MoveNodeToFront(elf_CountedList *pList, elf_DoubleNode *pNode){
+    elf_List_Remove(pNode);
+    elf_List_PushFront((elf_List*)pList, pNode);
+}
 //move to back
 static inline void elf_CountedList_MoveTo(elf_CountedList *pList, elf_CountedList *pTargetList){
     elf_List_MoveTo((elf_List*)pList, (elf_List*)pTargetList);

@@ -25,6 +25,22 @@ static inline Bool elf_List_NotEmpty(const elf_List *pList){
     return elf_DoubleNode_NotAlone((elf_DoubleNode*)pList);
 }
 
+static inline Bool elf_List_First(const elf_List *pList, const elf_DoubleNode *pNode){
+    return pNode->pPrev == ((elf_DoubleNode*)pList);
+}
+
+static inline Bool elf_List_NotFirst(const elf_List *pList, const elf_DoubleNode *pNode){
+    return pNode->pPrev != ((elf_DoubleNode*)pList);
+}
+
+static inline Bool elf_List_Last(const elf_List *pList, const elf_DoubleNode *pNode){
+    return pNode->pNext == ((elf_DoubleNode*)pList);
+}
+
+static inline Bool elf_List_NotLast(const elf_List *pList, const elf_DoubleNode *pNode){
+    return pNode->pNext != ((elf_DoubleNode*)pList);
+}
+
 static inline void elf_List_Insert(elf_DoubleNode *pNode, elf_DoubleNode *pPrev, elf_DoubleNode *pNext){
     elf_DoubleNode_Link(pNode, pPrev, pNext);
 }
@@ -53,6 +69,11 @@ static inline elf_DoubleNode *elf_List_PopBack (elf_List *pList){
     elf_DoubleNode *pNode = ((elf_DoubleNode*)pList)->pPrev;
     elf_DoubleNode_Unlink(pNode);
     return pNode;
+}
+
+static inline void elf_List_MoveNodeToFront(elf_List *pList, elf_DoubleNode *pNode){
+    elf_List_Remove(pNode);
+    elf_List_PushFront(pList, pNode);
 }
 
 //move to back
