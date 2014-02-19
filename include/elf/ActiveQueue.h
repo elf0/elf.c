@@ -51,13 +51,13 @@ static inline elf_ActiveObject *elf_ActiveQueue_PopLaziest(elf_ActiveQueue *pQue
     return (elf_ActiveObject*)elf_CountedList_PopBack((elf_CountedList*)pQueue);
 }
 
-static inline elf_ActiveObject *elf_ActiveQueue_AlarmLazyObjects(elf_ActiveQueue *pQueue, U64 nTimeSpan, U64 nNow, elf_event_ActiveQueue_Alarm onAlarm, void *pAlarmContext){
+static inline elf_ActiveObject *elf_ActiveQueue_AlarmLazyObjects(elf_ActiveQueue *pQueue, U64 nTimeOut, U64 nNow, elf_event_ActiveQueue_Alarm onAlarm, void *pAlarmContext){
     elf_ActiveObject *pFirstLazy = null;
     elf_DoubleNode *pEntryNode = (elf_DoubleNode*)pQueue;
     elf_DoubleNode *pNode = pEntryNode->pPrev;
     while(pNode != pEntryNode){
         elf_ActiveObject *pObject = (elf_ActiveObject*)pNode;
-        if(nNow < pObject->nTime + nTimeSpan)
+        if(nNow < pObject->nTime + nTimeOut)
             break;
         pFirstLazy = (elf_ActiveObject*)pNode;
         onAlarm(pAlarmContext, pFirstLazy);
