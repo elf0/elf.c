@@ -165,6 +165,7 @@ static inline  Char *String_ToF32(Char *pNumber, F32 *pValue){
     return p;
 }
 
+//parse '+', '-' youself
 static inline  Char *String_ToF64(Char *pNumber, F64 *pValue){
     Char *p = pNumber;
 
