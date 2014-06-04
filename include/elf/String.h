@@ -6,6 +6,19 @@
 
 #include "Char.h"
 
+static inline Char *String_SkipUntil(Char *p, Char value);
+static inline Char *String_SkipDigit(Char *p);
+static inline Char *String_SkipUpper(Char *p);
+static inline Char *String_SkipLower(Char *p);
+static inline Char *String_ToU32(Char *pNumber, U32 *pValue);
+static inline Char *String_ToI32(Char *pNumber, I32 *pValue);
+static inline Char *String_ToU64(Char *pNumber, U64 *pValue);
+static inline Char *String_ToI64(Char *pNumber, I64 *pValue);
+static inline  Char *String_ToDecimal32(Char *pNumber, F32 *pValue);
+static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue);
+static inline  Char *String_ToF32(Char *pNumber, F32 *pValue);
+static inline  Char *String_ToF64(Char *pNumber, F64 *pValue);
+
 static inline Char *String_SkipUntil(Char *p, Char value){
     while(*p != value)
         ++p;
@@ -30,37 +43,154 @@ static inline Char *String_SkipLower(Char *p){
     return p;
 }
 
-static inline U64 String_ToU64(Char *p){
-    U64 nValue = 0;
+static inline Char *String_ToU32(Char *pNumber, U32 *pValue){
+    Char *p = pNumber;
+    if(!Char_IsDigit(*p))
+        return p;
+
+    U32 nValue = *p - '0';
+    ++p;
 
     while(Char_IsDigit(*p)){
         nValue = 10 * nValue + (*p - '0');
         ++p;
     }
 
-    return nValue;
+    *pValue = nValue;
+    return p;
 }
 
-//"+xxx" not supported
-static inline I64 String_ToI64(Char *p){
-    Bool bNegtive;
-    if(*p != '-')
-        bNegtive = false;
-    else{
-        bNegtive = true;
-        ++p;
-    }
+//parse '+', '-' youself
+static inline Char *String_ToI32(Char *pNumber, I32 *pValue){
+    Char *p = pNumber;
+    if(!Char_IsDigit(*p))
+        return p;
 
-    I64 nValue = 0;
+    I32 nValue = *p - '0';
+    ++p;
+
     while(Char_IsDigit(*p)){
         nValue = 10 * nValue + (*p - '0');
         ++p;
     }
 
-    if(bNegtive)
-        nValue = -nValue;
-
-    return nValue;
+    *pValue = nValue;
+    return p;
 }
+
+static inline Char *String_ToU64(Char *pNumber, U64 *pValue){
+    Char *p = pNumber;
+    if(!Char_IsDigit(*p))
+        return p;
+
+    U64 nValue = *p - '0';
+    ++p;
+
+    while(Char_IsDigit(*p)){
+        nValue = 10 * nValue + (*p - '0');
+        ++p;
+    }
+
+    *pValue = nValue;
+    return p;
+}
+
+//parse '+', '-' youself
+static inline Char *String_ToI64(Char *pNumber, I64 *pValue){
+    Char *p = pNumber;
+    if(!Char_IsDigit(*p))
+        return p;
+
+    I64 nValue = *p - '0';
+    ++p;
+
+    while(Char_IsDigit(*p)){
+        nValue = 10 * nValue + (*p - '0');
+        ++p;
+    }
+
+    *pValue = nValue;
+    return p;
+}
+
+//FIXME: Precision problem
+static inline  Char *String_ToDecimal32(Char *pNumber, F32 *pValue){
+    Char *p = pNumber;
+    if(!Char_IsDigit(*p))
+        return p;
+
+    U32 nDelta = 10;
+    U32 nValue = *p - '0';
+    ++p;
+
+    while(Char_IsDigit(*p)){
+        nDelta *= 10;
+        nValue = 10 * nValue + (*p - '0');
+        ++p;
+    }
+
+    *pValue = (F32)nValue / (F32)nDelta;
+    return p;
+}
+
+static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue){
+    Char *p = pNumber;
+    if(!Char_IsDigit(*p))
+        return p;
+
+    U64 nDelta = 10;
+    U64 nValue = *p - '0';
+    ++p;
+
+    while(Char_IsDigit(*p)){
+        nDelta *= 10;
+        nValue = 10 * nValue + (*p - '0');
+        ++p;
+    }
+
+    *pValue = (F64)nValue / (F64)nDelta;
+    return p;
+}
+
+//Only "0.0" is valid
+//parse '+', '-' youself
+static inline  Char *String_ToF32(Char *pNumber, F32 *pValue){
+    F64 fValue;
+    Char *p = String_ToF64(pNumber, &fValue);
+    if(p == pNumber)
+        return p;
+
+    //FIXME: Precision problem
+    *pValue = fValue;
+    return p;
+}
+
+static inline  Char *String_ToF64(Char *pNumber, F64 *pValue){
+    Char *p = pNumber;
+
+    U64 nInteger;
+    p = String_ToU64(pNumber, &nInteger);
+    if(p == pNumber)
+        return p;
+
+    F64 fInteger = nInteger;
+
+    if(*p != '.'){
+        *pValue = fInteger;
+        return p;
+    }
+
+    Char *pDecimal = p + 1;
+    F64 fDecimal;
+    p = String_ToDecimal64(pDecimal, &fDecimal);
+    if(p == pDecimal){
+        *pValue = fInteger;
+        return p;
+    }
+
+    *pValue = fInteger + fDecimal;
+    return p;
+}
+
 #endif // STRING_H
 
