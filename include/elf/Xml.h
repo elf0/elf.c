@@ -16,7 +16,7 @@ static inline Bool Xml_Parse(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onProcessingInstruction(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onStartTag(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onEndTag(void *pContext, Char *pBegin, Char *pEnd);
-static inline void Xml_onAtrribute(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char *pName, Char *pNameEnd, Char *pValue, Char *pValueEnd);
+static inline void Xml_onAtrribute(void *pContext, Char *pTagName, Char *pTagNameEnd, Char *pName, Char *pNameEnd, Char *pValue, Char *pValueEnd);
 static inline void Xml_onError(void *pContext, Char *pBegin, Char *pEnd, Char *pPosition);
 
 //Internal functions
