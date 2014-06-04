@@ -4,7 +4,7 @@
 //Author: elf
 //EMail: elf198012@gmail.com
 
-//Multi-bytes char unsupported
+//Multi-bytes character in "Name" unsupported
 
 #include "String.h"
 
@@ -213,3 +213,4 @@ static inline Char *Xml_SkipName(Char *p){
 }
 
 #endif // XML_H
+
