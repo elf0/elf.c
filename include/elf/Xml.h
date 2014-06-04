@@ -9,6 +9,7 @@
 #include "String.h"
 
 //Api
+//pEnd must be writable
 static inline Bool Xml_Parse(void *pContext, Char *pBegin, Char *pEnd);
 
 //You MUST define follow event processing functions:
