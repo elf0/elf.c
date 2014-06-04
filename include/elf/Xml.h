@@ -16,8 +16,7 @@ static inline Bool Xml_Parse(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onProcessingInstruction(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onStartTag(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onEndTag(void *pContext, Char *pBegin, Char *pEnd);
-static inline void Xml_onAtrributeName(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char *pBegin, Char *pEnd);
-static inline void Xml_onAtrributeValue(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char *pBegin, Char *pEnd);
+static inline void Xml_onAtrribute(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char *pName, Char *pNameEnd, Char *pValue, Char *pValueEnd);
 static inline void Xml_onError(void *pContext, Char *pBegin, Char *pEnd, Char *pPosition);
 
 //Internal functions
@@ -33,18 +32,25 @@ static inline Bool Xml_IsNameChar(Char c);
 static inline Char *Xml_SkipName(Char *p);
 
 static inline Bool Xml_Parse(void *pContext, Char *pBegin, Char *pEnd){
-    Char *p = pBegin;
+    Char cOld = *pEnd;
     *pEnd = '"';
+
+    Char *p = pBegin;
     while((p = Xml_SkipWhiteSpace(p)) != pEnd){
         if(*p != '<'){
             Xml_onError(pContext, pBegin, pEnd, p);
+            *pEnd = cOld;
             return false;
         }
 
         p = Xml_ParseTag(pContext, p, pEnd);
-        if(p == null)
+        if(p == null){
+            *pEnd = cOld;
             return false;
+        }
     }
+
+    *pEnd = cOld;
     return true;
 }
 
@@ -150,7 +156,6 @@ EMTY_CONTENT:
 static inline Char *Xml_ParseAttribute(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char *pBegin, Char *pEnd){
     Char *pName = pBegin;
     Char *pNameEnd = Xml_SkipName(pName + 1);
-    Xml_onAtrributeName(pContext, pTagName, pTagNameEnd, pName, pNameEnd);
 
     Char *p = pNameEnd;
     if(*p != '='){
@@ -169,7 +174,7 @@ static inline Char *Xml_ParseAttribute(void *pContext,  Char *pTagName, Char *pT
     if(p == pEnd)
         return null;
 
-    Xml_onAtrributeValue(pContext, pTagName, pTagNameEnd, pValue, p);
+    Xml_onAtrribute(pContext, pTagName, pTagNameEnd, pName, pNameEnd, pValue, p);
     return ++p;
 }
 
