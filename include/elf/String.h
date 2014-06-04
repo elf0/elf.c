@@ -113,6 +113,7 @@ static inline Char *String_ToI64(Char *pNumber, I64 *pValue){
     return p;
 }
 
+//Decimal part
 //FIXME: Precision problem
 static inline  Char *String_ToDecimal32(Char *pNumber, F32 *pValue){
     Char *p = pNumber;
@@ -133,6 +134,7 @@ static inline  Char *String_ToDecimal32(Char *pNumber, F32 *pValue){
     return p;
 }
 
+//Decimal part
 static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue){
     Char *p = pNumber;
     if(!Char_IsDigit(*p))
@@ -154,17 +156,35 @@ static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue){
 
 //Only "0.0" is valid
 //parse '+', '-' youself
+//FIXME: Precision problem
 static inline  Char *String_ToF32(Char *pNumber, F32 *pValue){
-    F64 fValue;
-    Char *p = String_ToF64(pNumber, &fValue);
+    Char *p = pNumber;
+
+    U32 nInteger;
+    p = String_ToU32(pNumber, &nInteger);
     if(p == pNumber)
         return p;
 
-    //FIXME: Precision problem
-    *pValue = fValue;
+    F32 fInteger = nInteger;
+
+    if(*p != '.'){
+        *pValue = fInteger;
+        return p;
+    }
+
+    Char *pDecimal = p + 1;
+    F32 fDecimal;
+    p = String_ToDecimal32(pDecimal, &fDecimal);
+    if(p == pDecimal){
+        *pValue = fInteger;
+        return p;
+    }
+
+    *pValue = fInteger + fDecimal;
     return p;
 }
 
+//Only "0.0" is valid
 //parse '+', '-' youself
 static inline  Char *String_ToF64(Char *pNumber, F64 *pValue){
     Char *p = pNumber;
