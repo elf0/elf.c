@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UTF16_H
+#define UTF16_H
 
 //License: Public Domain
 //Author: elf
@@ -72,3 +73,5 @@ static inline UTF16 *UTF_To16(U32 value, UTF16 *pBuffer){
 
  return ++p;
 }
+
+#endif //UTF16_H

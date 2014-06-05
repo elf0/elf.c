@@ -1,4 +1,6 @@
-#pragma once
+#ifndef WORKERTHREAD_H
+#define WORKERTHREAD_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -54,3 +56,5 @@ static inline void WorkerThread_PostTasks(WorkerThread *pThread, ListNode *pTask
 
  ThreadCondition_Signal(&pThread->condition);
 }
+
+#endif //WORKERTHREAD_H

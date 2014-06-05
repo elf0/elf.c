@@ -1,4 +1,6 @@
-#pragma once
+#ifndef COUNTEDLIST_H
+#define COUNTEDLIST_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -6,101 +8,102 @@
 #include "List.h"
 
 typedef struct{
-    elf_List list;
+    List list;
     U nCount;
-}elf_CountedList;
+}CountedList;
 
-static inline void elf_CountedList_Reset(elf_CountedList *pList){
-    elf_List_Reset((elf_List*)pList);
+static inline void CountedList_Reset(CountedList *pList){
+    List_Reset((List*)pList);
     pList->nCount = 0;
 }
 
-static inline void elf_CountedList_Initialize(elf_CountedList *pList){
-    elf_CountedList_Reset(pList);
+static inline void CountedList_Initialize(CountedList *pList){
+    CountedList_Reset(pList);
 }
 
-static inline Bool elf_CountedList_Empty(const elf_CountedList *pList){
-    return elf_List_Empty((elf_List*)pList);
+static inline Bool CountedList_Empty(const CountedList *pList){
+    return List_Empty((List*)pList);
 }
 
-static inline Bool elf_CountedList_NotEmpty(const elf_CountedList *pList){
-    return elf_List_NotEmpty((elf_List*)pList);
+static inline Bool CountedList_NotEmpty(const CountedList *pList){
+    return List_NotEmpty((List*)pList);
 }
 
-static inline U elf_CountedList_GetCount(const elf_CountedList *pList){
+static inline U CountedList_GetCount(const CountedList *pList){
     return pList->nCount;
 }
 
-static inline Bool elf_CountedList_First(const elf_CountedList *pList, const elf_DoubleNode *pNode){
-    return elf_List_First((elf_List*)pList, pNode);
+static inline Bool CountedList_First(const CountedList *pList, const DoubleNode *pNode){
+    return List_First((List*)pList, pNode);
 }
 
-static inline Bool elf_CountedList_NotFirst(const elf_CountedList *pList, const elf_DoubleNode *pNode){
-    return elf_List_NotFirst((elf_List*)pList, pNode);
+static inline Bool CountedList_NotFirst(const CountedList *pList, const DoubleNode *pNode){
+    return List_NotFirst((List*)pList, pNode);
 }
 
-static inline Bool elf_CountedList_Last(const elf_CountedList *pList, const elf_DoubleNode *pNode){
-    return elf_List_Last((elf_List*)pList, pNode);
+static inline Bool CountedList_Last(const CountedList *pList, const DoubleNode *pNode){
+    return List_Last((List*)pList, pNode);
 }
 
-static inline Bool elf_CountedList_NotLast(const elf_CountedList *pList, const elf_DoubleNode *pNode){
-    return elf_List_NotLast((elf_List*)pList, pNode);
+static inline Bool CountedList_NotLast(const CountedList *pList, const DoubleNode *pNode){
+    return List_NotLast((List*)pList, pNode);
 }
 
-static inline void elf_CountedList_Insert(elf_CountedList *pList, elf_DoubleNode *pNode, elf_DoubleNode *pPrev, elf_DoubleNode *pNext){
-    elf_List_Insert(pNode, pPrev, pNext);
+static inline void CountedList_Insert(CountedList *pList, DoubleNode *pNode, DoubleNode *pPrev, DoubleNode *pNext){
+    List_Insert(pNode, pPrev, pNext);
     ++pList->nCount;
 }
 
-static inline void elf_CountedList_Remove(elf_CountedList *pList, elf_DoubleNode *pNode){
-    elf_List_Remove(pNode);
+static inline void CountedList_Remove(CountedList *pList, DoubleNode *pNode){
+    List_Remove(pNode);
     --pList->nCount;
 }
 
 //push back
-static inline void elf_CountedList_Push(elf_CountedList *pList, elf_DoubleNode *pNode){
-    elf_List_Push((elf_List*)pList, pNode);
+static inline void CountedList_Push(CountedList *pList, DoubleNode *pNode){
+    List_Push((List*)pList, pNode);
     ++pList->nCount;
 }
 
 //pop front
-static inline elf_DoubleNode *elf_CountedList_Pop(elf_CountedList *pList){
-    elf_DoubleNode *pNode = elf_List_Pop((elf_List*)pList);
+static inline DoubleNode *CountedList_Pop(CountedList *pList){
+    DoubleNode *pNode = List_Pop((List*)pList);
     --pList->nCount;
     return pNode;
 }
 
-static inline void elf_CountedList_PushFront(elf_CountedList *pList, elf_DoubleNode *pNode){
-    elf_List_PushFront((elf_List*)pList, pNode);
+static inline void CountedList_PushFront(CountedList *pList, DoubleNode *pNode){
+    List_PushFront((List*)pList, pNode);
     ++pList->nCount;
 }
 
-static inline elf_DoubleNode *elf_CountedList_PopBack(elf_CountedList *pList){
-    elf_DoubleNode *pNode = elf_List_PopBack((elf_List*)pList);
+static inline DoubleNode *CountedList_PopBack(CountedList *pList){
+    DoubleNode *pNode = List_PopBack((List*)pList);
     --pList->nCount;
     return pNode;
 }
 
-static inline void elf_CountedList_MoveNodeToFront(elf_CountedList *pList, elf_DoubleNode *pNode){
-    elf_List_MoveNodeToFront((elf_List*)pList, pNode);
+static inline void CountedList_MoveNodeToFront(CountedList *pList, DoubleNode *pNode){
+    List_MoveNodeToFront((List*)pList, pNode);
 }
 //move to back
-static inline void elf_CountedList_MoveTo(elf_CountedList *pList, elf_CountedList *pTargetList){
-    elf_List_MoveTo((elf_List*)pList, (elf_List*)pTargetList);
+static inline void CountedList_MoveTo(CountedList *pList, CountedList *pTargetList){
+    List_MoveTo((List*)pList, (List*)pTargetList);
     pTargetList->nCount += pList->nCount;
     pList->nCount = 0;
 }
 
-static inline void elf_CountedList_MoveToFront(elf_CountedList *pList, elf_CountedList *pTargetList){
-    elf_List_MoveToFront((elf_List*)pList, (elf_List*)pTargetList);
+static inline void CountedList_MoveToFront(CountedList *pList, CountedList *pTargetList){
+    List_MoveToFront((List*)pList, (List*)pTargetList);
     pTargetList->nCount += pList->nCount;
     pList->nCount = 0;
 }
 
-static inline void elf_CountedList_Swap(elf_CountedList *pList, elf_CountedList *pTargetList){
-    elf_List_Swap ((elf_List*)pList, (elf_List*)pTargetList);
+static inline void CountedList_Swap(CountedList *pList, CountedList *pTargetList){
+    List_Swap ((List*)pList, (List*)pTargetList);
     U nTmp = pList->nCount;
     pList->nCount = pTargetList->nCount;
     pTargetList->nCount = nTmp;
 }
 
+#endif //COUNTEDLIST_H

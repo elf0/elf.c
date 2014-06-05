@@ -1,5 +1,6 @@
 #ifndef STRING_H
 #define STRING_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com

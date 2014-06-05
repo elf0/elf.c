@@ -1,4 +1,9 @@
-#pragma once
+#ifndef THREAD_H
+#define THREAD_H
+
+//License: Public Domain
+//Author: elf
+//EMail: elf198012@gmail.com
 
 #include <pthread.h>
 
@@ -17,3 +22,5 @@ static inline void Thread_Initialize(Thread *pThread, ThreadEntry Entry){
 static inline Bool Thread_Run(Thread *pThread){
  return pthread_create(&pThread->thread, NULL, (void*(*)(void*))pThread->Entry, pThread) == 0;
 }
+
+#endif //THREAD_H

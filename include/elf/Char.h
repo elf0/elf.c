@@ -1,5 +1,6 @@
 #ifndef CHAR_H
 #define CHAR_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -32,5 +33,6 @@ static inline Bool Char_IsLower(Char c){
 static inline Bool Char_IsDigit(Char c){
     return c >= '0' && c <= '9';
 }
+
 #endif // CHAR_H
 

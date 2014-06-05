@@ -1,4 +1,6 @@
-#pragma once
+#ifndef POOL_H
+#define POOL_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -105,3 +107,4 @@ static inline void Pool_Push(Pool *pPool, void *pObject){
  PStack_Push(&pPool->used, pObject);
 }
 
+#endif //POOL_H

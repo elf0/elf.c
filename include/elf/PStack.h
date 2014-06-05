@@ -1,4 +1,6 @@
-#pragma once
+#ifndef PSTACK_H
+#define PSTACK_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -48,3 +50,5 @@ static inline void PStack_Push(PStack *pStack, void *pObject){
  assert(pStack->ppCur > pStack->ppBegin);
  *--pStack->ppCur = pObject;
 }
+
+#endif //PSTACK_H

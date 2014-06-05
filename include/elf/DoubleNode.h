@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DOUBLENODE_H
+#define DOUBLENODE_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -60,3 +62,5 @@ static inline void elf_DoubleNode_SwapBuddies(elf_DoubleNode *pNode, elf_DoubleN
     elf_DoubleNode_MoveBuddiesTo(pTargetNode, pNode);
     elf_DoubleNode_MoveBuddiesTo(&tmp, pTargetNode);
 }
+
+#endif //DOUBLENODE_H

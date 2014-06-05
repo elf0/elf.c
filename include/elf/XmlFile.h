@@ -1,5 +1,6 @@
 #ifndef XMLFILE_H
 #define XMLFILE_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com

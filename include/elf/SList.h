@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SLIST_H
+#define SLIST_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -44,3 +46,5 @@ static inline SList_Node *SList_Pop(SList_Node *pEntry){
 static inline void SList_Push(SList_Node *pEntry, SList_Node *pNode){
  SList_Append(pEntry, pNode);
 }
+
+#endif //SLIST_H

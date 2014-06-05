@@ -1,4 +1,6 @@
-#pragma once
+#ifndef THREADCONDITION_H
+#define THREADCONDITION_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -24,3 +26,5 @@ static inline void ThreadCondition_Wait(ThreadCondition *pCondition, ThreadLock 
 static inline void ThreadCondition_Signal(ThreadCondition *pCondition){
  pthread_cond_signal(&pCondition->condition);
 }
+
+#endif //THREADCONDITION_H

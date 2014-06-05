@@ -1,4 +1,6 @@
-#pragma once
+#ifndef THREADLOCK_H
+#define THREADLOCK_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -22,3 +24,5 @@ static inline void ThreadLock_Lock(ThreadLock *pLock){
 static inline void ThreadLock_Unlock(ThreadLock *pLock){
  pthread_mutex_unlock(&pLock->mutex);
 }
+
+#endif //THREADLOCK_H

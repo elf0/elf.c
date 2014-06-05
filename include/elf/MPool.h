@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MPOOL_H
+#define MPOOL_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -89,3 +91,5 @@ static inline void MPool_Push(MPool *pPool, void *pObject){
  pNode->pNext = pPool->pUsedEntry;
  pPool->pUsedEntry = pNode;
 }
+
+#endif //MPOOL_H

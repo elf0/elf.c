@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MEMORY_H
+#define MEMORY_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -47,3 +49,5 @@ static inline size_t Memory_Align(size_t nSize){
  assert(Memory_NotAligned(nSize));
  return (nSize & ~(PLATFORM_ALIGNMENT - 1)) + PLATFORM_ALIGNMENT;
 }
+
+#endif //MEMORY_H

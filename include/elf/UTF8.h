@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UTF8_H
+#define UTF8_H
 
 //License: Public Domain
 //Author: elf
@@ -99,3 +100,4 @@ static inline UTF8 *UTF_To8(U32 value, UTF8 *pBuffer){
  return ++p;
 }
 
+#endif //UTF8_H

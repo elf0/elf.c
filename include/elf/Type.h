@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TYPE_H
+#define TYPE_H
+
 //License: Public Domain
 //Author: elf
 //EMail: elf198012@gmail.com
@@ -28,3 +30,4 @@ typedef unsigned char Bool;
 
 #define null  0
 
+#endif //TYPE_H
