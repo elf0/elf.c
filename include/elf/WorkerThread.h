@@ -5,8 +5,6 @@
 //Author: elf
 //EMail: elf198012@gmail.com
 
-#include <pthread.h>
-
 #include "Type.h"
 #include "List.h"
 #include "Thread.h"
