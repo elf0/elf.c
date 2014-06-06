@@ -74,11 +74,6 @@ static inline Char *Xml_SkipWhiteSpace(Char *p){
     return p;
 }
 
-//	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6]
-//    | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D]
-//    | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF]
-//    | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
-
 #define CASE_XML_NAME_START_CHAR \
     case ':':  CASE_CHAR_UPPER: case '_': CASE_CHAR_LOWER: \
     case 0xC0: case 0xC1: case 0xC2: case 0xC3: case 0xC4: case 0xC5: case 0xC6: case 0xC7: \
