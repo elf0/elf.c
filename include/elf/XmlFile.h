@@ -16,7 +16,7 @@
 int XmlFile_Parse(void *pContext, const char *pszFileName);
 
 //You MUST define follow event processing function:
-static inline void XmlFile_onError(void *pContext, XmlResult error, size_t nOffset);
+static inline void XmlFile_onError(void *pContext, XmlResult xrError, size_t nOffset);
 
 int XmlFile_Parse(void *pContext, const char *pszFileName){
     int fd = open(pszFileName, O_RDONLY);
