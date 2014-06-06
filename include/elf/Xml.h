@@ -19,7 +19,7 @@ enum XmlResult{
 //pEnd must be writable
 static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd);
 
-//You MUST define follow event processing functions:
+//You MUST define following event processing functions:
 static inline void Xml_onProcessingInstruction(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onStartTag(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onEndTag(void *pContext, Char *pBegin, Char *pEnd);

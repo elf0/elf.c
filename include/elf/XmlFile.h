@@ -15,7 +15,7 @@
 //Api
 int XmlFile_Parse(void *pContext, const char *pszFileName);
 
-//You MUST define follow event processing function:
+//You MUST define following event processing function:
 static inline void XmlFile_onError(void *pContext, XmlResult xrError, size_t nOffset);
 
 int XmlFile_Parse(void *pContext, const char *pszFileName){
