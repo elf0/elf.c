@@ -5,54 +5,59 @@
 //Author: elf
 //EMail: elf198012@gmail.com
 
-//Multi-bytes character in "Name" unsupported
+//Multi-bytes character of "Name" unsupported
 
 #include "String.h"
 
+enum XmlResult{
+    xrOk, xrExpectLess, xrExpectGreater, xrExpectEndTagName, xrExpectAssign, xrExpectStartQuote, xrExpectEndQuote,
+    xrInvalidCharAfterLess, xrExpectInterrogation,
+    xrInvalidCharAfterWhiteSpace
+};
+
 //Api
 //pEnd must be writable
-static inline Bool Xml_Parse(void *pContext, Char *pBegin, Char *pEnd);
+static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd);
 
 //You MUST define follow event processing functions:
 static inline void Xml_onProcessingInstruction(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onStartTag(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onEndTag(void *pContext, Char *pBegin, Char *pEnd);
 static inline void Xml_onAtrribute(void *pContext, Char *pTagName, Char *pTagNameEnd, Char *pName, Char *pNameEnd, Char *pValue, Char *pValueEnd);
-static inline void Xml_onError(void *pContext, Char *pBegin, Char *pEnd, Char *pPosition);
 
 //Internal functions
-static inline Char *Xml_ParseTag(void *pContext, Char *pBegin, Char *pEnd);
-static inline Char *Xml_ParseStartTag(void *pContext, Char *pBegin, Char *pEnd);
-static inline Char *Xml_ParseAttribute(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char *pBegin, Char *pEnd);
-static inline Char *Xml_ParseEndTag(void *pContext, Char *pBegin, Char *pEnd);
-static inline Char *Xml_ParseProcessingInstruction(void *pContext, Char *pBegin, Char *pEnd);
+static inline XmlResult Xml_ParseTag(void *pContext, Char **ppBegin, Char *pEnd);
+static inline XmlResult Xml_ParseStartTag(void *pContext, Char **ppBegin, Char *pEnd);
+static inline XmlResult Xml_ParseAttribute(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char **ppBegin, Char *pEnd);
+static inline XmlResult Xml_ParseEndTag(void *pContext, Char **ppBegin, Char *pEnd);
+static inline XmlResult Xml_ParseProcessingInstruction(void *pContext, Char **ppBegin, Char *pEnd);
 static inline Bool Xml_IsWhiteSpace(Char c);
 static inline Char *Xml_SkipWhiteSpace(Char *p);
 static inline Bool Xml_IsNameStartChar(Char c);
 static inline Bool Xml_IsNameChar(Char c);
 static inline Char *Xml_SkipName(Char *p);
 
-static inline Bool Xml_Parse(void *pContext, Char *pBegin, Char *pEnd){
+static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd){
+    XmlResult r = xrOk;
+
     Char cOld = *pEnd;
     *pEnd = '"';
 
-    Char *p = pBegin;
+    Char *p = *ppBegin;
     while((p = Xml_SkipWhiteSpace(p)) != pEnd){
         if(*p != '<'){
-            Xml_onError(pContext, pBegin, pEnd, p);
-            *pEnd = cOld;
-            return false;
+            r = xrExpectLess;
+            break;
         }
 
-        p = Xml_ParseTag(pContext, p, pEnd);
-        if(p == null){
-            *pEnd = cOld;
-            return false;
-        }
+        r = Xml_ParseTag(pContext, &p, pEnd);
+        if(r != xrOk)
+            break;
     }
 
     *pEnd = cOld;
-    return true;
+    *ppBegin = p;
+    return r;
 }
 
 static inline Bool Xml_IsWhiteSpace(Char c){
@@ -85,42 +90,45 @@ static inline Char *Xml_SkipWhiteSpace(Char *p){
     case 0xF0: case 0xF1: case 0xF2: case 0xF3: case 0xF4: case 0xF5: case 0xF6: \
     case 0xF8: case 0xF9: case 0xFA: case 0xFB: case 0xFC: case 0xFD: case 0xFE: case 0xFF
 
-static inline Char *Xml_ParseTag(void *pContext, Char *pBegin, Char *pEnd){
-    Char *p = pBegin + 1;
+static inline XmlResult Xml_ParseTag(void *pContext, Char **ppBegin, Char *pEnd){
+    Char *p = *ppBegin + 1;
     switch(*p){
     case '/':
-        return Xml_ParseEndTag(pContext, pBegin, pEnd);
+        return Xml_ParseEndTag(pContext, ppBegin, pEnd);
     case '?':
-        return Xml_ParseProcessingInstruction(pContext, pBegin, pEnd);
+        return Xml_ParseProcessingInstruction(pContext, ppBegin, pEnd);
 CASE_XML_NAME_START_CHAR:
-        return Xml_ParseStartTag(pContext, pBegin, pEnd);
+        return Xml_ParseStartTag(pContext, ppBegin, pEnd);
     }
-    Xml_onError(pContext, pBegin, pEnd, p);
-    return null;
+
+    return xrInvalidCharAfterLess;
 }
 
-static inline Char *Xml_ParseProcessingInstruction(void *pContext, Char *pBegin, Char *pEnd){
+static inline XmlResult Xml_ParseProcessingInstruction(void *pContext, Char **ppBegin, Char *pEnd){
     Char cOld = *pEnd;
     *pEnd = '?';
-    Char *p = String_SkipUntil(pBegin + 2, '?');
+    Char *p = String_SkipUntil(*ppBegin + 2, '?');
     if(p == pEnd){
-        Xml_onError(pContext, pBegin, pEnd, pBegin + 2);
-        return null;
+        *ppBegin += 2;
+        return xrExpectInterrogation;
     }
     *pEnd = cOld;
     ++p;
 
     if(*p != '>'){
-        Xml_onError(pContext, pBegin, pEnd, p);
-        return null;
+        *ppBegin = p;
+        return xrExpectGreater;
     }
 
-    Xml_onProcessingInstruction(pContext, pBegin, ++p);
-    return p;
+    Xml_onProcessingInstruction(pContext, *ppBegin, ++p);
+    *ppBegin = p;
+    return xrOk;
 }
 
-static inline Char *Xml_ParseStartTag(void *pContext, Char *pBegin, Char *pEnd){
-    Char *pName = pBegin + 1;
+static inline XmlResult Xml_ParseStartTag(void *pContext, Char **ppBegin, Char *pEnd){
+    XmlResult r = xrOk;
+
+    Char *pName = *ppBegin + 1;
     Char *pNameEnd = Xml_SkipName(pName + 1);
     Xml_onStartTag(pContext, pName, pNameEnd);
 
@@ -130,13 +138,18 @@ static inline Char *Xml_ParseStartTag(void *pContext, Char *pBegin, Char *pEnd){
         case '/':
             goto EMTY_CONTENT;
         case '>':
-            return ++p;
+            *ppBegin = p + 1;
+            return xrOk;
 CASE_XML_NAME_START_CHAR:
-            p = Xml_ParseAttribute(pContext, pName, pNameEnd, p, pEnd);
+            r = Xml_ParseAttribute(pContext, pName, pNameEnd, &p, pEnd);
+            if(r != xrOk){
+                *ppBegin = p;
+                return r;
+            }
             break;
         default:
-            Xml_onError(pContext, pBegin, pEnd, p);
-            return null;
+            *ppBegin = p;
+            return xrInvalidCharAfterWhiteSpace;
         }
     }
 
@@ -147,43 +160,47 @@ EMTY_CONTENT:
     }
 
     if(*p != '>'){
-        Xml_onError(pContext, pBegin, pEnd, p);
-        return null;
+        *ppBegin = p;
+        return xrExpectGreater;
     }
 
-    return ++p;
+    *ppBegin = p + 1;
+    return xrOk;
 }
 
-static inline Char *Xml_ParseAttribute(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char *pBegin, Char *pEnd){
-    Char *pName = pBegin;
+static inline XmlResult Xml_ParseAttribute(void *pContext,  Char *pTagName, Char *pTagNameEnd, Char **ppBegin, Char *pEnd){
+    Char *pName = *ppBegin;
     Char *pNameEnd = Xml_SkipName(pName + 1);
 
     Char *p = pNameEnd;
     if(*p != '='){
-        Xml_onError(pContext, pBegin, pEnd, p);
-        return null;
+        *ppBegin = p;
+        return xrExpectAssign;
     }
     ++p;
 
     if(*p != '"' || p == pEnd){
-        Xml_onError(pContext, pBegin, pEnd, p);
-        return null;
+        *ppBegin = p;
+        return xrExpectStartQuote;
     }
     ++p;
     Char *pValue = p;
     p = String_SkipUntil(p, '"');
-    if(p == pEnd)
-        return null;
+    if(p == pEnd){
+        *ppBegin = p;
+        return xrExpectEndQuote;
+    }
 
     Xml_onAtrribute(pContext, pTagName, pTagNameEnd, pName, pNameEnd, pValue, p);
-    return ++p;
+    *ppBegin = p + 1;
+    return xrOk;
 }
 
-static inline Char *Xml_ParseEndTag(void *pContext, Char *pBegin, Char *pEnd){
-    Char *pName = pBegin + 2;
+static inline XmlResult Xml_ParseEndTag(void *pContext, Char **ppBegin, Char *pEnd){
+    Char *pName = *ppBegin + 2;
     if(!Xml_IsNameStartChar(*pName)){
-        Xml_onError(pContext, pBegin, pEnd, pName);
-        return null;
+        *ppBegin = pName;
+        return xrExpectEndTagName;
     }
     Char *pNameEnd = Xml_SkipName(pName + 1);
     Xml_onEndTag(pContext, pName, pNameEnd);
@@ -191,7 +208,14 @@ static inline Char *Xml_ParseEndTag(void *pContext, Char *pBegin, Char *pEnd){
     Char *p = pNameEnd;
     if(Xml_IsWhiteSpace(*p))
         ++p;
-    return *p != '>'? null : ++p;
+
+    if(*p != '>'){
+        *ppBegin = p;
+        return xrExpectGreater;
+    }
+
+    *ppBegin = p + 1;
+    return xrOk;
 }
 
 #define CASE_XML_NAME_CHAR \

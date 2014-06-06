@@ -13,6 +13,11 @@
 #include "Xml.h"
 
 //Api
+int XmlFile_Parse(void *pContext, const char *pszFileName);
+
+//You MUST define follow event processing function:
+static inline void XmlFile_onError(void *pContext, XmlResult result, size_t nOffset);
+
 int XmlFile_Parse(void *pContext, const char *pszFileName){
     int fd = open(pszFileName, O_RDONLY);
     if(fd == -1)
@@ -24,21 +29,29 @@ int XmlFile_Parse(void *pContext, const char *pszFileName){
         return -2;
     }
 
+    if(st.st_size == 0)
+        return 0;
+
     Byte *pBegin = (Byte*)mmap(0, st.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
     if(pBegin == MAP_FAILED){
         close(fd);
         return -3;
     }
 
-    if(!Xml_Parse(pContext, pBegin, pBegin + st.st_size)){
-        munmap(pBegin, st.st_size);
-        close(fd);
-        return false;
-    }
+    Byte *pEnd = pBegin + st.st_size - 1;
+    Char cEnd = *pEnd;
+
+    Byte *p = pBegin;
+    XmlResult r = Xml_Parse(pContext, &p, pEnd);
 
     munmap(pBegin, st.st_size);
     close(fd);
-    return 0;
+
+    if((r == xrOk || (r == xrExpectGreater && p == pEnd && cEnd == '>')))
+        return 0;
+
+    XmlFile_onError(pContext, r, p - pBegin);
+    return -4;
 }
 
 #endif // XMLFILE_H
