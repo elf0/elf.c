@@ -21,9 +21,9 @@ static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd);
 
 //You MUST define following event processing functions:
 static inline void Xml_onProcessingInstruction(void *pContext, Char *pBegin, Char *pEnd);
-static inline void Xml_onStartTag(void *pContext, Char *pBegin, Char *pEnd);
-static inline void Xml_onEndTag(void *pContext, Char *pBegin, Char *pEnd);
-static inline void Xml_onAtrribute(void *pContext, Char *pTagName, Char *pTagNameEnd, Char *pName, Char *pNameEnd, Char *pValue, Char *pValueEnd);
+static inline void Xml_onStartTag(void *pContext, Char *pName, Char *pNameEnd);
+static inline void Xml_onEndTag(void *pContext, Char *pName, Char *pNameEnd);
+static inline void Xml_onAtrribute(void *pContext, Char *pName, Char *pNameEnd, Char *pValue, Char *pValueEnd);
 
 //Internal functions
 static inline XmlResult Xml_ParseTag(void *pContext, Char **ppBegin, Char *pEnd);
@@ -191,7 +191,7 @@ static inline XmlResult Xml_ParseAttribute(void *pContext,  Char *pTagName, Char
         return xrExpectEndQuote;
     }
 
-    Xml_onAtrribute(pContext, pTagName, pTagNameEnd, pName, pNameEnd, pValue, p);
+    Xml_onAtrribute(pContext, pName, pNameEnd, pValue, p);
     *ppBegin = p + 1;
     return xrOk;
 }
@@ -244,4 +244,3 @@ static inline Char *Xml_SkipName(Char *p){
 }
 
 #endif // XML_H
-
