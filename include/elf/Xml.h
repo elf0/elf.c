@@ -53,12 +53,13 @@ static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd){
             p = String_SkipUntil(p, '<');
             *pEnd = '"';
             Xml_onContent(pContext, pContent, p);
-        }
-        else{
-            r = Xml_ParseTag(pContext, &p, pEnd);
-            if(r != xrOk)
+            if(p == pEnd)
                 break;
         }
+
+        r = Xml_ParseTag(pContext, &p, pEnd);
+        if(r != xrOk)
+            break;
     }
 
     *pEnd = cOld;
