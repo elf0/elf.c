@@ -24,6 +24,7 @@ static inline void Xml_onProcessingInstruction(void *pContext, Char *pBegin, Cha
 static inline void Xml_onStartTag(void *pContext, Char *pName, Char *pNameEnd);
 static inline void Xml_onEndTag(void *pContext, Char *pName, Char *pNameEnd);
 static inline void Xml_onAtrribute(void *pContext, Char *pName, Char *pNameEnd, Char *pValue, Char *pValueEnd);
+static inline void Xml_onContent(void *pContext, Char *pBegin, Char *pEnd);
 
 //Internal functions
 static inline XmlResult Xml_ParseTag(void *pContext, Char **ppBegin, Char *pEnd);
@@ -43,16 +44,21 @@ static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd){
     Char cOld = *pEnd;
     *pEnd = '"';
 
+    Char *pContent;
     Char *p = *ppBegin;
     while((p = Xml_SkipWhiteSpace(p)) != pEnd){
         if(*p != '<'){
-            r = xrExpectLess;
-            break;
+            pContent = p;
+            *pEnd = '<';
+            p = String_SkipUntil(p, '<');
+            *pEnd = '"';
+            Xml_onContent(pContext, pContent, p);
         }
-
-        r = Xml_ParseTag(pContext, &p, pEnd);
-        if(r != xrOk)
-            break;
+        else{
+            r = Xml_ParseTag(pContext, &p, pEnd);
+            if(r != xrOk)
+                break;
+        }
     }
 
     *pEnd = cOld;
