@@ -20,6 +20,12 @@ static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue);
 static inline  Char *String_ToF32(Char *pNumber, F32 *pValue);
 static inline  Char *String_ToF64(Char *pNumber, F64 *pValue);
 
+static inline Char *String_Skip(Char *p, Char value){
+    while(*p == value)
+        ++p;
+    return p;
+}
+
 static inline Char *String_SkipUntil(Char *p, Char value){
     while(*p != value)
         ++p;
@@ -215,4 +221,5 @@ static inline  Char *String_ToF64(Char *pNumber, F64 *pValue){
 }
 
 #endif // STRING_H
+
 
