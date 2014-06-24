@@ -7,10 +7,12 @@
 
 #include "Char.h"
 
+static inline Char *String_Skip(Char *p, Char value);
 static inline Char *String_SkipUntil(Char *p, Char value);
 static inline Char *String_SkipDigit(Char *p);
 static inline Char *String_SkipUpper(Char *p);
 static inline Char *String_SkipLower(Char *p);
+static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value);
 static inline Char *String_ToU32(Char *pNumber, U32 *pValue);
 static inline Char *String_ToI32(Char *pNumber, I32 *pValue);
 static inline Char *String_ToU64(Char *pNumber, U64 *pValue);
@@ -48,6 +50,17 @@ static inline Char *String_SkipLower(Char *p){
     while(Char_IsLower(*p))
         ++p;
     return p;
+}
+
+static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value){
+    Char *pREnd = pBegin - 1;
+    Char *p = pEnd - 1;
+    while(p != pREnd){
+        if(*p != value)
+            break;
+        --p;
+    }
+    return ++p;
 }
 
 static inline Char *String_ToU32(Char *pNumber, U32 *pValue){
