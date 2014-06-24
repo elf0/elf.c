@@ -12,6 +12,7 @@ static inline Char *String_SkipUntil(Char *p, Char value);
 static inline Char *String_SkipDigit(Char *p);
 static inline Char *String_SkipUpper(Char *p);
 static inline Char *String_SkipLower(Char *p);
+static inline Char *String_SkipAlpha(Char *p);
 static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value);
 static inline Char *String_ToU32(Char *pNumber, U32 *pValue);
 static inline Char *String_ToI32(Char *pNumber, I32 *pValue);
@@ -48,6 +49,12 @@ static inline Char *String_SkipUpper(Char *p){
 
 static inline Char *String_SkipLower(Char *p){
     while(Char_IsLower(*p))
+        ++p;
+    return p;
+}
+
+static inline Char *String_SkipAlpha(Char *p){
+    while(Char_IsAlpha(*p))
         ++p;
     return p;
 }

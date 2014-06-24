@@ -30,9 +30,18 @@ static inline Bool Char_IsLower(Char c){
     return c >= 'a' && c <= 'z';
 }
 
+static inline Bool Char_IsAlpha(Char c){
+    switch(c){
+    CASE_CHAR_LOWER: CASE_CHAR_UPPER:
+        return true;
+    }
+    return false;
+}
+
 static inline Bool Char_IsDigit(Char c){
     return c >= '0' && c <= '9';
 }
 
 #endif // CHAR_H
+
 
