@@ -7,6 +7,8 @@
 
 #include "Char.h"
 
+typedef void (*String_EventHandler)(void *pContext, Char *pBegin, Char *pEnd);
+
 static inline Char *String_Skip(Char *p, Char value);
 static inline Char *String_SkipUntil(Char *p, Char value);
 static inline Char *String_SkipDigit(Char *p);
@@ -14,6 +16,7 @@ static inline Char *String_SkipUpper(Char *p);
 static inline Char *String_SkipLower(Char *p);
 static inline Char *String_SkipAlpha(Char *p);
 static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value);
+static inline void String_Split(Char *pBegin, Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext);
 static inline Char *String_ToU32(Char *pNumber, U32 *pValue);
 static inline Char *String_ToI32(Char *pNumber, I32 *pValue);
 static inline Char *String_ToU64(Char *pNumber, U64 *pValue);
@@ -68,6 +71,18 @@ static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value){
         --p;
     }
     return ++p;
+}
+
+//*pEnd MUST equal cSplitter
+static inline void String_Split(Char *pBegin, Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext){
+    Char *pSubString;
+    Char *p = pBegin;
+    while(p < pEnd){
+        pSubString = p;
+        p = String_SkipUntil(p, cSplitter);
+        onSubString(pContext, pSubString, p);
+        ++p;
+    }
 }
 
 static inline Char *String_ToU32(Char *pNumber, U32 *pValue){
