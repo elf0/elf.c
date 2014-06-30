@@ -13,13 +13,11 @@
 #include "Xml.h"
 
 //Api
-int XmlFile_Parse(void *pContext, const char *pszFileName);
-
-//You MUST define following event processing function:
-static inline void XmlFile_onError(void *pContext, XmlResult xrError, size_t nOffset);
-
-int XmlFile_Parse(void *pContext, const char *pszFileName){
-    int fd = open(pszFileName, O_RDONLY);
+typedef void (*XmlFile_ErrorHandler)(void *pContext, XmlResult xrError, size_t nOffset);
+int XmlFile_Parse(void *pContext, const Char *pszFileName, Xml_Handler onProcessingInstruction, Xml_Handler onStartTag,
+                  Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue,
+                  Xml_Handler onEndTag, Xml_Handler onContent, XmlFile_ErrorHandler onError){
+    int fd = open((const char*)pszFileName, O_RDONLY);
     if(fd == -1)
         return -1;
 
@@ -42,7 +40,7 @@ int XmlFile_Parse(void *pContext, const char *pszFileName){
     Char cEnd = *pEnd;
 
     Byte *p = pBegin;
-    XmlResult r = Xml_Parse(pContext, &p, pEnd);
+    XmlResult r = Xml_Parse(pContext, &p, pEnd, onProcessingInstruction, onStartTag, onAtrributeName, onAtrributeValue, onEndTag, onContent);
 
     munmap(pBegin, st.st_size);
     close(fd);
@@ -50,7 +48,7 @@ int XmlFile_Parse(void *pContext, const char *pszFileName){
     if((r == xrOk || (r == xrExpectGreater && p == pEnd && cEnd == '>')))
         return 0;
 
-    XmlFile_onError(pContext, r, p - pBegin);
+    onError(pContext, r, p - pBegin);
     return -4;
 }
 
