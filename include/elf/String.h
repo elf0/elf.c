@@ -26,6 +26,11 @@ static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue);
 static inline  Char *String_ToF32(Char *pNumber, F32 *pValue);
 static inline  Char *String_ToF64(Char *pNumber, F64 *pValue);
 
+static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
+static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
+static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
+static inline Bool String_Equal8(const Char *pLeft, const Char *pRight);
+
 static inline Char *String_Skip(Char *p, Char value){
     while(*p == value)
         ++p;
@@ -255,6 +260,23 @@ static inline  Char *String_ToF64(Char *pNumber, F64 *pValue){
     return p;
 }
 
+static inline Bool String_Equal2(const Char *pLeft, const Char *pRight){
+    return *(U16*)pLeft == *(U16*)pRight;
+}
+
+static inline Bool String_Equal4(const Char *pLeft, const Char *pRight){
+    return *(U32*)pLeft == *(U32*)pRight;
+}
+
+static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2){
+    return String_Equal4(pLeft, pRight4) && String_Equal2(pLeft + 4, pRight2);
+}
+
+static inline Bool String_Equal8(const Char *pLeft, const Char *pRight){
+    return *(U64*)pLeft == *(U64*)pRight;
+}
+
 #endif // STRING_H
+
 
 

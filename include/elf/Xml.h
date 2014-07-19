@@ -10,6 +10,12 @@
 #include "String.h"
 
 //Api
+#ifdef XML_SINGLE_QUOTE_MARK
+    #define XML_QUOTE_MARK '\''
+#else
+    #define XML_QUOTE_MARK '"'
+#endif
+
 enum XmlResult{
     xrOk, xrExpectLess, xrExpectGreater, xrExpectEndTagName, xrExpectAssign, xrExpectStartQuote, xrExpectEndQuote,
     xrInvalidCharAfterLess, xrExpectInterrogation,
@@ -190,13 +196,13 @@ static inline XmlResult Xml_ParseAttribute(void *pContext, Char **ppBegin, Char 
     }
     ++p;
 
-    if(*p != '"' || p == pEnd){
+    if(*p != XML_QUOTE_MARK || p == pEnd){
         *ppBegin = p;
         return xrExpectStartQuote;
     }
     ++p;
     Char *pValue = p;
-    p = String_SkipUntil(p, '"');
+    p = String_SkipUntil(p, XML_QUOTE_MARK);
     if(p == pEnd){
         *ppBegin = p;
         return xrExpectEndQuote;
@@ -255,3 +261,4 @@ static inline Char *Xml_SkipName(Char *p){
 }
 
 #endif // XML_H
+
