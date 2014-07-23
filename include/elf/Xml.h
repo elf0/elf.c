@@ -23,21 +23,22 @@ enum XmlResult{
 };
 
 typedef void (*Xml_Handler)(void *pContext, Char *pBegin, Char *pEnd);
+typedef void (*XmlAttribute_Handler)(void *pContext, Char *pName, Char *pNameEnd, Char *pValue, Char *pValueEnd);
 
 //pEnd must be writable
 static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd,
                                   Xml_Handler onProcessingInstruction, Xml_Handler onStartTag,
-                                  Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue,
+                                  XmlAttribute_Handler onAttribute,
                                   Xml_Handler onEndTag, Xml_Handler onContent);
 
 //Internal functions
 static inline XmlResult Xml_ParseTag(void *pContext, Char **ppBegin, Char *pEnd,
                                      Xml_Handler onProcessingInstruction, Xml_Handler onStartTag,
-                                     Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue, Xml_Handler onEndTag);
+                                     XmlAttribute_Handler onAttribute, Xml_Handler onEndTag);
 static inline XmlResult Xml_ParseStartTag(void *pContext, Char **ppBegin, Char *pEnd,
-                                          Xml_Handler onStartTag, Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue, Xml_Handler onEndTag);
+                                          Xml_Handler onStartTag, XmlAttribute_Handler onAttribute, Xml_Handler onEndTag);
 static inline XmlResult Xml_ParseAttribute(void *pContext, Char **ppBegin, Char *pEnd,
-                                           Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue);
+                                           XmlAttribute_Handler onAttribute);
 static inline XmlResult Xml_ParseEndTag(void *pContext, Char **ppBegin, Char *pEnd, Xml_Handler onEndTag);
 static inline XmlResult Xml_ParseProcessingInstruction(void *pContext, Char **ppBegin, Char *pEnd, Xml_Handler onProcessingInstruction);
 static inline Bool Xml_IsWhiteSpace(Char c);
@@ -48,7 +49,7 @@ static inline Char *Xml_SkipName(Char *p);
 
 static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd,
                                   Xml_Handler onProcessingInstruction, Xml_Handler onStartTag,
-                                  Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue,
+                                  XmlAttribute_Handler onAttribute,
                                   Xml_Handler onEndTag, Xml_Handler onContent){
     XmlResult r = xrOk;
 
@@ -69,7 +70,7 @@ static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd,
         }
 
         r = Xml_ParseTag(pContext, &p, pEnd, onProcessingInstruction, onStartTag,
-                         onAtrributeName, onAtrributeValue, onEndTag);
+                         onAttribute, onEndTag);
         if(r != xrOk)
             break;
     }
@@ -106,7 +107,7 @@ static inline Char *Xml_SkipWhiteSpace(Char *p){
 
 static inline XmlResult Xml_ParseTag(void *pContext, Char **ppBegin, Char *pEnd,
                                      Xml_Handler onProcessingInstruction, Xml_Handler onStartTag,
-                                     Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue, Xml_Handler onEndTag){
+                                     XmlAttribute_Handler onAttribute, Xml_Handler onEndTag){
     Char *p = *ppBegin + 1;
     switch(*p){
     case '/':
@@ -114,7 +115,7 @@ static inline XmlResult Xml_ParseTag(void *pContext, Char **ppBegin, Char *pEnd,
     case '?':
         return Xml_ParseProcessingInstruction(pContext, ppBegin, pEnd, onProcessingInstruction);
 CASE_XML_NAME_START_CHAR:
-        return Xml_ParseStartTag(pContext, ppBegin, pEnd, onStartTag, onAtrributeName, onAtrributeValue, onEndTag);
+        return Xml_ParseStartTag(pContext, ppBegin, pEnd, onStartTag, onAttribute, onEndTag);
     }
 
     return xrInvalidCharAfterLess;
@@ -142,7 +143,7 @@ static inline XmlResult Xml_ParseProcessingInstruction(void *pContext, Char **pp
 }
 
 static inline XmlResult Xml_ParseStartTag(void *pContext, Char **ppBegin, Char *pEnd,
-                                          Xml_Handler onStartTag, Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue, Xml_Handler onEndTag){
+                                          Xml_Handler onStartTag, XmlAttribute_Handler onAttribute, Xml_Handler onEndTag){
     XmlResult r = xrOk;
 
     Char *pName = *ppBegin + 1;
@@ -158,7 +159,7 @@ static inline XmlResult Xml_ParseStartTag(void *pContext, Char **ppBegin, Char *
             *ppBegin = p + 1;
             return xrOk;
 CASE_XML_NAME_START_CHAR:
-            r = Xml_ParseAttribute(pContext, &p, pEnd, onAtrributeName, onAtrributeValue);
+            r = Xml_ParseAttribute(pContext, &p, pEnd, onAttribute);
             if(r != xrOk){
                 *ppBegin = p;
                 return r;
@@ -185,10 +186,10 @@ EMTY_CONTENT:
     return xrOk;
 }
 
-static inline XmlResult Xml_ParseAttribute(void *pContext, Char **ppBegin, Char *pEnd, Xml_Handler onAtrributeName, Xml_Handler onAtrributeValue){
+static inline XmlResult Xml_ParseAttribute(void *pContext, Char **ppBegin, Char *pEnd, XmlAttribute_Handler onAttribute){
     Char *pName = *ppBegin;
-    Char *p = Xml_SkipName(pName + 1);
-    onAtrributeName(pContext, pName, p);
+    Char *pNameEnd = Xml_SkipName(pName + 1);
+    Char *p = pNameEnd;
 
     if(*p != '='){
         *ppBegin = p;
@@ -208,7 +209,7 @@ static inline XmlResult Xml_ParseAttribute(void *pContext, Char **ppBegin, Char 
         return xrExpectEndQuote;
     }
 
-    onAtrributeValue(pContext, pValue, p);
+    onAttribute(pContext, pName, pNameEnd, pValue, p);
     *ppBegin = p + 1;
     return xrOk;
 }
