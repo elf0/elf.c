@@ -7,61 +7,62 @@
 
 #include "Char.h"
 
-typedef void (*String_EventHandler)(void *pContext, Char *pBegin, Char *pEnd);
+typedef void (*String_EventHandler)(void *pContext, const Char *pBegin, const Char *pEnd);
 
-static inline Char *String_Skip(Char *p, Char value);
-static inline Char *String_SkipUntil(Char *p, Char value);
-static inline Char *String_SkipDigit(Char *p);
-static inline Char *String_SkipUpper(Char *p);
-static inline Char *String_SkipLower(Char *p);
-static inline Char *String_SkipAlpha(Char *p);
+static inline const Char *String_Skip(const Char *p, const Char value);
+static inline const Char *String_SkipUntil(const Char *p, Char value);
+static inline const Char *String_SkipDigit(const Char *p);
+static inline const Char *String_SkipUpper(const Char *p);
+static inline const Char *String_SkipLower(const Char *p);
+static inline const Char *String_SkipAlpha(const Char *p);
 static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value);
-static inline void String_Split(Char *pBegin, Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext);
-static inline Char *String_ToU32(Char *pNumber, U32 *pValue);
-static inline Char *String_ToI32(Char *pNumber, I32 *pValue);
-static inline Char *String_ToU64(Char *pNumber, U64 *pValue);
-static inline Char *String_ToI64(Char *pNumber, I64 *pValue);
-static inline  Char *String_ToDecimal32(Char *pNumber, F32 *pValue);
-static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue);
-static inline  Char *String_ToF32(Char *pNumber, F32 *pValue);
-static inline  Char *String_ToF64(Char *pNumber, F64 *pValue);
+static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext);
+static inline  U32 String_ToU32(const Char *pBegin, const Char *pEnd);
+static inline Char *String_ParseU32(Char *pNumber, U32 *pValue);
+static inline Char *String_ParseI32(Char *pNumber, I32 *pValue);
+static inline const Char *String_ParseU64(const Char *pNumber, U64 *pValue);
+static inline Char *String_ParseI64(Char *pNumber, I64 *pValue);
+static inline  Char *String_ParseDecimal32(Char *pNumber, F32 *pValue);
+static inline  const Char *String_ParseDecimal64(const Char *pNumber, F64 *pValue);
+static inline  const Char *String_ParseF32(const Char *pNumber, F32 *pValue);
+static inline  const Char *String_ParseF64(const Char *pNumber, F64 *pValue);
 
 static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
 static inline Bool String_Equal8(const Char *pLeft, const Char *pRight);
 
-static inline Char *String_Skip(Char *p, Char value){
+static inline const Char *String_Skip(const Char *p, const Char value){
     while(*p == value)
         ++p;
     return p;
 }
 
-static inline Char *String_SkipUntil(Char *p, Char value){
+static inline const Char *String_SkipUntil(const Char *p, Char value){
     while(*p != value)
         ++p;
     return p;
 }
 
-static inline Char *String_SkipDigit(Char *p){
+static inline const Char *String_SkipDigit(const Char *p){
     while(Char_IsDigit(*p))
         ++p;
     return p;
 }
 
-static inline Char *String_SkipUpper(Char *p){
+static inline const Char *String_SkipUpper(const Char *p){
     while(Char_IsUpper(*p))
         ++p;
     return p;
 }
 
-static inline Char *String_SkipLower(Char *p){
+static inline const Char *String_SkipLower(const Char *p){
     while(Char_IsLower(*p))
         ++p;
     return p;
 }
 
-static inline Char *String_SkipAlpha(Char *p){
+static inline const Char *String_SkipAlpha(const Char *p){
     while(Char_IsAlpha(*p))
         ++p;
     return p;
@@ -79,9 +80,9 @@ static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value){
 }
 
 //*pEnd MUST equal cSplitter
-static inline void String_Split(Char *pBegin, Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext){
-    Char *pSubString;
-    Char *p = pBegin;
+static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext){
+    const Char *pSubString;
+    const Char *p = pBegin;
     while(p < pEnd){
         pSubString = p;
         p = String_SkipUntil(p, cSplitter);
@@ -90,7 +91,20 @@ static inline void String_Split(Char *pBegin, Char *pEnd, Char cSplitter, String
     }
 }
 
-static inline Char *String_ToU32(Char *pNumber, U32 *pValue){
+static inline  U32 String_ToU32(const Char *pBegin, const Char *pEnd){
+    const Char *p = pBegin;
+    U32 nValue = *p - '0';
+    ++p;
+
+    while(p != pEnd){
+        nValue = 10 * nValue + (*p - '0');
+        ++p;
+    }
+
+    return nValue;
+}
+
+static inline Char *String_ParseU32(Char *pNumber, U32 *pValue){
     Char *p = pNumber;
     if(!Char_IsDigit(*p))
         return p;
@@ -108,7 +122,7 @@ static inline Char *String_ToU32(Char *pNumber, U32 *pValue){
 }
 
 //parse '+', '-' youself
-static inline Char *String_ToI32(Char *pNumber, I32 *pValue){
+static inline Char *String_ParseI32(Char *pNumber, I32 *pValue){
     Char *p = pNumber;
     if(!Char_IsDigit(*p))
         return p;
@@ -125,8 +139,8 @@ static inline Char *String_ToI32(Char *pNumber, I32 *pValue){
     return p;
 }
 
-static inline Char *String_ToU64(Char *pNumber, U64 *pValue){
-    Char *p = pNumber;
+static inline const Char *String_ParseU64(const Char *pNumber, U64 *pValue){
+    const Char *p = pNumber;
     if(!Char_IsDigit(*p))
         return p;
 
@@ -143,7 +157,7 @@ static inline Char *String_ToU64(Char *pNumber, U64 *pValue){
 }
 
 //parse '+', '-' youself
-static inline Char *String_ToI64(Char *pNumber, I64 *pValue){
+static inline Char *String_ParseI64(Char *pNumber, I64 *pValue){
     Char *p = pNumber;
     if(!Char_IsDigit(*p))
         return p;
@@ -162,7 +176,7 @@ static inline Char *String_ToI64(Char *pNumber, I64 *pValue){
 
 //Decimal part
 //FIXME: Precision problem
-static inline  Char *String_ToDecimal32(Char *pNumber, F32 *pValue){
+static inline  Char *String_ParseDecimal32(Char *pNumber, F32 *pValue){
     Char *p = pNumber;
     if(!Char_IsDigit(*p))
         return p;
@@ -182,8 +196,8 @@ static inline  Char *String_ToDecimal32(Char *pNumber, F32 *pValue){
 }
 
 //Decimal part
-static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue){
-    Char *p = pNumber;
+static inline  const Char *String_ParseDecimal64(const Char *pNumber, F64 *pValue){
+    const Char *p = pNumber;
     if(!Char_IsDigit(*p))
         return p;
 
@@ -204,11 +218,11 @@ static inline  Char *String_ToDecimal64(Char *pNumber, F64 *pValue){
 //Only "0.0" is valid
 //parse '+', '-' youself
 //FIXME: Precision problem
-static inline  Char *String_ToF32(Char *pNumber, F32 *pValue){
+static inline  Char *String_ParseF32(Char *pNumber, F32 *pValue){
     Char *p = pNumber;
 
     U32 nInteger;
-    p = String_ToU32(pNumber, &nInteger);
+    p = String_ParseU32(pNumber, &nInteger);
     if(p == pNumber)
         return p;
 
@@ -221,7 +235,7 @@ static inline  Char *String_ToF32(Char *pNumber, F32 *pValue){
 
     Char *pDecimal = p + 1;
     F32 fDecimal;
-    p = String_ToDecimal32(pDecimal, &fDecimal);
+    p = String_ParseDecimal32(pDecimal, &fDecimal);
     if(p == pDecimal){
         *pValue = fInteger;
         return p;
@@ -233,11 +247,11 @@ static inline  Char *String_ToF32(Char *pNumber, F32 *pValue){
 
 //Only "0.0" is valid
 //parse '+', '-' youself
-static inline  Char *String_ToF64(Char *pNumber, F64 *pValue){
-    Char *p = pNumber;
+static inline const Char *String_ParseF64(const Char *pNumber, F64 *pValue){
+    const Char *p = pNumber;
 
     U64 nInteger;
-    p = String_ToU64(pNumber, &nInteger);
+    p = String_ParseU64(pNumber, &nInteger);
     if(p == pNumber)
         return p;
 
@@ -248,9 +262,9 @@ static inline  Char *String_ToF64(Char *pNumber, F64 *pValue){
         return p;
     }
 
-    Char *pDecimal = p + 1;
+    const Char *pDecimal = p + 1;
     F64 fDecimal;
-    p = String_ToDecimal64(pDecimal, &fDecimal);
+    p = String_ParseDecimal64(pDecimal, &fDecimal);
     if(p == pDecimal){
         *pValue = fInteger;
         return p;
@@ -277,6 +291,7 @@ static inline Bool String_Equal8(const Char *pLeft, const Char *pRight){
 }
 
 #endif // STRING_H
+
 
 
 

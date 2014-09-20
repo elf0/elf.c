@@ -27,6 +27,14 @@ static inline Bool List_NotEmpty(const List *pList){
     return DoubleNode_NotAlone((DoubleNode*)pList);
 }
 
+static inline DoubleNode *List_Front(const List *pList){
+    return pList->entry.pNext;
+}
+
+static inline DoubleNode *List_Back(const List *pList){
+    return pList->entry.pPrev;
+}
+
 static inline Bool List_First(const List *pList, const DoubleNode *pNode){
     return pNode->pPrev == ((DoubleNode*)pList);
 }
