@@ -42,7 +42,10 @@ static inline Bool Char_IsDigit(Char c){
     return c >= '0' && c <= '9';
 }
 
-#endif // CHAR_H
+static inline Bool Char_IsNotDigit(Char c){
+    return c < '0' || c > '9';
+}
 
+#endif // CHAR_H
 
 

@@ -15,17 +15,27 @@ static inline const Char *String_SkipDigit(const Char *p);
 static inline const Char *String_SkipUpper(const Char *p);
 static inline const Char *String_SkipLower(const Char *p);
 static inline const Char *String_SkipAlpha(const Char *p);
-static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value);
+static inline const Char *String_TrimEnd(const Char *pBegin, Char *pEnd, Char value);
 static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext);
-static inline  U32 String_ToU32(const Char *pBegin, const Char *pEnd);
-static inline Char *String_ParseU32(Char *pNumber, U32 *pValue);
-static inline Char *String_ParseI32(Char *pNumber, I32 *pValue);
-static inline const Char *String_ParseU64(const Char *pNumber, U64 *pValue);
-static inline Char *String_ParseI64(Char *pNumber, I64 *pValue);
-static inline  Char *String_ParseDecimal32(Char *pNumber, F32 *pValue);
-static inline  const Char *String_ParseDecimal64(const Char *pNumber, F64 *pValue);
-static inline  const Char *String_ParseF32(const Char *pNumber, F32 *pValue);
-static inline  const Char *String_ParseF64(const Char *pNumber, F64 *pValue);
+
+//Digits string
+static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd);
+static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd);
+//*puValue MUST be initialized
+static inline const Char *String_ParseU32(const Char *pszNumber, U32 *puValue);
+static inline const Char *String_ParseU64(const Char *pszNumber, U64 *puValue);
+static inline const Char *String_ParseU32_Overflow(const Char *pszNumber, U32 *puValue, Bool *pbOverflow);
+static inline const Char *String_ParseU64_Overflow(const Char *pszNumber, U64 *puValue, Bool *pbOverflow);
+//*piValue MUST be initialized
+//Parse '+' and '-' youself
+static inline const Char *String_ParseI32(const Char *pszNumber, I32 *piValue);
+static inline const Char *String_ParseI64(const Char *pszNumber, I64 *piValue);
+//Parse '+' youself
+static inline const Char *String_ParseI32_Positive(const Char *pszNumber, I32 *piValue, Bool *pbOverflow);
+static inline const Char *String_ParseI64_Positive(const Char *pszNumber, I64 *piValue, Bool *pbOverflow);
+//Parse '-' youself
+static inline const Char *String_ParseI32_Negative(const Char *pszNumber, I32 *piValue, Bool *pbOverflow);
+static inline const Char *String_ParseI64_Negative(const Char *pszNumber, I64 *piValue, Bool *pbOverflow);
 
 static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
@@ -68,9 +78,9 @@ static inline const Char *String_SkipAlpha(const Char *p){
     return p;
 }
 
-static inline Char *String_TrimEnd(Char *pBegin, Char *pEnd, Char value){
-    Char *pREnd = pBegin - 1;
-    Char *p = pEnd - 1;
+static inline const Char *String_TrimEnd(const Char *pBegin, Char *pEnd, Char value){
+    const Char *pREnd = pBegin - 1;
+    const Char *p = pEnd - 1;
     while(p != pREnd){
         if(*p != value)
             break;
@@ -91,195 +101,212 @@ static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSpli
     }
 }
 
-static inline  U32 String_ToU32(const Char *pBegin, const Char *pEnd){
+static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd){
     const Char *p = pBegin;
-    U32 nValue = *p - '0';
+    U32 uValue = *p - '0';
     ++p;
 
     while(p != pEnd){
-        nValue = 10 * nValue + (*p - '0');
+        uValue = 10 * uValue + (*p - '0');
         ++p;
     }
 
-    return nValue;
+    return uValue;
 }
 
-static inline Char *String_ParseU32(Char *pNumber, U32 *pValue){
-    Char *p = pNumber;
-    if(!Char_IsDigit(*p))
-        return p;
-
-    U32 nValue = *p - '0';
+static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd){
+    const Char *p = pBegin;
+    U64 uValue = *p - '0';
     ++p;
+
+    while(p != pEnd){
+        uValue = 10 * uValue + (*p - '0');
+        ++p;
+    }
+
+    return uValue;
+}
+
+static inline const Char *String_ParseU32(const Char *pszNumber, U32 *puValue){
+    U32 uValue = *puValue;
+    const Char *p = pszNumber;
+
+    while(Char_IsDigit(*p)){
+        uValue = 10 * uValue + (*p - '0');
+        ++p;
+    }
+
+    *puValue = uValue;
+    return p;
+}
+
+static inline const Char *String_ParseU64(const Char *pszNumber, U64 *puValue){
+    U64 nValue = *puValue;
+    const Char *p = pszNumber;
 
     while(Char_IsDigit(*p)){
         nValue = 10 * nValue + (*p - '0');
         ++p;
     }
 
-    *pValue = nValue;
+    *puValue = nValue;
     return p;
 }
 
-//parse '+', '-' youself
-static inline Char *String_ParseI32(Char *pNumber, I32 *pValue){
-    Char *p = pNumber;
-    if(!Char_IsDigit(*p))
-        return p;
-
-    I32 nValue = *p - '0';
-    ++p;
+static inline const Char *String_ParseU32_Overflow(const Char *pszNumber, U32 *puValue, Bool *pbOverflow){
+    U32 uNewValue;
+    U32 uValue = *puValue;
+    const Char *p = pszNumber;
 
     while(Char_IsDigit(*p)){
-        nValue = 10 * nValue + (*p - '0');
+        uNewValue = 10 * uValue + (*p - '0');
+        if(uNewValue < uValue){
+            *puValue = uValue;
+            *pbOverflow = true;
+            return p;
+        }
+        uValue = uNewValue;
         ++p;
     }
 
-    *pValue = nValue;
+    *puValue = uValue;
+    *pbOverflow = false;
     return p;
 }
 
-static inline const Char *String_ParseU64(const Char *pNumber, U64 *pValue){
-    const Char *p = pNumber;
-    if(!Char_IsDigit(*p))
-        return p;
-
-    U64 nValue = *p - '0';
-    ++p;
+static inline const Char *String_ParseU64_Overflow(const Char *pszNumber, U64 *puValue, Bool *pbOverflow){
+    U64 uNewValue;
+    U64 uValue = *puValue;
+    const Char *p = pszNumber;
 
     while(Char_IsDigit(*p)){
-        nValue = 10 * nValue + (*p - '0');
+        uNewValue = 10 * uValue + (*p - '0');
+        if(uNewValue < uValue){
+            *puValue = uValue;
+            *pbOverflow = true;
+            return p;
+        }
+        uValue = uNewValue;
         ++p;
     }
 
-    *pValue = nValue;
+    *puValue = uValue;
+    *pbOverflow = false;
     return p;
 }
 
-//parse '+', '-' youself
-static inline Char *String_ParseI64(Char *pNumber, I64 *pValue){
-    Char *p = pNumber;
-    if(!Char_IsDigit(*p))
-        return p;
-
-    I64 nValue = *p - '0';
-    ++p;
+static inline const Char *String_ParseI32(const Char *pszNumber, I32 *piValue){
+    I32 iValue = *piValue;
+    const Char *p = pszNumber;
 
     while(Char_IsDigit(*p)){
-        nValue = 10 * nValue + (*p - '0');
+        iValue = 10 * iValue + (*p - '0');
         ++p;
     }
 
-    *pValue = nValue;
+    *piValue = iValue;
     return p;
 }
 
-//Decimal part
-//FIXME: Precision problem
-static inline  Char *String_ParseDecimal32(Char *pNumber, F32 *pValue){
-    Char *p = pNumber;
-    if(!Char_IsDigit(*p))
-        return p;
-
-    U32 nDelta = 10;
-    U32 nValue = *p - '0';
-    ++p;
+static inline const Char *String_ParseI64(const Char *pszNumber, I64 *piValue){
+    I64 iValue = *piValue;
+    const Char *p = pszNumber;
 
     while(Char_IsDigit(*p)){
-        nDelta *= 10;
-        nValue = 10 * nValue + (*p - '0');
+        iValue = 10 * iValue + (*p - '0');
         ++p;
     }
 
-    *pValue = (F32)nValue / (F32)nDelta;
+    *piValue = iValue;
     return p;
 }
 
-//Decimal part
-static inline  const Char *String_ParseDecimal64(const Char *pNumber, F64 *pValue){
-    const Char *p = pNumber;
-    if(!Char_IsDigit(*p))
-        return p;
-
-    U64 nDelta = 10;
-    U64 nValue = *p - '0';
-    ++p;
+static inline const Char *String_ParseI32_Positive(const Char *pszNumber, I32 *piValue, Bool *pbOverflow){
+    I32 iNewValue;
+    I32 iValue = *piValue;
+    const Char *p = pszNumber;
 
     while(Char_IsDigit(*p)){
-        nDelta *= 10;
-        nValue = 10 * nValue + (*p - '0');
+        iNewValue = 10 * iValue + (*p - '0');
+        if(iNewValue < iValue){
+            *piValue = iValue;
+            *pbOverflow = true;
+            return p;
+        }
+        iValue = iNewValue;
         ++p;
     }
 
-    *pValue = (F64)nValue / (F64)nDelta;
+    *piValue = iValue;
     return p;
 }
 
-//Only "0.0" is valid
-//parse '+', '-' youself
-//FIXME: Precision problem
-static inline  Char *String_ParseF32(Char *pNumber, F32 *pValue){
-    Char *p = pNumber;
+static inline const Char *String_ParseI64_Positive(const Char *pszNumber, I64 *piValue, Bool *pbOverflow){
+    I64 iNewValue;
+    I64 iValue = *piValue;
+    const Char *p = pszNumber;
 
-    U32 nInteger;
-    p = String_ParseU32(pNumber, &nInteger);
-    if(p == pNumber)
-        return p;
-
-    F32 fInteger = nInteger;
-
-    if(*p != '.'){
-        *pValue = fInteger;
-        return p;
+    while(Char_IsDigit(*p)){
+        iNewValue = 10 * iValue + (*p - '0');
+        if(iNewValue < iValue){
+            *piValue = iValue;
+            *pbOverflow = true;
+            return p;
+        }
+        iValue = iNewValue;
+        ++p;
     }
 
-    Char *pDecimal = p + 1;
-    F32 fDecimal;
-    p = String_ParseDecimal32(pDecimal, &fDecimal);
-    if(p == pDecimal){
-        *pValue = fInteger;
-        return p;
-    }
-
-    *pValue = fInteger + fDecimal;
+    *piValue = iValue;
     return p;
 }
 
-//Only "0.0" is valid
-//parse '+', '-' youself
-static inline const Char *String_ParseF64(const Char *pNumber, F64 *pValue){
-    const Char *p = pNumber;
+static inline const Char *String_ParseI32_Negative(const Char *pszNumber, I32 *piValue, Bool *pbOverflow){
+    I32 iNewValue;
+    I32 iValue = *piValue;
+    const Char *p = pszNumber;
 
-    U64 nInteger;
-    p = String_ParseU64(pNumber, &nInteger);
-    if(p == pNumber)
-        return p;
-
-    F64 fInteger = nInteger;
-
-    if(*p != '.'){
-        *pValue = fInteger;
-        return p;
+    while(Char_IsDigit(*p)){
+        iNewValue = 10 * iValue + (*p - '0');
+        if(iNewValue > iValue){
+            *piValue = iValue;
+            *pbOverflow = true;
+            return p;
+        }
+        iValue = iNewValue;
+        ++p;
     }
 
-    const Char *pDecimal = p + 1;
-    F64 fDecimal;
-    p = String_ParseDecimal64(pDecimal, &fDecimal);
-    if(p == pDecimal){
-        *pValue = fInteger;
-        return p;
+    *piValue = iValue;
+    return p;
+}
+
+static inline const Char *String_ParseI64_Negative(const Char *pszNumber, I64 *piValue, Bool *pbOverflow){
+    I64 iNewValue;
+    I64 iValue = *piValue;
+    const Char *p = pszNumber;
+
+    while(Char_IsDigit(*p)){
+        iNewValue = 10 * iValue + (*p - '0');
+        if(iNewValue > iValue){
+            *piValue = iValue;
+            *pbOverflow = true;
+            return p;
+        }
+        iValue = iNewValue;
+        ++p;
     }
 
-    *pValue = fInteger + fDecimal;
+    *piValue = iValue;
     return p;
 }
 
 static inline Bool String_Equal2(const Char *pLeft, const Char *pRight){
-    return *(U16*)pLeft == *(U16*)pRight;
+    return *(const U16*)pLeft == *(const U16*)pRight;
 }
 
 static inline Bool String_Equal4(const Char *pLeft, const Char *pRight){
-    return *(U32*)pLeft == *(U32*)pRight;
+    return *(const U32*)pLeft == *(const U32*)pRight;
 }
 
 static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2){
@@ -287,11 +314,8 @@ static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const C
 }
 
 static inline Bool String_Equal8(const Char *pLeft, const Char *pRight){
-    return *(U64*)pLeft == *(U64*)pRight;
+    return *(const U64*)pLeft == *(const U64*)pRight;
 }
 
 #endif // STRING_H
-
-
-
 
