@@ -67,6 +67,20 @@ static inline U32 U32_Mul(U32 uLeft, U32 uRight, U32 *puOverflow){
     return uResult;
 }
 
+static inline U64 U64_Mul(U64 uLeft, U64 uRight, U64 *puOverflow){
+    register U64 uOverflow;
+    register U64 uResult;
+
+    asm volatile(
+                "mulq %[uRight]\n\t"
+                : [uResult] "=a" (uResult), [uOverflow] "=d" (uOverflow)
+                : [uLeft] "a" (uLeft), [uRight] "r" (uRight)
+                : "cc");
+
+    *puOverflow = uOverflow;
+    return uResult;
+}
+
 typedef signed long        I;
 typedef signed char        I8;
 typedef signed short       I16;
