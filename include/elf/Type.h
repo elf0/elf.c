@@ -81,6 +81,42 @@ static inline U64 U64_Mul(U64 uLeft, U64 uRight, U64 *puOverflow){
     return uResult;
 }
 
+static inline U32 U32_MulAdd(U32 uLeft, U32 uRight, U32 uAdd, U32 *puOverflow){
+    register U32 uOverflow;
+    register U32 uResult;
+
+    asm volatile(
+                "mull %[uRight]\n\t"
+                "addl %[uAdd], %%eax\n\t"
+                "jnb 0f\n\t"
+                "incl %[uOverflow]\n\t"
+                "0:\n\t"
+                : [uResult] "=a" (uResult), [uOverflow] "=d" (uOverflow)
+                : [uLeft] "a" (uLeft), [uRight] "r" (uRight), [uAdd] "r" (uAdd)
+                : "cc");
+
+    *puOverflow = uOverflow;
+    return uResult;
+}
+
+static inline U64 U64_MulAdd(U64 uLeft, U64 uRight, U64 uAdd, U64 *puOverflow){
+    register U64 uOverflow;
+    register U64 uResult;
+
+    asm volatile(
+                "mulq %[uRight]\n\t"
+                "addq %[uAdd], %%rax\n\t"
+                "jnb 0f\n\t"
+                "incq %[uOverflow]\n\t"
+                "0:\n\t"
+                : [uResult] "=a" (uResult), [uOverflow] "=d" (uOverflow)
+                : [uLeft] "a" (uLeft), [uRight] "r" (uRight), [uAdd] "r" (uAdd)
+                : "cc");
+
+    *puOverflow = uOverflow;
+    return uResult;
+}
+
 typedef signed long        I;
 typedef signed char        I8;
 typedef signed short       I16;
@@ -182,3 +218,4 @@ static inline Bool F64_IsNegativeInfinity(F64 fValue){
 }
 
 #endif //TYPE_H
+
