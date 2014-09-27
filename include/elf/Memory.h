@@ -81,14 +81,6 @@ static inline void Memory_Copy32(Pointer pDest, Pointer pSrc, U32 nBytes){
                 );
 }
 
-static inline void Memory_Set(Pointer pAddress, U8 nValue, U32 nBytes){
-    asm(
-    "rep stosb\n\t"
-    ::[pAddress] "D" (pAddress), [nValue] "a" (nValue), [nBytes] "c" (nBytes)
-        : "memory"
-          );
-}
-
 //From Ivy Bridge microarchitecture
 static inline void Memory_FastClear(Pointer pAddress, U32 nBytes){
     asm(
