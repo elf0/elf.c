@@ -60,7 +60,7 @@ static inline void Memory_SetNegativeDirection(){
 }
 
 //From Ivy Bridge microarchitecture
-static inline void Memory_FastCopy32(void *pDest, void *pSrc, U32 nBytes){
+static inline void Memory_FastCopy32(Pointer pDest, Pointer pSrc, U32 nBytes){
     asm(
     "rep movsb\n\t"
     ::[pDest] "D" (pDest), [pSrc] "S" (pSrc), [nBytes] "c" (nBytes)
@@ -68,7 +68,7 @@ static inline void Memory_FastCopy32(void *pDest, void *pSrc, U32 nBytes){
           );
 }
 
-static inline void Memory_Copy32(void *pDest, void *pSrc, U32 nBytes){
+static inline void Memory_Copy32(Pointer pDest, Pointer pSrc, U32 nBytes){
     asm volatile(
                 "movl %[nBytes], %%edx\n\t"
                 "andl $7, %%edx\n\t"
@@ -79,5 +79,32 @@ static inline void Memory_Copy32(void *pDest, void *pSrc, U32 nBytes){
                 ::[pDest] "D" (pDest), [pSrc] "S" (pSrc), [nBytes] "c" (nBytes)
                 : "%edx", "memory"
                 );
+}
+
+static inline void Memory_Set(Pointer pAddress, U8 nValue, U32 nBytes){
+    asm(
+    "rep stosb\n\t"
+    ::[pAddress] "D" (pAddress), [nValue] "a" (nValue), [nBytes] "c" (nBytes)
+        : "memory"
+          );
+}
+
+//From Ivy Bridge microarchitecture
+static inline void Memory_FastClear(Pointer pAddress, U32 nBytes){
+    asm(
+    "xorb %%al, %%al\n\t"
+    "rep stosb\n\t"
+    ::[pAddress] "D" (pAddress), [nBytes] "c" (nBytes)
+        : "%al", "memory"
+          );
+}
+
+//From Ivy Bridge microarchitecture
+static inline void Memory_FastSet(Pointer pAddress, U8 nValue, U32 nBytes){
+    asm(
+    "rep stosb\n\t"
+    ::[pAddress] "D" (pAddress), [nValue] "a" (nValue), [nBytes] "c" (nBytes)
+        : "memory"
+          );
 }
 #endif //MEMORY_H
