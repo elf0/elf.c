@@ -70,15 +70,29 @@ static inline void Memory_FastCopy32(Pointer pDest, Pointer pSrc, U32 nBytes){
 
 static inline void Memory_Copy32(Pointer pDest, Pointer pSrc, U32 nBytes){
     asm volatile(
-                "movl %[nBytes], %%edx\n\t"
+                "movl %%ecx, %%edx\n\t"
                 "andl $7, %%edx\n\t"
-                "shrl $3, %[nBytes]\n\t"
+                "shrl $3, %%ecx\n\t"
                 "rep movsq\n\t"
-                "movl %%edx, %[nBytes]\n\t"
+                "movl %%edx, %%ecx\n\t"
                 "rep movsb\n\t"
                 ::[pDest] "D" (pDest), [pSrc] "S" (pSrc), [nBytes] "c" (nBytes)
                 : "%edx", "memory"
                 );
+}
+
+static inline void Memory_Clear(Pointer pAddress, U32 nBytes){
+    asm(
+    "movl %%ecx, %%edx\n\t"
+    "andl $7, %%edx\n\t"
+    "shrl $3, %%ecx\n\t"
+    "xorl %%eax, %%eax\n\t"
+    "rep stosq\n\t"
+    "movl %%edx, %%ecx\n\t"
+    "rep stosb\n\t"
+    ::"D" (pAddress), [nBytes] "c" (nBytes)
+        : "%rax", "%edx", "memory"
+          );
 }
 
 //From Ivy Bridge microarchitecture
@@ -86,7 +100,7 @@ static inline void Memory_FastClear(Pointer pAddress, U32 nBytes){
     asm(
     "xorb %%al, %%al\n\t"
     "rep stosb\n\t"
-    ::[pAddress] "D" (pAddress), [nBytes] "c" (nBytes)
+    ::"D" (pAddress), "c" (nBytes)
         : "%al", "memory"
           );
 }
