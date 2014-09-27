@@ -50,4 +50,34 @@ static inline size_t Memory_Align(size_t nSize){
  return (nSize & ~(PLATFORM_ALIGNMENT - 1)) + PLATFORM_ALIGNMENT;
 }
 
+//asm
+static inline void Memory_SetPositiveDirection(){
+    asm("cld\n\t");
+}
+
+static inline void Memory_SetNegativeDirection(){
+    asm("std\n\t");
+}
+
+//From Ivy Bridge microarchitecture
+static inline void Memory_FastCopy32(void *pDest, void *pSrc, U32 nBytes){
+    asm(
+    "rep movsb\n\t"
+    ::[pDest] "D" (pDest), [pSrc] "S" (pSrc), [nBytes] "c" (nBytes)
+        : "memory"
+          );
+}
+
+static inline void Memory_Copy32(void *pDest, void *pSrc, U32 nBytes){
+    asm volatile(
+                "movl %[nBytes], %%edx\n\t"
+                "andl $7, %%edx\n\t"
+                "shrl $3, %[nBytes]\n\t"
+                "rep movsq\n\t"
+                "movl %%edx, %[nBytes]\n\t"
+                "rep movsb\n\t"
+                ::[pDest] "D" (pDest), [pSrc] "S" (pSrc), [nBytes] "c" (nBytes)
+                : "%edx", "memory"
+                );
+}
 #endif //MEMORY_H
