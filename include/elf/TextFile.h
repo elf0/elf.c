@@ -1,6 +1,10 @@
 #ifndef TEXTFILE_H
 #define TEXTFILE_H
 
+//License: Public Domain
+//Author: elf
+//EMail: elf198012@gmail.com
+
 #include "File.h"
 
 #define MAX_BLOCK_LINES 255

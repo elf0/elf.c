@@ -1,6 +1,10 @@
 #ifndef TEXTWRITER_H
 #define TEXTWRITER_H
 
+//License: Public Domain
+//Author: elf
+//EMail: elf198012@gmail.com
+
 #include "TextFile.h"
 
 //typedef struct{

@@ -1,6 +1,10 @@
 #ifndef FILE_H
 #define FILE_H
 
+//License: Public Domain
+//Author: elf
+//EMail: elf198012@gmail.com
+
 #include <unistd.h>
 #include <fcntl.h>
 #include "Type.h"
