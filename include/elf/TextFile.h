@@ -11,7 +11,8 @@
 #define MAX_LINE_SIZE 16777215
 
 typedef enum{
-    TextFile_ErrorCode_Open = 1, TextFile_ErrorCode_Verify,
+    TextFile_ErrorCode_Argument = 1, TextFile_ErrorCode_Create, TextFile_ErrorCode_Open, TextFile_ErrorCode_Verify,
+    TextFile_ErrorCode_Read, TextFile_ErrorCode_Write,
     TextFile_ErrorCode_ReadHeader, TextFile_ErrorCode_ReadLine,
     TextFile_ErrorCode_WriteHeader, TextFile_ErrorCode_WriteLine,
     TextFile_ErrorCode_BufferSize
