@@ -5,18 +5,14 @@
 //Author: elf
 //EMail: elf198012@gmail.com
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include "Type.h"
+#include "File.h"
 
 typedef struct FileHandler FileHandler;
 typedef I32 (*FileHandler_ReadFunction)(FileHandler *pHandler, Byte *pBuffer, U32 nSize);
 typedef I32 (*FileHandler_WriteFunction)(FileHandler *pHandler, const Byte *pData, U32 nSize);
 
 struct FileHandler{
-    int fd;
-    struct stat meta;
+    File file;
     U64 nReadOffset;
     U64 nWriteOffset;
     FileHandler_ReadFunction Read;
@@ -27,8 +23,7 @@ static inline I32 FileHandler_DefaultRead(FileHandler *pHandler, Byte *pBuffer, 
 static inline I32 FileHandler_DefaultWrite(FileHandler *pHandler, const Byte *pData, U32 nSize);
 
 static inline Bool FileHandler_Create(FileHandler *pHandler, const Char *pszPathName){
-    pHandler->fd = open((const char*)pszPathName, O_CREAT | O_TRUNC | O_RDWR, 0644);
-    if(pHandler->fd == -1)
+    if(!File_Create(&pHandler->file, pszPathName))
         return false;
 
     pHandler->nReadOffset = 0;
@@ -39,15 +34,8 @@ static inline Bool FileHandler_Create(FileHandler *pHandler, const Char *pszPath
 }
 
 static inline Bool FileHandler_Open(FileHandler *pHandler, const Char *pszPathName){
-    pHandler->fd = open((const char*)pszPathName, O_RDWR);
-    if(pHandler->fd == -1){
-        if(errno != ENOENT)
-            return false;
-
-        pHandler->fd = open((const char*)pszPathName, O_CREAT | O_RDWR, 0644);
-        if(pHandler->fd == -1)
-            return false;
-    }
+    if(!File_Open(&pHandler->file, pszPathName))
+        return false;
 
     pHandler->nReadOffset = 0;
     pHandler->nWriteOffset = 0;
@@ -56,13 +44,12 @@ static inline Bool FileHandler_Open(FileHandler *pHandler, const Char *pszPathNa
     return true;
 }
 
-static inline Bool FileHandler_Close(FileHandler *pHandler){
-    close(pHandler->fd);
-    pHandler->fd = -1;
+static inline void FileHandler_Close(FileHandler *pHandler){
+    File_Close(&pHandler->file);
 }
 
 static inline Bool FileHandler_ReadMeta(FileHandler *pHandler){
-    return fstat(pHandler->fd, &pHandler->meta) != -1;
+    return File_ReadMeta(&pHandler->file);
 }
 
 static inline void FileHandler_SeekRead(FileHandler *pHandler, U64 nOffset){
@@ -77,7 +64,7 @@ static inline Bool FileHandler_SeekWriteToEnd(FileHandler *pHandler){
     if(!FileHandler_ReadMeta(pHandler))
         return false;
 
-    pHandler->nWriteOffset = pHandler->meta.st_size;
+    pHandler->nWriteOffset = pHandler->file.meta.st_size;
     return true;
 }
 
@@ -85,12 +72,8 @@ static inline I32 FileHandler_Read(FileHandler *pHandler, Byte *pBuffer, U32 nSi
     return pHandler->Read(pHandler, pBuffer, nSize);
 }
 
-static inline I32 FileHandler_ReadAt(const FileHandler *pHandler, Byte *pBuffer, U32 nSize, U64 nOffset){
-    return pread(pHandler->fd, pBuffer, nSize, nOffset);
-}
-
 static inline I32 FileHandler_DefaultRead(FileHandler *pHandler, Byte *pBuffer, U32 nSize){
-    I32 nResult = FileHandler_ReadAt(pHandler, pBuffer, nSize, pHandler->nReadOffset);
+    I32 nResult = File_ReadAt(&pHandler->file, pBuffer, nSize, pHandler->nReadOffset);
     if(nResult == -1)
         return -1;
 
@@ -102,12 +85,8 @@ static inline I32 FileHandler_Write(FileHandler *pHandler, const Byte *pData, U3
     return pHandler->Write(pHandler, pData, nSize);
 }
 
-static inline I32 FileHandler_WriteAt(const FileHandler *pHandler, const Byte *pData, U32 nSize, U64 nOffset){
-    return pwrite(pHandler->fd, pData, nSize, nOffset);
-}
-
 static inline I32 FileHandler_DefaultWrite(FileHandler *pHandler, const Byte *pData, U32 nSize){
-    ssize_t nResult = FileHandler_WriteAt(pHandler, pData, nSize, pHandler->nWriteOffset);
+    ssize_t nResult = File_WriteAt(&pHandler->file, pData, nSize, pHandler->nWriteOffset);
     if(nResult == -1)
         return -1;
 
