@@ -19,6 +19,24 @@ struct FileWriter{
 static inline Bool FileWriter_SeekToEnd(FileWriter *pWriter);
 static inline I32 FileWriter_DefaultWrite(FileWriter *pWriter, const Byte *pData, U32 nSize);
 
+static inline Bool FileWriter_Create(FileWriter *pWriter, const Char *pszPathName){
+    if(!File_CreateForWrite(&pWriter->file, pszPathName))
+        return false;
+
+    pWriter->nOffset = 0;
+    pWriter->Write = FileWriter_DefaultWrite;
+    return true;
+}
+
+static inline Bool FileWriter_Open(FileWriter *pWriter, const Char *pszPathName){
+    if(!File_OpenForWrite(&pWriter->file, pszPathName))
+        return false;
+
+    pWriter->nOffset = 0;
+    pWriter->Write = FileWriter_DefaultWrite;
+    return true;
+}
+
 static inline Bool FileWriter_OpenForAppend(FileWriter *pWriter, const Char *pszPathName){
     if(!File_OpenForWrite(&pWriter->file, pszPathName))
         return false;
@@ -28,7 +46,7 @@ static inline Bool FileWriter_OpenForAppend(FileWriter *pWriter, const Char *psz
         return false;
     }
 
-    pWriter->Write = File_DefaultWrite;
+    pWriter->Write = FileWriter_DefaultWrite;
     return true;
 }
 
@@ -45,10 +63,10 @@ static inline void FileWriter_Seek(FileWriter *pWriter, U64 nOffset){
 }
 
 static inline Bool FileWriter_SeekToEnd(FileWriter *pWriter){
-    if(!File_ReadMeta(pWriter))
+    if(!File_ReadMeta(&pWriter->file))
         return false;
 
-    pWriter->nOffset = pWriter->meta.st_size;
+    pWriter->nOffset = pWriter->file.meta.st_size;
     return true;
 }
 
@@ -65,3 +83,4 @@ static inline I32 FileWriter_DefaultWrite(FileWriter *pWriter, const Byte *pData
     return nResult;
 }
 #endif // FILEWRITER_H
+
