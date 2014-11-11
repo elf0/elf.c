@@ -7,6 +7,7 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include "Type.h"
 
@@ -14,6 +15,8 @@ struct File{
     I32 fd;
     struct stat meta;
 };
+
+typedef struct File File;
 
 static inline Bool File_Create(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_CREAT | O_TRUNC | O_RDWR, 0644);
