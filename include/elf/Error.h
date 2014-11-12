@@ -6,7 +6,7 @@
 //EMail: elf198012@gmail.com
 
 enum ErrorCode{
-    ErrorCode_Error = 1, ErrorCode_Argument, ErrorCode_Size, ErrorCode_Verify, ErrorCode_Full, ErrorCode_Format,
+    ErrorCode_Error = 1, ErrorCode_Argument, ErrorCode_IllegalValue, ErrorCode_Size, ErrorCode_Verify, ErrorCode_Full, ErrorCode_Format,
     ErrorCode_BufferSize, ErrorCode_DataSize,
     //File
     ErrorCode_File_Create, ErrorCode_File_Open, ErrorCode_File_Access, ErrorCode_File_NotFound,
