@@ -28,4 +28,6 @@ typedef U8 Bool;
 typedef Byte* Pointer;
 #define null  0
 
+typedef signed long Result;
+
 #endif //TYPE_H
