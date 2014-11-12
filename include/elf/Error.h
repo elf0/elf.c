@@ -13,6 +13,9 @@ typedef enum{
     ErrorCode_File_Create, ErrorCode_File_Open, ErrorCode_File_Access, ErrorCode_File_NotFound,
     ErrorCode_File_Read, ErrorCode_File_ReadMeta,
     ErrorCode_File_Write, ErrorCode_File_WriteMeta,
+    ErrorCode_File_Format,
+    //Packet
+    ErrorCode_Packet_Format,
     //Database
     ErrorCode_Database_Error, ErrorCode_Database_NotOpen, ErrorCode_Database_KeyNotFound,
 }ErrorCode;
