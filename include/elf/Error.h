@@ -14,7 +14,7 @@ enum ErrorCode{
     ErrorCode_File_Read, ErrorCode_File_ReadMeta,
     ErrorCode_File_Write, ErrorCode_File_WriteMeta,
     //Database
-    ErrorCode_Database_NotOpen, ErrorCode_Database_Error, ErrorCode_Database_KeyNotFound,
+    ErrorCode_Database_Error, ErrorCode_Database_NotOpen, ErrorCode_Database_KeyNotFound,
 };
 
 #endif // ERROR_H
