@@ -6,7 +6,7 @@
 //EMail: elf198012@gmail.com
 
 typedef enum{
-    ErrorCode_Error = 1, ErrorCode_Argument, ErrorCode_IllegalValue, ErrorCode_Size,
+    ErrorCode_Error = 1, ErrorCode_Argument, ErrorCode_TimeOut, ErrorCode_IllegalValue, ErrorCode_Size,
     ErrorCode_Verify, ErrorCode_Full, ErrorCode_Format,
     ErrorCode_BufferSize, ErrorCode_DataSize,
     //File
