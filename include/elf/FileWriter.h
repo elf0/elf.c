@@ -84,7 +84,7 @@ static inline I32 FileWriter_Write(FileWriter *pWriter, const Byte *pData, U32 n
 }
 
 static inline I32 FileWriter_DefaultWrite(FileWriter *pWriter, const Byte *pData, U32 nSize){
-    ssize_t nResult = File_WriteAt(&pWriter->file, pData, nSize, pWriter->nOffset);
+    ssize_t nResult = File_WriteTo(&pWriter->file, pWriter->nOffset, pData, nSize);
     if(nResult == -1)
         return -1;
 
