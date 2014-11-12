@@ -92,7 +92,7 @@ static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 nSize){
     return read(pFile->fd, pBuffer, nSize);
 }
 
-static inline I32 File_ReadAt(const File *pFile, Byte *pBuffer, U32 nSize, U64 nOffset){
+static inline I32 File_ReadFrom(const File *pFile, U64 nOffset, Byte *pBuffer, U32 nSize){
     return pread(pFile->fd, pBuffer, nSize, nOffset);
 }
 
@@ -100,7 +100,7 @@ static inline I32 File_Write(const File *pFile, const Byte *pData, U32 nSize){
     return write(pFile->fd, pData, nSize);
 }
 
-static inline I32 File_WriteAt(const File *pFile, const Byte *pData, U32 nSize, U64 nOffset){
+static inline I32 File_WriteTo(const File *pFile, U64 nOffset, const Byte *pData, U32 nSize){
     return pwrite(pFile->fd, pData, nSize, nOffset);
 }
 #endif // FILE_H

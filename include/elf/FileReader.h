@@ -44,7 +44,7 @@ static inline I32 FileReader_Read(FileReader *pReader, Byte *pBuffer, U32 nSize)
 }
 
 static inline I32 FileReader_DefaultRead(FileReader *pReader, Byte *pBuffer, U32 nSize){
-    I32 nResult = File_ReadAt(&pReader->file, pBuffer, nSize, pReader->nOffset);
+    I32 nResult = File_ReadFrom(&pReader->file, pReader->nOffset, pBuffer, nSize);
     if(nResult == -1)
         return -1;
 

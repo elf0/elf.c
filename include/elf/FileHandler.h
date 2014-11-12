@@ -84,7 +84,7 @@ static inline I32 FileHandler_Read(FileHandler *pHandler, Byte *pBuffer, U32 nSi
 }
 
 static inline I32 FileHandler_DefaultRead(FileHandler *pHandler, Byte *pBuffer, U32 nSize){
-    I32 nResult = File_ReadAt(&pHandler->file, pBuffer, nSize, pHandler->nReadOffset);
+    I32 nResult = File_ReadFrom(&pHandler->file, pHandler->nReadOffset, pBuffer, nSize);
     if(nResult == -1)
         return -1;
 
@@ -97,7 +97,7 @@ static inline I32 FileHandler_Write(FileHandler *pHandler, const Byte *pData, U3
 }
 
 static inline I32 FileHandler_DefaultWrite(FileHandler *pHandler, const Byte *pData, U32 nSize){
-    ssize_t nResult = File_WriteAt(&pHandler->file, pData, nSize, pHandler->nWriteOffset);
+    ssize_t nResult = File_WriteTo(&pHandler->file, pHandler->nWriteOffset, pData, nSize);
     if(nResult == -1)
         return -1;
 
