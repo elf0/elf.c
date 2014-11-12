@@ -37,8 +37,17 @@ static inline Bool FileWriter_Open(FileWriter *pWriter, const Char *pszPathName)
     return true;
 }
 
-static inline Bool FileWriter_OpenForAppend(FileWriter *pWriter, const Char *pszPathName){
-    if(!File_OpenForWrite(&pWriter->file, pszPathName))
+static inline Bool FileWriter_Prepare(FileWriter *pWriter, const Char *pszPathName){
+    if(!File_PrepareForWrite(&pWriter->file, pszPathName))
+        return false;
+
+    pWriter->nOffset = 0;
+    pWriter->Write = FileWriter_DefaultWrite;
+    return true;
+}
+
+static inline Bool FileWriter_PrepareForAppend(FileWriter *pWriter, const Char *pszPathName){
+    if(!File_PrepareForWrite(&pWriter->file, pszPathName))
         return false;
 
     if(!FileWriter_SeekToEnd(pWriter)){
@@ -83,4 +92,3 @@ static inline I32 FileWriter_DefaultWrite(FileWriter *pWriter, const Byte *pData
     return nResult;
 }
 #endif // FILEWRITER_H
-

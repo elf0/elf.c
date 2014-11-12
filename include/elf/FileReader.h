@@ -53,4 +53,3 @@ static inline I32 FileReader_DefaultRead(FileReader *pReader, Byte *pBuffer, U32
 }
 
 #endif // FILEREADER_H
-

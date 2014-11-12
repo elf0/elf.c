@@ -30,6 +30,21 @@ static inline Bool File_CreateForWrite(File *pFile, const Char *pszPathName){
 
 static inline Bool File_Open(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_RDWR);
+    return pFile->fd != -1;
+}
+
+static inline Bool File_OpenForRead(File *pFile, const Char *pszPathName){
+    pFile->fd = open((const char*)pszPathName, O_RDONLY);
+    return pFile->fd != -1;
+}
+
+static inline Bool File_OpenForWrite(File *pFile, const Char *pszPathName){
+    pFile->fd = open((const char*)pszPathName, O_WRONLY);
+    return pFile->fd != -1;
+}
+
+static inline Bool File_Prepare(File *pFile, const Char *pszPathName){
+    pFile->fd = open((const char*)pszPathName, O_RDWR);
     if(pFile->fd != -1)
         return true;
 
@@ -40,12 +55,7 @@ static inline Bool File_Open(File *pFile, const Char *pszPathName){
     return pFile->fd != -1;
 }
 
-static inline Bool File_OpenForRead(File *pFile, const Char *pszPathName){
-    pFile->fd = open((const char*)pszPathName, O_RDONLY);
-    return pFile->fd != -1;
-}
-
-static inline Bool File_OpenForWrite(File *pFile, const Char *pszPathName){
+static inline Bool File_PrepareForWrite(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_WRONLY);
     if(pFile->fd != -1)
         return true;
@@ -94,4 +104,3 @@ static inline I32 File_WriteAt(const File *pFile, const Byte *pData, U32 nSize, 
     return pwrite(pFile->fd, pData, nSize, nOffset);
 }
 #endif // FILE_H
-

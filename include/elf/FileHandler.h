@@ -44,6 +44,17 @@ static inline Bool FileHandler_Open(FileHandler *pHandler, const Char *pszPathNa
     return true;
 }
 
+static inline Bool FileHandler_Prepare(FileHandler *pHandler, const Char *pszPathName){
+    if(!File_Prepare(&pHandler->file, pszPathName))
+        return false;
+
+    pHandler->nReadOffset = 0;
+    pHandler->nWriteOffset = 0;
+    pHandler->Read = FileHandler_DefaultRead;
+    pHandler->Write = FileHandler_DefaultWrite;
+    return true;
+}
+
 static inline void FileHandler_Close(FileHandler *pHandler){
     File_Close(&pHandler->file);
 }
