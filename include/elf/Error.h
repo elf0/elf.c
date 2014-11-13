@@ -6,19 +6,19 @@
 //EMail: elf198012@gmail.com
 
 typedef enum{
-    ErrorCode_Error = 1, ErrorCode_Argument, ErrorCode_TimeOut, ErrorCode_IllegalValue, ErrorCode_Size,
-    ErrorCode_Verify, ErrorCode_Full, ErrorCode_Format, ErrorCode_Version,
-    ErrorCode_BufferSize, ErrorCode_DataSize,
+    error_Error = 1, error_Argument, error_TimeOut, error_IllegalValue, error_Size,
+    error_Verify, error_Full, error_Format, error_Version,
+    error_BufferSize, error_DataSize,
     //File
-    ErrorCode_File_Create, ErrorCode_File_Open, ErrorCode_File_Access, ErrorCode_File_NotFound,
-    ErrorCode_File_Read, ErrorCode_File_ReadMeta,
-    ErrorCode_File_Write, ErrorCode_File_WriteMeta,
-    ErrorCode_File_Format, ErrorCode_File_Verify,
+    error_File_Create, error_File_Open, error_File_Access, error_File_NotFound,
+    error_File_Read, error_File_ReadMeta,
+    error_File_Write, error_File_WriteMeta,
+    error_File_Format, error_File_Verify,
     //Packet
-    ErrorCode_Packet_Format, ErrorCode_Packet_Verify,
+    error_Packet_Format, error_Packet_Verify,
     //Database
-    ErrorCode_Database_Error, ErrorCode_Database_NotOpen, ErrorCode_Database_KeyNotFound,
-}ErrorCode;
+    error_Database_Error, error_Database_NotOpen, error_Database_KeyNotFound,
+}Error;
 
 #endif // ERROR_H
 
