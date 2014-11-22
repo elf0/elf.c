@@ -18,6 +18,10 @@ struct File{
 
 typedef struct File File;
 
+static inline Bool File_Exists(const Char *pszPathName) {
+  return access((const char*)pszPathName, F_OK) != -1;
+}
+
 static inline Bool File_Create(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_CREAT | O_TRUNC | O_RDWR, 0644);
     return pFile->fd != -1;
@@ -85,7 +89,19 @@ static inline void File_Close(File *pFile){
 }
 
 static inline Bool File_ReadMeta(File *pFile){
-    return fstat(pFile->fd, &pFile->meta) != -1;
+    return fstat(pFile->fd, &pFile->meta) == 0;
+}
+
+static inline U64 File_GetSize(File *pFile){
+    return pFile->meta.st_size;
+}
+
+static inline Bool File_SetSize(File *pFile, U64 nSize){
+    return ftruncate(pFile->fd, nSize) == 0;
+}
+
+static inline Bool File_Commit(File *pFile){
+    return fsync(pFile->fd) == 0;
 }
 
 static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 nSize){
