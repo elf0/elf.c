@@ -16,6 +16,10 @@ typedef struct{
   struct timespec tsTime;
 }Time;
 
+static inline void Time_Now(Time *pTime){
+  clock_gettime(CLOCK_REALTIME, &pTime->tsTime);
+}
+
 static inline void Time_Boot(Time *pTime){
   clock_gettime(CLOCK_BOOTTIME, &pTime->tsTime);
 }
