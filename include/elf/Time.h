@@ -40,7 +40,7 @@ static inline void Time_End(Time *pTime){
   I64 nNanoSeconds = tsEnd.tv_nsec - pTime->tsTime.tv_nsec;
   if(nNanoSeconds < 0){
     --nSeconds;
-    nNanoSeconds += NANO_SECONDS_PER_SECOND;
+    nNanoSeconds += NANOSECONDS_PER_SECOND;
   }
 
   pTime->tsTime.tv_sec = nSeconds;
