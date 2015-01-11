@@ -10,8 +10,8 @@ void WorkerThread_Initialize(WorkerThread *pThread){
  Thread_Initialize((Thread*)pThread, (ThreadEntry)WorkerThread_Entry);
  ThreadLock_Initialize(&pThread->lock);
  ThreadCondition_Initialize(&pThread->condition);
- DoubleNode_Reset(&pThread->tasks);
- DoubleNode_Reset(&pThread->pendingTasks);
+ List_Initialize(&pThread->tasks);
+ List_Initialize(&pThread->pendingTasks);
 }
 
 void WorkerThread_Finalize(WorkerThread *pThread){
@@ -23,21 +23,21 @@ Bool WorkerThread_Run(WorkerThread *pThread){
  return Thread_Run((Thread*)pThread);
 }
 
-static inline Bool HaveTasks(DoubleNode *pEntry){
- return DoubleNode_NotAlone(pEntry);
+static inline Bool HaveTasks(List *pTasks){
+ return List_NotEmpty(pTasks);
 }
 
-static inline Bool NoTasks(DoubleNode *pEntry){
- return DoubleNode_Alone(pEntry);
+static inline Bool NoTasks(List *pTasks){
+ return List_Empty(pTasks);
 }
 
-static inline void MoveTasks(DoubleNode *pPendingTasks, DoubleNode *pTasks){
- DoubleNode_MoveBuddiesTo(pPendingTasks, pTasks);
+static inline void MoveTasks(List *pPendingTasks, List *pTasks){
+ List_MoveTo(pPendingTasks, pTasks);
 }
 
 static inline void WaitTasks(WorkerThread *pThread){
-  DoubleNode *pTasks = &pThread->tasks;
-  DoubleNode *pPendingTasks = &pThread->pendingTasks;
+  List *pTasks = &pThread->tasks;
+  List *pPendingTasks = &pThread->pendingTasks;
 
   ThreadLock_Lock(&pThread->lock);
 
@@ -53,13 +53,13 @@ static inline void WaitTasks(WorkerThread *pThread){
 }
 
 static inline void RunTasks(WorkerThread *pThread){
- DoubleNode *pEntry = &pThread->tasks;
+ DoubleNode *pEntry = (DoubleNode*)&pThread->tasks;
  DoubleNode *pNode = pEntry->pNext;
  Task *pTask;
  while(pNode != pEntry){
   pTask = (Task*)pNode;
   if(pTask->Entry(pTask)){
-   DoubleNode_Unlink(pNode);
+   List_Remove(pNode);
    pNode = pNode->pNext;
    pTask->Finalize(pTask);
   }

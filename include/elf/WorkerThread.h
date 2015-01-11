@@ -30,8 +30,8 @@ typedef struct{
  Thread thread;
  ThreadLock lock;
  ThreadCondition condition;
- DoubleNode tasks;
- DoubleNode pendingTasks;
+ List tasks;
+ List pendingTasks;
 }WorkerThread;
 
 void WorkerThread_Initialize(WorkerThread *pThread);
@@ -40,16 +40,16 @@ Bool WorkerThread_Run(WorkerThread *pThread);
 
 static inline void WorkerThread_Post(WorkerThread *pThread, Task *pTask){
  ThreadLock_Lock(&pThread->lock);
- DoubleNode_Link(&pTask->node, pThread->pendingTasks.pPrev, &pThread->pendingTasks);
+ List_Push(&pThread->pendingTasks, (DoubleNode*)pTask);
  ThreadLock_Unlock(&pThread->lock);
 
  ThreadCondition_Signal(&pThread->condition);
 }
 
 //Do not post Empty task list
-static inline void WorkerThread_PostTasks(WorkerThread *pThread, DoubleNode *pTasks){
+static inline void WorkerThread_PostTasks(WorkerThread *pThread, List *pTasks){
  ThreadLock_Lock(&pThread->lock);
- DoubleNode_MoveBuddiesTo(pTasks, &pThread->pendingTasks);
+ List_MoveTo(pTasks, &pThread->pendingTasks);
  ThreadLock_Unlock(&pThread->lock);
 
  ThreadCondition_Signal(&pThread->condition);
