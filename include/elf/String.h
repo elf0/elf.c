@@ -78,6 +78,23 @@ static inline const Char *String_SkipAlpha(const Char *p){
     return p;
 }
 
+static inline Char *String_SkipAndLowerAlpha(Char *pBegin, Char *pEnd){
+    Char *p = pBegin;
+    while(p != pEnd){
+        switch(*p){
+        default:
+            return p;
+        case CASE_CHAR_UPPER:
+            *p = *p + ('a' - 'A');
+            break;
+        case CASE_CHAR_LOWER:
+            break;
+        }
+        ++p;
+    }
+    return p;
+}
+
 static inline const Char *String_TrimEnd(const Char *pBegin, Char *pEnd, Char value){
     const Char *pREnd = pBegin - 1;
     const Char *p = pEnd - 1;
