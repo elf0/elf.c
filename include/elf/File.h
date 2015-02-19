@@ -9,17 +9,21 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include "Type.h"
 
 struct File{
-    I32 fd;
+    union{
+        I32 fd;
+        Byte *pBegin;
+    };
     struct stat meta;
 };
 
 typedef struct File File;
 
 static inline Bool File_Exists(const Char *pszPathName) {
-  return access((const char*)pszPathName, F_OK) != -1;
+    return access((const char*)pszPathName, F_OK) != -1;
 }
 
 static inline Bool File_Create(File *pFile, const Char *pszPathName){
@@ -81,6 +85,27 @@ static inline void File_OpenStdOut(File *pFile){
 
 static inline void File_OpenStdError(File *pFile){
     pFile->fd = 2;
+}
+
+static inline Byte *File_MapForRead(File *pFile, const Char *pszPathName){
+    I32 fd = open((const char*)pszPathName, O_RDONLY);
+    if(fd == -1)
+        return null;
+
+    if(fstat(fd, &pFile->meta) == -1){
+        close(fd);
+        return null;
+    }
+
+    pFile->pBegin = (Byte*)mmap(0, pFile->meta.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);
+    if(pFile->pBegin == MAP_FAILED)
+        return null;
+    return pFile->pBegin;
+}
+
+static inline void File_Unmap(File *pFile){
+    munmap(pFile->pBegin, pFile->meta.st_size);
 }
 
 static inline void File_Close(File *pFile){
