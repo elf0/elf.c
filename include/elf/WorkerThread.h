@@ -34,9 +34,24 @@ typedef struct{
  List pendingTasks;
 }WorkerThread;
 
-void WorkerThread_Initialize(WorkerThread *pThread);
-void WorkerThread_Finalize(WorkerThread *pThread);
-Bool WorkerThread_Run(WorkerThread *pThread);
+static void *WorkerThread_Entry(WorkerThread *pThread);
+
+static inline void WorkerThread_Initialize(WorkerThread *pThread){
+ Thread_Initialize((Thread*)pThread, (ThreadEntry)WorkerThread_Entry);
+ ThreadLock_Initialize(&pThread->lock);
+ ThreadCondition_Initialize(&pThread->condition);
+ List_Initialize(&pThread->tasks);
+ List_Initialize(&pThread->pendingTasks);
+}
+
+static inline void WorkerThread_Finalize(WorkerThread *pThread){
+ ThreadCondition_Finalize(&pThread->condition);
+ ThreadLock_Finalize(&pThread->lock);
+}
+
+static inline Bool WorkerThread_Run(WorkerThread *pThread){
+ return Thread_Run((Thread*)pThread);
+}
 
 static inline void WorkerThread_Post(WorkerThread *pThread, Task *pTask){
  ThreadLock_Lock(&pThread->lock);
@@ -55,4 +70,58 @@ static inline void WorkerThread_PostTasks(WorkerThread *pThread, List *pTasks){
  ThreadCondition_Signal(&pThread->condition);
 }
 
+//Internal
+static inline Bool WorkerThread_HaveTasks(List *pTasks){
+ return List_NotEmpty(pTasks);
+}
+
+static inline Bool WorkerThread_NoTasks(List *pTasks){
+ return List_Empty(pTasks);
+}
+
+static inline void WorkerThread_MoveTasks(List *pPendingTasks, List *pTasks){
+ List_MoveTo(pPendingTasks, pTasks);
+}
+
+static inline void WorkerThread_WaitTasks(WorkerThread *pThread){
+  List *pTasks = &pThread->tasks;
+  List *pPendingTasks = &pThread->pendingTasks;
+
+  ThreadLock_Lock(&pThread->lock);
+
+  if(WorkerThread_HaveTasks(pPendingTasks))
+   WorkerThread_MoveTasks(pPendingTasks, pTasks);
+
+  if(WorkerThread_NoTasks(pTasks)){
+   ThreadCondition_Wait(&pThread->condition, &pThread->lock);
+   WorkerThread_MoveTasks(pPendingTasks, pTasks);
+  }
+
+  ThreadLock_Unlock(&pThread->lock);
+}
+
+static inline void WorkerThread_RunTasks(WorkerThread *pThread){
+ DoubleNode *pEntry = (DoubleNode*)&pThread->tasks;
+ DoubleNode *pNode = pEntry->pNext;
+ Task *pTask;
+ while(pNode != pEntry){
+  pTask = (Task*)pNode;
+  if(pTask->Entry(pTask)){
+   List_Remove(pNode);
+   pNode = pNode->pNext;
+   pTask->Finalize(pTask);
+  }
+  else
+   pNode = pNode->pNext;
+ }
+}
+
+static void *WorkerThread_Entry(WorkerThread *pThread){
+ while(true){
+  WorkerThread_WaitTasks(pThread);
+  WorkerThread_RunTasks(pThread);
+ }
+ return null;
+}
 #endif //WORKERTHREAD_H
+
