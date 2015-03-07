@@ -318,6 +318,52 @@ static inline const Char *String_ParseI64_Negative(const Char *pszNumber, I64 *p
     return p;
 }
 
+static inline const Char *String_ParseHexU32(const Char *pszNumber, U32 *puValue){
+    U32 u32 = *puValue;
+    const Char *p = pszNumber;
+
+    while(true){
+        switch(*p){
+        default:
+            *puValue = u32;
+            return p;
+        case CASE_CHAR_DIGIT:
+            u32 = (u32 << 4) | (*p - '0');
+            break;
+        case CASE_CHAR_HEX_LETTER_UPPER:
+            u32 = (u32 << 4) | (10 + (*p - 'A'));
+            break;
+        case CASE_CHAR_HEX_LETTER_LOWER:
+            u32 = (u32 << 4) | (10 + (*p - 'a'));
+            break;
+        }
+        ++p;
+    }
+}
+
+static inline const Char *String_ParseHexU64(const Char *pszNumber, U64 *puValue){
+    U64 u64 = *puValue;
+    const Char *p = pszNumber;
+
+    while(true){
+        switch(*p){
+        default:
+            *puValue = u64;
+            return p;
+        case CASE_CHAR_DIGIT:
+            u64 = (u64 << 4) | (*p - '0');
+            break;
+        case CASE_CHAR_HEX_LETTER_UPPER:
+            u64 = (u64 << 4) | (10 + (*p - 'A'));
+            break;
+        case CASE_CHAR_HEX_LETTER_LOWER:
+            u64 = (u64 << 4) | (10 + (*p - 'a'));
+            break;
+        }
+        ++p;
+    }
+}
+
 static inline Bool String_Equal2(const Char *pLeft, const Char *pRight){
     return *(const U16*)pLeft == *(const U16*)pRight;
 }
