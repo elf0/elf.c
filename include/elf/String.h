@@ -9,6 +9,7 @@
 
 typedef void (*String_EventHandler)(void *pContext, const Char *pBegin, const Char *pEnd);
 
+static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize);
 static inline const Char *String_Skip(const Char *p, const Char value);
 static inline const Char *String_SkipUntil(const Char *p, Char value);
 static inline const Char *String_SkipDigit(const Char *p);
@@ -41,6 +42,22 @@ static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
 static inline Bool String_Equal8(const Char *pLeft, const Char *pRight);
+
+static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize){
+    if(nPrefixSize > nSize)
+        return false;
+
+    const Char *pPrefixEnd = pPrefix + nPrefixSize;
+    const Char *pStr = pBegin;
+    const Char *pPre = pPrefix;
+    while(pPre != pPrefixEnd){
+        if(*pStr != *pPre)
+            return false;
+        ++pStr;
+        ++pPre;
+    }
+    return true;
+}
 
 static inline const Char *String_Skip(const Char *p, const Char value){
     while(*p == value)
