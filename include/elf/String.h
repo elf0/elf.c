@@ -74,10 +74,8 @@ static inline const Char *String_FindSub(const Char *pBegin, const Char *pEnd, c
     U32 nS = nSubSize - 1;
     const Char *p = pBegin;
     while(p != pEnd){
-        if(*p++ == *pSub){
-            if(String_StartsWith(p, pEnd - p, pS, nS))
-                return p - 1;
-        }
+        if(*p++ == *pSub && String_StartsWith(p, pEnd - p, pS, nS))
+            return p - 1;
     }
     return pEnd;
 }
