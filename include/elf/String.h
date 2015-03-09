@@ -77,7 +77,7 @@ static inline const Char *String_FindSub(const Char *pBegin, const Char *pEnd, c
         if(*p++ == *pSub && String_StartsWith(p, pEnd - p, pS, nS))
             return p - 1;
     }
-    return pEnd;
+    return null;
 }
 
 static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize){
