@@ -12,6 +12,7 @@ typedef void (*String_EventHandler)(void *pContext, const Char *pBegin, const Ch
 static inline const Char *String_Find(const Char *pBegin, const Char *pEnd, Char value);
 static inline const Char *String_FindLast(const Char *pBegin, const Char *pEnd, Char value);
 static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize);
+static inline Bool String_EndsWith(const Char *pBegin, U32 nSize, const Char *pSuffix, U32 nSuffixSize);
 static inline const Char *String_Skip(const Char *p, const Char value);
 static inline const Char *String_SkipUntil(const Char *p, Char value);
 static inline const Char *String_SkipForwardUntil(const Char *p, Char value);
@@ -79,6 +80,22 @@ static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *
             return false;
         ++pStr;
         ++pPre;
+    }
+    return true;
+}
+
+static inline Bool String_EndsWith(const Char *pBegin, U32 nSize, const Char *pSuffix, U32 nSuffixSize){
+    if(nSuffixSize > nSize)
+        return false;
+
+    const Char *pSuffixEnd = pSuffix + nSuffixSize;
+    const Char *pStr = pBegin + (nSize - nSuffixSize);
+    const Char *pSuf = pSuffix;
+    while(pSuf != pSuffixEnd){
+        if(*pStr != *pSuf)
+            return false;
+        ++pStr;
+        ++pSuf;
     }
     return true;
 }
