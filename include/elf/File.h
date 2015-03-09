@@ -30,6 +30,16 @@ static inline Bool File_Delete(const Char *pszPathName){
     return unlink((const char*)pszPathName) == 0;
 }
 
+static inline Bool File_Link(const Char *pszOldName, const Char *pszNewName){
+    return link((const char*)pszOldName, (const char*)pszNewName) == 0;
+}
+
+static inline Bool File_Rename(const Char *pszOldName, const Char *pszNewName){
+    if(!File_Link(pszOldName, pszNewName))
+        return false;
+    return File_Delete(pszOldName);
+}
+
 static inline Bool File_Create(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_CREAT | O_TRUNC | O_RDWR, 0644);
     return pFile->fd != -1;
