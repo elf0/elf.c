@@ -9,9 +9,12 @@
 
 typedef void (*String_EventHandler)(void *pContext, const Char *pBegin, const Char *pEnd);
 
+static inline const Char *String_Find(const Char *pBegin, const Char *pEnd, Char value);
+static inline const Char *String_FindLast(const Char *pBegin, const Char *pEnd, Char value);
 static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize);
 static inline const Char *String_Skip(const Char *p, const Char value);
 static inline const Char *String_SkipUntil(const Char *p, Char value);
+static inline const Char *String_SkipForwardUntil(const Char *p, Char value);
 static inline const Char *String_SkipDigit(const Char *p);
 static inline const Char *String_SkipUpper(const Char *p);
 static inline const Char *String_SkipLower(const Char *p);
@@ -43,6 +46,27 @@ static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
 static inline Bool String_Equal8(const Char *pLeft, const Char *pRight);
 
+static inline const Char *String_Find(const Char *pBegin, const Char *pEnd, Char value){
+    const Char *p = pBegin;
+    while(p != pEnd){
+        if(*p == value)
+            return p;
+        ++p;
+    }
+    return null;
+}
+
+static inline const Char *String_FindLast(const Char *pBegin, const Char *pEnd, Char value){
+    const Char *pREnd = pBegin - 1;
+    const Char *p = pEnd - 1;
+    while(p != pREnd){
+        if(*p == value)
+            return p;
+        --p;
+    }
+    return null;
+}
+
 static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize){
     if(nPrefixSize > nSize)
         return false;
@@ -68,6 +92,12 @@ static inline const Char *String_Skip(const Char *p, const Char value){
 static inline const Char *String_SkipUntil(const Char *p, Char value){
     while(*p != value)
         ++p;
+    return p;
+}
+
+static inline const Char *String_SkipForwardUntil(const Char *p, Char value){
+    while(*p != value)
+        --p;
     return p;
 }
 
