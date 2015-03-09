@@ -45,7 +45,7 @@ static inline Bool File_Create(File *pFile, const Char *pszPathName){
     return pFile->fd != -1;
 }
 
-static inline Bool File_CreateForWrite(File *pFile, const Char *pszPathName){
+static inline Bool File_CreateForWriting(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_CREAT | O_TRUNC | O_WRONLY, 0644);
     return pFile->fd != -1;
 }
@@ -60,8 +60,13 @@ static inline Bool File_OpenForRead(File *pFile, const Char *pszPathName){
     return pFile->fd != -1;
 }
 
-static inline Bool File_OpenForWrite(File *pFile, const Char *pszPathName){
+static inline Bool File_OpenForWriting(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_WRONLY);
+    return pFile->fd != -1;
+}
+
+static inline Bool File_OpenForAppending(File *pFile, const Char *pszPathName){
+    pFile->fd = open((const char*)pszPathName, O_APPEND);
     return pFile->fd != -1;
 }
 
@@ -77,7 +82,7 @@ static inline Bool File_Prepare(File *pFile, const Char *pszPathName){
     return pFile->fd != -1;
 }
 
-static inline Bool File_PrepareForWrite(File *pFile, const Char *pszPathName){
+static inline Bool File_PrepareForWriting(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_WRONLY);
     if(pFile->fd != -1)
         return true;
@@ -86,6 +91,17 @@ static inline Bool File_PrepareForWrite(File *pFile, const Char *pszPathName){
         return false;
 
     pFile->fd = open((const char*)pszPathName, O_CREAT | O_WRONLY, 0644);
+    return pFile->fd != -1;
+}
+static inline Bool File_PrepareForAppending(File *pFile, const Char *pszPathName){
+    pFile->fd = open((const char*)pszPathName, O_APPEND);
+    if(pFile->fd != -1)
+        return true;
+
+    if(errno != ENOENT)
+        return false;
+
+    pFile->fd = open((const char*)pszPathName, O_CREAT | O_APPEND, 0644);
     return pFile->fd != -1;
 }
 
@@ -125,6 +141,18 @@ static inline void File_Unmap(File *pFile){
 static inline void File_Close(File *pFile){
     close(pFile->fd);
     pFile->fd = -1;
+}
+
+static inline I64 File_Seek(File *pFile, U64 nOffset){
+    return lseek(pFile->fd, nOffset, SEEK_SET);
+}
+
+static inline I64 File_Offset(File *pFile){
+    return lseek(pFile->fd, 0, SEEK_CUR);
+}
+
+static inline I64 File_SeekToEnd(File *pFile){
+    return lseek(pFile->fd, 0, SEEK_END);
 }
 
 static inline Bool File_ReadMeta(File *pFile){
