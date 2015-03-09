@@ -23,7 +23,11 @@ struct File{
 typedef struct File File;
 
 static inline Bool File_Exists(const Char *pszPathName) {
-    return access((const char*)pszPathName, F_OK) != -1;
+    return access((const char*)pszPathName, F_OK) == 0;
+}
+
+static inline Bool File_Delete(const Char *pszPathName){
+    return unlink((const char*)pszPathName) == 0;
 }
 
 static inline Bool File_Create(File *pFile, const Char *pszPathName){
@@ -92,7 +96,7 @@ static inline Byte *File_MapForRead(File *pFile, const Char *pszPathName){
     if(fd == -1)
         return null;
 
-    if(fstat(fd, &pFile->meta) == -1){
+    if(fstat(fd, &pFile->meta) != 0){
         close(fd);
         return null;
     }
