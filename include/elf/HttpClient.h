@@ -5,6 +5,8 @@
 //Author: elf
 //EMail: elf198012@gmail.com
 
+//Note: User MUST define macro "HTTPCLIENT_BASE" before this file
+
 #define HTTP_VERSION_1_0
 
 #include "Type.h"
@@ -33,10 +35,21 @@ enum ResultOfHttpParsing{
 };
 
 typedef struct HttpClient HttpClient;
-typedef ResultOfHttpParsing (*ParseFunction)(HttpClient *pClient, const Char *pBegin, Char *pEnd);
 typedef int (*EventHandler)(HttpClient *pClient);
 typedef int (*DataHandler)(HttpClient *pClient, const Char *pBegin, const Char *pEnd);
 typedef int (*FieldHandler)(HttpClient *pClient, const Char *pName, const Char *pNameEnd, const Char *pValue, const Char *pValueEnd);
+//Api
+static inline void HttpClient_Initialize(HttpClient *pClient, DataHandler onVersion,
+                                         DataHandler onStatusCode,
+                                         DataHandler onReasonPhrase,
+                                         FieldHandler onField,
+                                         EventHandler onHeaderComplete,
+                                         DataHandler onBody,
+                                         EventHandler onComplete);
+
+static inline ResultOfHttpParsing HttpClient_Parse(HttpClient *pClient, const Char *pBegin, Char *pEnd);
+
+typedef ResultOfHttpParsing (*ParseFunction)(HttpClient *pClient, const Char *pBegin, Char *pEnd);
 
 struct HttpClient{
     HTTPCLIENT_BASE base;
@@ -65,7 +78,7 @@ struct HttpClient{
     Byte szBuffer[HTTP_RECEIVE_BUFFER_SIZE];
 };
 
-static inline ResultOfHttpParsing HttpClient_Parse(HttpClient *pClient, const Char *pBegin, Char *pEnd);
+//Internal
 static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, const Char *pBegin, Char *pEnd);
 static inline ResultOfHttpParsing HttpClient_ParseStatusCode(HttpClient *pClient, const Char *pBegin, Char *pEnd);
 static inline ResultOfHttpParsing HttpClient_ParseReasonPhrase(HttpClient *pClient, const Char *pBegin, Char *pEnd);
