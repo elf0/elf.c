@@ -120,17 +120,23 @@ static inline Char *HttpClient_ReadLine(const Char *pBegin, Char *pEnd){
 }
 
 static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, const Char *pBegin, Char *pEnd){
-    const Char *p = String_SkipUpper(pBegin);
-    U32 nSize = p - pBegin;
-    if(p == pEnd){
-        if(nSize > 4)
+    U32 nSize = pEnd - pBegin;
+    if(nSize < 4){
+        if(nSize && *pBegin != 'H')
             return rohpBadFormat;
-
         return rohpNeedMoreData;
     }
 
-    if(nSize != 4 || !String_Equal4(pBegin, (const Char*)"HTTP"))
+    if(!String_Equal4(pBegin, (const Char*)"HTTP"))
         return rohpBadFormat;
+
+    const Char *p = pBegin + 4;
+    if(*p != '/'){
+        if(p != pEnd)
+            return rohpBadFormat;
+        else
+            return rohpNeedMoreData;
+    }
     ++p;
 
     //Parse major version
@@ -393,4 +399,3 @@ static inline Bool ParseFieldContent(HttpClient *pClient, const Char *pName, con
 }
 
 #endif // HTTPCLIENT
-
