@@ -13,7 +13,13 @@ static inline const Char *String_Find(const Char *pBegin, const Char *pEnd, Char
 static inline const Char *String_FindLast(const Char *pBegin, const Char *pEnd, Char value);
 static inline const Char *String_FindSub(const Char *pBegin, const Char *pEnd, const Char *pSub, U32 nSubSize);
 static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize);
+static inline Bool String_StartsWith2(const Char *pBegin, U32 nSize, const Char *pPrefix);
+static inline Bool String_StartsWith4(const Char *pBegin, U32 nSize, const Char *pPrefix);
+static inline Bool String_StartsWith8(const Char *pBegin, U32 nSize, const Char *pPrefix);
 static inline Bool String_EndsWith(const Char *pBegin, U32 nSize, const Char *pSuffix, U32 nSuffixSize);
+static inline Bool String_EndsWith2(const Char *pEnd, U32 nSize, const Char *pSuffix);
+static inline Bool String_EndsWith4(const Char *pEnd, U32 nSize, const Char *pSuffix);
+static inline Bool String_EndsWith8(const Char *pEnd, U32 nSize, const Char *pSuffix);
 static inline const Char *String_Skip(const Char *p, const Char value);
 static inline const Char *String_SkipUntil(const Char *p, Char value);
 static inline const Char *String_SkipForwardUntil(const Char *p, Char value);
@@ -96,6 +102,18 @@ static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *
     return true;
 }
 
+static inline Bool String_StartsWith2(const Char *pBegin, U32 nSize, const Char *pPrefix){
+    return nSize > 1 && String_Equal2(pBegin, pPrefix);
+}
+
+static inline Bool String_StartsWith4(const Char *pBegin, U32 nSize, const Char *pPrefix){
+    return nSize > 3 && String_Equal4(pBegin, pPrefix);
+}
+
+static inline Bool String_StartsWith8(const Char *pBegin, U32 nSize, const Char *pPrefix){
+    return nSize > 7 && String_Equal8(pBegin, pPrefix);
+}
+
 static inline Bool String_EndsWith(const Char *pBegin, U32 nSize, const Char *pSuffix, U32 nSuffixSize){
     if(nSuffixSize > nSize)
         return false;
@@ -111,6 +129,19 @@ static inline Bool String_EndsWith(const Char *pBegin, U32 nSize, const Char *pS
     }
     return true;
 }
+
+static inline Bool String_EndsWith2(const Char *pEnd, U32 nSize, const Char *pSuffix){
+    return nSize > 1 && String_Equal2(pEnd - 2, pSuffix);
+}
+
+static inline Bool String_EndsWith4(const Char *pEnd, U32 nSize, const Char *pSuffix){
+    return nSize > 3 && String_Equal4(pEnd - 4, pSuffix);
+}
+
+static inline Bool String_EndsWith8(const Char *pEnd, U32 nSize, const Char *pSuffix){
+    return nSize > 7 && String_Equal8(pEnd - 8, pSuffix);
+}
+
 
 static inline const Char *String_Skip(const Char *p, const Char value){
     while(*p == value)
