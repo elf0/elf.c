@@ -18,7 +18,7 @@ typedef struct RBTree  RBTree;
 typedef struct RBTreeNode RBTreeNode;
 
 static inline void RBTree_Initialize(RBTree *pTree);
-static inline RBTreeNode *BBTree_Find(RBTree *pTree, RBTreeKey nKey);
+static inline RBTreeNode *RBTree_Find(RBTree *pTree, RBTreeKey nKey);
 static inline Bool RBTree_Insert(RBTree *pTree, RBTreeNode *pNew);
 
 //Internal
@@ -60,7 +60,7 @@ static inline void RBTree_Initialize(RBTree *pTree){
     pTree->fInsert = RBTree_InsertRoot;
 }
 
-static inline RBTreeNode *BBTree_Find(RBTree *pTree, RBTreeKey nKey){
+static inline RBTreeNode *RBTree_Find(RBTree *pTree, RBTreeKey nKey){
     RBTreeNode  *pSentinel = &pTree->ndSentinel;
     RBTreeNode *pNode = RBTREE_ROOT(pTree);
     while(pNode != pSentinel){
