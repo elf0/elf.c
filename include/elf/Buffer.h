@@ -27,9 +27,7 @@ static inline U32 Buffer_Size(Buffer *pbBuffer){
 }
 
 static inline void Buffer_Finalize(Buffer *pbBuffer){
-    U32 nSize = Buffer_Size(pbBuffer);
     pbBuffer->pBegin = null;
-    pbBuffer->pEnd = (Byte*)null + nSize;
 }
 
 static inline Bool Buffer_IsFinalized(Buffer *pbBuffer){
