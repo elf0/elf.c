@@ -2,3 +2,18 @@ human.c
 =======
 
 C-based platform/library for human being. It distributed under the 'Public Domain' license.
+List.h
+    A double linked list.
+
+CountedList.h
+    A counted double linked list.
+
+DataProcessor.h:
+    A worker thread. Thread calls "DataHandler()" for each "Data" that you posted.
+  "Post()" function is thread safe.
+
+TaskProcessor.h:
+    A worker thread. You can use it as coroutine.
+  Return "false" from "TaskEntry()" will run again at next time.
+  'Post()' function is thread safe.
+
