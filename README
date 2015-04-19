@@ -24,12 +24,12 @@ Buffer.h:
     A tool for receiving partial data from input device.
 
 DataProcessor.h:
-    A worker thread. Thread calls "DataHandler()" for each "Data" that you posted.
+    A worker thread. Thread calls "Handle()" for each "Data" that you posted.
   "Post()" function is thread safe.
 
 TaskProcessor.h:
     A worker thread. You can use it as coroutine.
-  Return "false" from "Execute()" will run again at next time.
+  Return "false" from "Perform()" will run again at next time.
   'Post()' function is thread safe.
 
 UTF8/16:

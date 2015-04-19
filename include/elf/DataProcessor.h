@@ -19,7 +19,7 @@ typedef struct{
     ThreadCondition condition;
     List datas;
     List pendingDatas;
-    DataHandler onData;
+    DataHandler Handle;
 }DataProcessor;
 
 struct Data{
@@ -28,13 +28,13 @@ struct Data{
 
 static void *DataProcessor_Entry(DataProcessor *pProcessor);
 
-static inline void DataProcessor_Initialize(DataProcessor *pProcessor, DataHandler onData){
+static inline void DataProcessor_Initialize(DataProcessor *pProcessor, DataHandler Handle){
     Thread_Initialize((Thread*)pProcessor, (ThreadEntry)DataProcessor_Entry);
     ThreadLock_Initialize(&pProcessor->lock);
     ThreadCondition_Initialize(&pProcessor->condition);
     List_Initialize(&pProcessor->datas);
     List_Initialize(&pProcessor->pendingDatas);
-    pProcessor->onData = onData;
+    pProcessor->Handle = Handle;
 }
 
 static inline void DataProcessor_Finalize(DataProcessor *pProcessor){
@@ -97,7 +97,7 @@ static inline void  DataProcessor_ProcessDatas(DataProcessor *pProcessor){
     List *pDatas = &pProcessor->datas;
     while(List_NotEmpty(pDatas)){
         Data *pData = (Data*)List_Pop(pDatas);
-        pProcessor->onData(pData);
+        pProcessor->Handle(pData);
     }
 }
 

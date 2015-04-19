@@ -16,12 +16,12 @@ typedef void (*TaskFinalize)(Task *pTask);
 
 struct structTask{
     DoubleNode node;
-    TaskHandler Execute;
+    TaskHandler Perform;
     TaskFinalize Finalize;
 };
 
-static inline void Task_Initialize(Task *pTask,  TaskHandler Execute, TaskFinalize Finalize){
-    pTask->Execute = Execute;
+static inline void Task_Initialize(Task *pTask,  TaskHandler Perform, TaskFinalize Finalize){
+    pTask->Perform = Perform;
     pTask->Finalize = Finalize;
 }
 
@@ -106,7 +106,7 @@ static inline void TaskProcessor_RunTasks(TaskProcessor *pProcessor){
     Task *pTask;
     while(pNode != pEntry){
         pTask = (Task*)pNode;
-        if(pTask->Execute(pTask)){
+        if(pTask->Perform(pTask)){
             List_Remove(pNode);
             pNode = pNode->pNext;
             pTask->Finalize(pTask);
