@@ -26,41 +26,41 @@ struct Data{
     DoubleNode node;
 };
 
-static void *DataProcessor_Entry(DataProcessor *pThread);
+static void *DataProcessor_Entry(DataProcessor *pProcessor);
 
-static inline void DataProcessor_Initialize(DataProcessor *pThread, DataHandler onData){
-    Thread_Initialize((Thread*)pThread, (ThreadEntry)DataProcessor_Entry);
-    ThreadLock_Initialize(&pThread->lock);
-    ThreadCondition_Initialize(&pThread->condition);
-    List_Initialize(&pThread->datas);
-    List_Initialize(&pThread->pendingDatas);
-    pThread->onData = onData;
+static inline void DataProcessor_Initialize(DataProcessor *pProcessor, DataHandler onData){
+    Thread_Initialize((Thread*)pProcessor, (ThreadEntry)DataProcessor_Entry);
+    ThreadLock_Initialize(&pProcessor->lock);
+    ThreadCondition_Initialize(&pProcessor->condition);
+    List_Initialize(&pProcessor->datas);
+    List_Initialize(&pProcessor->pendingDatas);
+    pProcessor->onData = onData;
 }
 
-static inline void DataProcessor_Finalize(DataProcessor *pThread){
-    ThreadCondition_Finalize(&pThread->condition);
-    ThreadLock_Finalize(&pThread->lock);
+static inline void DataProcessor_Finalize(DataProcessor *pProcessor){
+    ThreadCondition_Finalize(&pProcessor->condition);
+    ThreadLock_Finalize(&pProcessor->lock);
 }
 
-static inline Bool DataProcessor_Run(DataProcessor *pThread){
-    return Thread_Run((Thread*)pThread);
+static inline Bool DataProcessor_Run(DataProcessor *pProcessor){
+    return Thread_Run((Thread*)pProcessor);
 }
 
-static inline void DataProcessor_Post(DataProcessor *pThread, Data *pData){
-    ThreadLock_Lock(&pThread->lock);
-    List_Push(&pThread->pendingDatas, (DoubleNode*)pData);
-    ThreadLock_Unlock(&pThread->lock);
+static inline void DataProcessor_Post(DataProcessor *pProcessor, Data *pData){
+    ThreadLock_Lock(&pProcessor->lock);
+    List_Push(&pProcessor->pendingDatas, (DoubleNode*)pData);
+    ThreadLock_Unlock(&pProcessor->lock);
 
-    ThreadCondition_Signal(&pThread->condition);
+    ThreadCondition_Signal(&pProcessor->condition);
 }
 
 //Do not post Empty task list
-static inline void DataProcessor_PostDatas(DataProcessor *pThread, List *pDatas){
-    ThreadLock_Lock(&pThread->lock);
-    List_MoveTo(pDatas, &pThread->pendingDatas);
-    ThreadLock_Unlock(&pThread->lock);
+static inline void DataProcessor_PostDatas(DataProcessor *pProcessor, List *pDatas){
+    ThreadLock_Lock(&pProcessor->lock);
+    List_MoveTo(pDatas, &pProcessor->pendingDatas);
+    ThreadLock_Unlock(&pProcessor->lock);
 
-    ThreadCondition_Signal(&pThread->condition);
+    ThreadCondition_Signal(&pProcessor->condition);
 }
 
 //Internal
@@ -76,35 +76,35 @@ static inline void DataProcessor_MoveDatas(List *pPendingDatas, List *pDatas){
     List_MoveTo(pPendingDatas, pDatas);
 }
 
-static inline void DataProcessor_WaitDatas(DataProcessor *pThread){
-    List *pDatas = &pThread->datas;
-    List *pPendingDatas = &pThread->pendingDatas;
+static inline void DataProcessor_WaitDatas(DataProcessor *pProcessor){
+    List *pDatas = &pProcessor->datas;
+    List *pPendingDatas = &pProcessor->pendingDatas;
 
-    ThreadLock_Lock(&pThread->lock);
+    ThreadLock_Lock(&pProcessor->lock);
 
     if(DATAPROCESSOR_HaveDatas(pPendingDatas))
         DataProcessor_MoveDatas(pPendingDatas, pDatas);
 
     if(DataProcessor_NoDatas(pDatas)){
-        ThreadCondition_Wait(&pThread->condition, &pThread->lock);
+        ThreadCondition_Wait(&pProcessor->condition, &pProcessor->lock);
         DataProcessor_MoveDatas(pPendingDatas, pDatas);
     }
 
-    ThreadLock_Unlock(&pThread->lock);
+    ThreadLock_Unlock(&pProcessor->lock);
 }
 
-static inline void  DataProcessor_ProcessDatas(DataProcessor *pThread){
-    List *pDatas = &pThread->datas;
+static inline void  DataProcessor_ProcessDatas(DataProcessor *pProcessor){
+    List *pDatas = &pProcessor->datas;
     while(List_NotEmpty(pDatas)){
         Data *pData = (Data*)List_Pop(pDatas);
-        pThread->onData(pData);
+        pProcessor->onData(pData);
     }
 }
 
-static void *DataProcessor_Entry(DataProcessor *pThread){
+static void *DataProcessor_Entry(DataProcessor *pProcessor){
     while(true){
-        DataProcessor_WaitDatas(pThread);
-        DataProcessor_ProcessDatas(pThread);
+        DataProcessor_WaitDatas(pProcessor);
+        DataProcessor_ProcessDatas(pProcessor);
     }
     return null;
 }
