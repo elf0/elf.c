@@ -29,7 +29,7 @@ DataProcessor.h:
 
 TaskProcessor.h:
     A worker thread. You can use it as coroutine.
-  Return "false" from "TaskEntry()" will run again at next time.
+  Return "false" from "Execute()" will run again at next time.
   'Post()' function is thread safe.
 
 UTF8/16:

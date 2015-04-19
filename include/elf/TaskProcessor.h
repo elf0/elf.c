@@ -11,17 +11,17 @@
 #include "ThreadCondition.h"
 
 typedef struct structTask Task;
-typedef Bool (*TaskEntry)(Task *pTask);
+typedef Bool (* TaskHandler)(Task *pTask);
 typedef void (*TaskFinalize)(Task *pTask);
 
 struct structTask{
     DoubleNode node;
-    TaskEntry Entry;
+    TaskHandler Execute;
     TaskFinalize Finalize;
 };
 
-static inline void Task_Initialize(Task *pTask, TaskEntry Entry, TaskFinalize Finalize){
-    pTask->Entry = Entry;
+static inline void Task_Initialize(Task *pTask,  TaskHandler Execute, TaskFinalize Finalize){
+    pTask->Execute = Execute;
     pTask->Finalize = Finalize;
 }
 
@@ -106,7 +106,7 @@ static inline void TaskProcessor_RunTasks(TaskProcessor *pProcessor){
     Task *pTask;
     while(pNode != pEntry){
         pTask = (Task*)pNode;
-        if(pTask->Entry(pTask)){
+        if(pTask->Execute(pTask)){
             List_Remove(pNode);
             pNode = pNode->pNext;
             pTask->Finalize(pTask);
