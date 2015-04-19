@@ -24,3 +24,9 @@ UTF8/16:
     Read/Check UTF8/16 strings, 
   Convert string from UTF8 to UTF16.
   Convert string from UTF16 to UTF8.
+
+Time.h:
+    Measure time utilities for linux. 
+
+Buffer.h:
+    A tool for receiving partial data from input device.
