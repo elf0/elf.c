@@ -11,11 +11,17 @@ List.h:
 CountedList.h:
     A counted double linked list.
 
+SList.h:
+    A single linked list.
+
 PStack.h:
     A pointer stack.
 
 Pool.h/MPool.h:
     Memory pool.
+
+Buffer.h:
+    A tool for receiving partial data from input device.
 
 DataProcessor.h:
     A worker thread. Thread calls "DataHandler()" for each "Data" that you posted.
@@ -34,5 +40,5 @@ UTF8/16:
 Time.h:
     Measure time utilities for linux. 
 
-Buffer.h:
-    A tool for receiving partial data from input device.
+File.h:
+    File utilities for linux.
