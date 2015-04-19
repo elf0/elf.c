@@ -11,6 +11,12 @@ List.h:
 CountedList.h:
     A counted double linked list.
 
+PStack.h:
+    A pointer stack.
+
+Pool.h/MPool.h:
+    Memory pool.
+
 DataProcessor.h:
     A worker thread. Thread calls "DataHandler()" for each "Data" that you posted.
   "Post()" function is thread safe.
