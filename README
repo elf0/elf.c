@@ -2,10 +2,13 @@ human.c
 =======
 
 C-based platform/library for human being. It distributed under the 'Public Domain' license.
-List.h
+String.h:
+    Many utilities(Find, Parse number..) for string. They are faster.
+
+List.h:
     A double linked list.
 
-CountedList.h
+CountedList.h:
     A counted double linked list.
 
 DataProcessor.h:
@@ -17,3 +20,7 @@ TaskProcessor.h:
   Return "false" from "TaskEntry()" will run again at next time.
   'Post()' function is thread safe.
 
+UTF8/16:
+    Read/Check UTF8/16 strings, 
+  Convert string from UTF8 to UTF16.
+  Convert string from UTF16 to UTF8.
