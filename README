@@ -23,14 +23,14 @@ Pool.h/MPool.h:
 Buffer.h:
     A tool for receiving partial data from input device.
 
-DataProcessor.h:
+DataThread.h:
     A worker thread. Thread calls "Handle()" for each "Data" that you posted.
-  "Post()" function is thread safe.
+  "Post()" functions are thread safe.
 
-TaskProcessor.h:
+TaskThread.h.h:
     A worker thread. You can use it as coroutine.
   Return "false" from "Perform()" will run again at next time.
-  'Post()' function is thread safe.
+  'Post()' functions are thread safe.
 
 UTF8/16:
     Read/Check UTF8/16 strings, 
