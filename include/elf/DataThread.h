@@ -1,5 +1,5 @@
-#ifndef DATAPROCESSOR_H
-#define DATAPROCESSOR_H
+#ifndef DATATHREAD_H
+#define DATATHREAD_H
 
 //License: Public Domain
 //Author: elf
@@ -20,16 +20,16 @@ typedef struct{
     List datas;
     List pendingDatas;
     DataHandler Handle;
-}DataProcessor;
+}DataThread;
 
 struct Data{
     DoubleNode node;
 };
 
-static void *DataProcessor_Entry(DataProcessor *pProcessor);
+static void *DataThread_Entry(DataThread *pProcessor);
 
-static inline void DataProcessor_Initialize(DataProcessor *pProcessor, DataHandler Handle){
-    Thread_Initialize((Thread*)pProcessor, (ThreadEntry)DataProcessor_Entry);
+static inline void DataThread_Initialize(DataThread *pProcessor, DataHandler Handle){
+    Thread_Initialize((Thread*)pProcessor, (ThreadEntry)DataThread_Entry);
     ThreadLock_Initialize(&pProcessor->lock);
     ThreadCondition_Initialize(&pProcessor->condition);
     List_Initialize(&pProcessor->datas);
@@ -37,16 +37,16 @@ static inline void DataProcessor_Initialize(DataProcessor *pProcessor, DataHandl
     pProcessor->Handle = Handle;
 }
 
-static inline void DataProcessor_Finalize(DataProcessor *pProcessor){
+static inline void DataThread_Finalize(DataThread *pProcessor){
     ThreadCondition_Finalize(&pProcessor->condition);
     ThreadLock_Finalize(&pProcessor->lock);
 }
 
-static inline Bool DataProcessor_Run(DataProcessor *pProcessor){
+static inline Bool DataThread_Run(DataThread *pProcessor){
     return Thread_Run((Thread*)pProcessor);
 }
 
-static inline void DataProcessor_Post(DataProcessor *pProcessor, Data *pData){
+static inline void DataThread_Post(DataThread *pProcessor, Data *pData){
     ThreadLock_Lock(&pProcessor->lock);
     List_Push(&pProcessor->pendingDatas, (DoubleNode*)pData);
     ThreadLock_Unlock(&pProcessor->lock);
@@ -54,8 +54,8 @@ static inline void DataProcessor_Post(DataProcessor *pProcessor, Data *pData){
     ThreadCondition_Signal(&pProcessor->condition);
 }
 
-//Do not post Empty task list
-static inline void DataProcessor_PostDatas(DataProcessor *pProcessor, List *pDatas){
+//Do not post Empty data list
+static inline void DataThread_PostDatas(DataThread *pProcessor, List *pDatas){
     ThreadLock_Lock(&pProcessor->lock);
     List_MoveTo(pDatas, &pProcessor->pendingDatas);
     ThreadLock_Unlock(&pProcessor->lock);
@@ -64,36 +64,36 @@ static inline void DataProcessor_PostDatas(DataProcessor *pProcessor, List *pDat
 }
 
 //Internal
-static inline Bool DATAPROCESSOR_HaveDatas(List *pDatas){
+static inline Bool DATATHREAD_HaveDatas(List *pDatas){
     return List_NotEmpty(pDatas);
 }
 
-static inline Bool DataProcessor_NoDatas(List *pDatas){
+static inline Bool DataThread_NoDatas(List *pDatas){
     return List_Empty(pDatas);
 }
 
-static inline void DataProcessor_MoveDatas(List *pPendingDatas, List *pDatas){
+static inline void DataThread_MoveDatas(List *pPendingDatas, List *pDatas){
     List_MoveTo(pPendingDatas, pDatas);
 }
 
-static inline void DataProcessor_WaitDatas(DataProcessor *pProcessor){
+static inline void DataThread_WaitDatas(DataThread *pProcessor){
     List *pDatas = &pProcessor->datas;
     List *pPendingDatas = &pProcessor->pendingDatas;
 
     ThreadLock_Lock(&pProcessor->lock);
 
-    if(DATAPROCESSOR_HaveDatas(pPendingDatas))
-        DataProcessor_MoveDatas(pPendingDatas, pDatas);
+    if(DATATHREAD_HaveDatas(pPendingDatas))
+        DataThread_MoveDatas(pPendingDatas, pDatas);
 
-    if(DataProcessor_NoDatas(pDatas)){
+    if(DataThread_NoDatas(pDatas)){
         ThreadCondition_Wait(&pProcessor->condition, &pProcessor->lock);
-        DataProcessor_MoveDatas(pPendingDatas, pDatas);
+        DataThread_MoveDatas(pPendingDatas, pDatas);
     }
 
     ThreadLock_Unlock(&pProcessor->lock);
 }
 
-static inline void  DataProcessor_ProcessDatas(DataProcessor *pProcessor){
+static inline void  DataThread_ProcessDatas(DataThread *pProcessor){
     List *pDatas = &pProcessor->datas;
     while(List_NotEmpty(pDatas)){
         Data *pData = (Data*)List_Pop(pDatas);
@@ -101,13 +101,13 @@ static inline void  DataProcessor_ProcessDatas(DataProcessor *pProcessor){
     }
 }
 
-static void *DataProcessor_Entry(DataProcessor *pProcessor){
+static void *DataThread_Entry(DataThread *pProcessor){
     while(true){
-        DataProcessor_WaitDatas(pProcessor);
-        DataProcessor_ProcessDatas(pProcessor);
+        DataThread_WaitDatas(pProcessor);
+        DataThread_ProcessDatas(pProcessor);
     }
     return null;
 }
-#endif //DATAPROCESSOR_H
+#endif //DATATHREAD_H
 
 
