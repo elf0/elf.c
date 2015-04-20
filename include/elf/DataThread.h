@@ -18,7 +18,7 @@ typedef struct{
     ThreadLock lock;
     ThreadCondition condition;
     List datas;
-    List pendingDatas;
+    List pendings;
     DataHandler Handle;
 }DataThread;
 
@@ -33,7 +33,7 @@ static inline void DataThread_Initialize(DataThread *pThread, DataHandler Handle
     ThreadLock_Initialize(&pThread->lock);
     ThreadCondition_Initialize(&pThread->condition);
     List_Initialize(&pThread->datas);
-    List_Initialize(&pThread->pendingDatas);
+    List_Initialize(&pThread->pendings);
     pThread->Handle = Handle;
 }
 
@@ -48,7 +48,7 @@ static inline Bool DataThread_Run(DataThread *pThread){
 
 static inline void DataThread_Post(DataThread *pThread, Data *pData){
     ThreadLock_Lock(&pThread->lock);
-    List_Push(&pThread->pendingDatas, (DoubleNode*)pData);
+    List_Push(&pThread->pendings, (DoubleNode*)pData);
     ThreadLock_Unlock(&pThread->lock);
 
     ThreadCondition_Signal(&pThread->condition);
@@ -57,7 +57,7 @@ static inline void DataThread_Post(DataThread *pThread, Data *pData){
 //Do not post Empty data list
 static inline void DataThread_PostDatas(DataThread *pThread, List *pDatas){
     ThreadLock_Lock(&pThread->lock);
-    List_MoveTo(pDatas, &pThread->pendingDatas);
+    List_MoveTo(pDatas, &pThread->pendings);
     ThreadLock_Unlock(&pThread->lock);
 
     ThreadCondition_Signal(&pThread->condition);
@@ -72,22 +72,22 @@ static inline Bool DataThread_NoDatas(List *pDatas){
     return List_Empty(pDatas);
 }
 
-static inline void DataThread_MoveDatas(List *pPendingDatas, List *pDatas){
-    List_MoveTo(pPendingDatas, pDatas);
+static inline void DataThread_MoveDatas(List *pPendings, List *pDatas){
+    List_MoveTo(pPendings, pDatas);
 }
 
 static inline void DataThread_WaitDatas(DataThread *pThread){
     List *pDatas = &pThread->datas;
-    List *pPendingDatas = &pThread->pendingDatas;
+    List *pPendings = &pThread->pendings;
 
     ThreadLock_Lock(&pThread->lock);
 
-    if(DataThread_HaveDatas(pPendingDatas))
-        DataThread_MoveDatas(pPendingDatas, pDatas);
+    if(DataThread_HaveDatas(pPendings))
+        DataThread_MoveDatas(pPendings, pDatas);
 
     if(DataThread_NoDatas(pDatas)){
         ThreadCondition_Wait(&pThread->condition, &pThread->lock);
-        DataThread_MoveDatas(pPendingDatas, pDatas);
+        DataThread_MoveDatas(pPendings, pDatas);
     }
 
     ThreadLock_Unlock(&pThread->lock);

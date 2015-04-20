@@ -31,7 +31,7 @@ typedef struct{
     ThreadLock lock;
     ThreadCondition condition;
     List tasks;
-    List pendingTasks;
+    List pendings;
 }TaskThread;
 
 static void *TaskThread_Entry(TaskThread *pThread);
@@ -41,7 +41,7 @@ static inline void TaskThread_Initialize(TaskThread *pThread){
     ThreadLock_Initialize(&pThread->lock);
     ThreadCondition_Initialize(&pThread->condition);
     List_Initialize(&pThread->tasks);
-    List_Initialize(&pThread->pendingTasks);
+    List_Initialize(&pThread->pendings);
 }
 
 static inline void TaskThread_Finalize(TaskThread *pThread){
@@ -55,7 +55,7 @@ static inline Bool TaskThread_Run(TaskThread *pThread){
 
 static inline void TaskThread_Post(TaskThread *pThread, Task *pTask){
     ThreadLock_Lock(&pThread->lock);
-    List_Push(&pThread->pendingTasks, (DoubleNode*)pTask);
+    List_Push(&pThread->pendings, (DoubleNode*)pTask);
     ThreadLock_Unlock(&pThread->lock);
 
     ThreadCondition_Signal(&pThread->condition);
@@ -64,7 +64,7 @@ static inline void TaskThread_Post(TaskThread *pThread, Task *pTask){
 //Do not post Empty task list
 static inline void TaskThread_PostTasks(TaskThread *pThread, List *pTasks){
     ThreadLock_Lock(&pThread->lock);
-    List_MoveTo(pTasks, &pThread->pendingTasks);
+    List_MoveTo(pTasks, &pThread->pendings);
     ThreadLock_Unlock(&pThread->lock);
 
     ThreadCondition_Signal(&pThread->condition);
@@ -79,22 +79,22 @@ static inline Bool TaskThread_NoTasks(List *pTasks){
     return List_Empty(pTasks);
 }
 
-static inline void TaskThread_MoveTasks(List *pPendingTasks, List *pTasks){
-    List_MoveTo(pPendingTasks, pTasks);
+static inline void TaskThread_MoveTasks(List *pPendings, List *pTasks){
+    List_MoveTo(pPendings, pTasks);
 }
 
 static inline void TaskThread_WaitTasks(TaskThread *pThread){
     List *pTasks = &pThread->tasks;
-    List *pPendingTasks = &pThread->pendingTasks;
+    List *pPendings = &pThread->pendings;
 
     ThreadLock_Lock(&pThread->lock);
 
-    if(TaskThread_HaveTasks(pPendingTasks))
-        TaskThread_MoveTasks(pPendingTasks, pTasks);
+    if(TaskThread_HaveTasks(pPendings))
+        TaskThread_MoveTasks(pPendings, pTasks);
 
     if(TaskThread_NoTasks(pTasks)){
         ThreadCondition_Wait(&pThread->condition, &pThread->lock);
-        TaskThread_MoveTasks(pPendingTasks, pTasks);
+        TaskThread_MoveTasks(pPendings, pTasks);
     }
 
     ThreadLock_Unlock(&pThread->lock);
