@@ -1,5 +1,5 @@
-#ifndef DataThread_H
-#define DataThread_H
+#ifndef DATATHREAD_H
+#define DATATHREAD_H
 
 //License: Public Domain
 //Author: elf
@@ -64,7 +64,7 @@ static inline void DataThread_PostDatas(DataThread *pThread, List *pDatas){
 }
 
 //Internal
-static inline Bool DataThread_HaveDatas(List *pDatas){
+static inline Bool DATATHREAD_HaveDatas(List *pDatas){
     return List_NotEmpty(pDatas);
 }
 
@@ -82,7 +82,7 @@ static inline void DataThread_WaitDatas(DataThread *pThread){
 
     ThreadLock_Lock(&pThread->lock);
 
-    if(DataThread_HaveDatas(pPendings))
+    if(DATATHREAD_HaveDatas(pPendings))
         DataThread_MoveDatas(pPendings, pDatas);
     else if(DataThread_NoDatas(pDatas)){
         ThreadCondition_Wait(&pThread->condition, &pThread->lock);
@@ -107,6 +107,6 @@ static void *DataThread_Entry(DataThread *pThread){
     }
     return null;
 }
-#endif //DataThread_H
+#endif //DATATHREAD_H
 
 
