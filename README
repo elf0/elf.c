@@ -32,6 +32,12 @@ TaskThread.h:
   Return "false" from "Perform()" will run again at next time.
   'Post()' functions are thread safe.
 
+FixedTaskThread.h:
+    A worker thread. You can use it as coroutine.
+  Return "false" from "Perform()" will run again at next time.
+  'Post()' functions are thread safe.
+  Each cycle only perform fixed number tasks, others must wait.
+
 UTF8/16:
     Read/Check UTF8/16 strings, 
   Convert string from UTF8 to UTF16.
