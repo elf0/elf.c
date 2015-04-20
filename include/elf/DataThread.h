@@ -26,41 +26,41 @@ struct Data{
     DoubleNode node;
 };
 
-static void *DataThread_Entry(DataThread *pProcessor);
+static void *DataThread_Entry(DataThread *pThread);
 
-static inline void DataThread_Initialize(DataThread *pProcessor, DataHandler Handle){
-    Thread_Initialize((Thread*)pProcessor, (ThreadEntry)DataThread_Entry);
-    ThreadLock_Initialize(&pProcessor->lock);
-    ThreadCondition_Initialize(&pProcessor->condition);
-    List_Initialize(&pProcessor->datas);
-    List_Initialize(&pProcessor->pendingDatas);
-    pProcessor->Handle = Handle;
+static inline void DataThread_Initialize(DataThread *pThread, DataHandler Handle){
+    Thread_Initialize((Thread*)pThread, (ThreadEntry)DataThread_Entry);
+    ThreadLock_Initialize(&pThread->lock);
+    ThreadCondition_Initialize(&pThread->condition);
+    List_Initialize(&pThread->datas);
+    List_Initialize(&pThread->pendingDatas);
+    pThread->Handle = Handle;
 }
 
-static inline void DataThread_Finalize(DataThread *pProcessor){
-    ThreadCondition_Finalize(&pProcessor->condition);
-    ThreadLock_Finalize(&pProcessor->lock);
+static inline void DataThread_Finalize(DataThread *pThread){
+    ThreadCondition_Finalize(&pThread->condition);
+    ThreadLock_Finalize(&pThread->lock);
 }
 
-static inline Bool DataThread_Run(DataThread *pProcessor){
-    return Thread_Run((Thread*)pProcessor);
+static inline Bool DataThread_Run(DataThread *pThread){
+    return Thread_Run((Thread*)pThread);
 }
 
-static inline void DataThread_Post(DataThread *pProcessor, Data *pData){
-    ThreadLock_Lock(&pProcessor->lock);
-    List_Push(&pProcessor->pendingDatas, (DoubleNode*)pData);
-    ThreadLock_Unlock(&pProcessor->lock);
+static inline void DataThread_Post(DataThread *pThread, Data *pData){
+    ThreadLock_Lock(&pThread->lock);
+    List_Push(&pThread->pendingDatas, (DoubleNode*)pData);
+    ThreadLock_Unlock(&pThread->lock);
 
-    ThreadCondition_Signal(&pProcessor->condition);
+    ThreadCondition_Signal(&pThread->condition);
 }
 
 //Do not post Empty data list
-static inline void DataThread_PostDatas(DataThread *pProcessor, List *pDatas){
-    ThreadLock_Lock(&pProcessor->lock);
-    List_MoveTo(pDatas, &pProcessor->pendingDatas);
-    ThreadLock_Unlock(&pProcessor->lock);
+static inline void DataThread_PostDatas(DataThread *pThread, List *pDatas){
+    ThreadLock_Lock(&pThread->lock);
+    List_MoveTo(pDatas, &pThread->pendingDatas);
+    ThreadLock_Unlock(&pThread->lock);
 
-    ThreadCondition_Signal(&pProcessor->condition);
+    ThreadCondition_Signal(&pThread->condition);
 }
 
 //Internal
@@ -76,35 +76,35 @@ static inline void DataThread_MoveDatas(List *pPendingDatas, List *pDatas){
     List_MoveTo(pPendingDatas, pDatas);
 }
 
-static inline void DataThread_WaitDatas(DataThread *pProcessor){
-    List *pDatas = &pProcessor->datas;
-    List *pPendingDatas = &pProcessor->pendingDatas;
+static inline void DataThread_WaitDatas(DataThread *pThread){
+    List *pDatas = &pThread->datas;
+    List *pPendingDatas = &pThread->pendingDatas;
 
-    ThreadLock_Lock(&pProcessor->lock);
+    ThreadLock_Lock(&pThread->lock);
 
     if(DATATHREAD_HaveDatas(pPendingDatas))
         DataThread_MoveDatas(pPendingDatas, pDatas);
 
     if(DataThread_NoDatas(pDatas)){
-        ThreadCondition_Wait(&pProcessor->condition, &pProcessor->lock);
+        ThreadCondition_Wait(&pThread->condition, &pThread->lock);
         DataThread_MoveDatas(pPendingDatas, pDatas);
     }
 
-    ThreadLock_Unlock(&pProcessor->lock);
+    ThreadLock_Unlock(&pThread->lock);
 }
 
-static inline void  DataThread_ProcessDatas(DataThread *pProcessor){
-    List *pDatas = &pProcessor->datas;
+static inline void  DataThread_ProcessDatas(DataThread *pThread){
+    List *pDatas = &pThread->datas;
     while(List_NotEmpty(pDatas)){
         Data *pData = (Data*)List_Pop(pDatas);
-        pProcessor->Handle(pData);
+        pThread->Handle(pData);
     }
 }
 
-static void *DataThread_Entry(DataThread *pProcessor){
+static void *DataThread_Entry(DataThread *pThread){
     while(true){
-        DataThread_WaitDatas(pProcessor);
-        DataThread_ProcessDatas(pProcessor);
+        DataThread_WaitDatas(pThread);
+        DataThread_ProcessDatas(pThread);
     }
     return null;
 }

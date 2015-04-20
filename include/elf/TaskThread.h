@@ -34,40 +34,40 @@ typedef struct{
     List pendingTasks;
 }TaskThread;
 
-static void *TaskThread_Entry(TaskThread *pProcessor);
+static void *TaskThread_Entry(TaskThread *pThread);
 
-static inline void TaskThread_Initialize(TaskThread *pProcessor){
-    Thread_Initialize((Thread*)pProcessor, (ThreadEntry)TaskThread_Entry);
-    ThreadLock_Initialize(&pProcessor->lock);
-    ThreadCondition_Initialize(&pProcessor->condition);
-    List_Initialize(&pProcessor->tasks);
-    List_Initialize(&pProcessor->pendingTasks);
+static inline void TaskThread_Initialize(TaskThread *pThread){
+    Thread_Initialize((Thread*)pThread, (ThreadEntry)TaskThread_Entry);
+    ThreadLock_Initialize(&pThread->lock);
+    ThreadCondition_Initialize(&pThread->condition);
+    List_Initialize(&pThread->tasks);
+    List_Initialize(&pThread->pendingTasks);
 }
 
-static inline void TaskThread_Finalize(TaskThread *pProcessor){
-    ThreadCondition_Finalize(&pProcessor->condition);
-    ThreadLock_Finalize(&pProcessor->lock);
+static inline void TaskThread_Finalize(TaskThread *pThread){
+    ThreadCondition_Finalize(&pThread->condition);
+    ThreadLock_Finalize(&pThread->lock);
 }
 
-static inline Bool TaskThread_Run(TaskThread *pProcessor){
-    return Thread_Run((Thread*)pProcessor);
+static inline Bool TaskThread_Run(TaskThread *pThread){
+    return Thread_Run((Thread*)pThread);
 }
 
-static inline void TaskThread_Post(TaskThread *pProcessor, Task *pTask){
-    ThreadLock_Lock(&pProcessor->lock);
-    List_Push(&pProcessor->pendingTasks, (DoubleNode*)pTask);
-    ThreadLock_Unlock(&pProcessor->lock);
+static inline void TaskThread_Post(TaskThread *pThread, Task *pTask){
+    ThreadLock_Lock(&pThread->lock);
+    List_Push(&pThread->pendingTasks, (DoubleNode*)pTask);
+    ThreadLock_Unlock(&pThread->lock);
 
-    ThreadCondition_Signal(&pProcessor->condition);
+    ThreadCondition_Signal(&pThread->condition);
 }
 
 //Do not post Empty task list
-static inline void TaskThread_PostTasks(TaskThread *pProcessor, List *pTasks){
-    ThreadLock_Lock(&pProcessor->lock);
-    List_MoveTo(pTasks, &pProcessor->pendingTasks);
-    ThreadLock_Unlock(&pProcessor->lock);
+static inline void TaskThread_PostTasks(TaskThread *pThread, List *pTasks){
+    ThreadLock_Lock(&pThread->lock);
+    List_MoveTo(pTasks, &pThread->pendingTasks);
+    ThreadLock_Unlock(&pThread->lock);
 
-    ThreadCondition_Signal(&pProcessor->condition);
+    ThreadCondition_Signal(&pThread->condition);
 }
 
 //Internal
@@ -83,25 +83,25 @@ static inline void TaskThread_MoveTasks(List *pPendingTasks, List *pTasks){
     List_MoveTo(pPendingTasks, pTasks);
 }
 
-static inline void TaskThread_WaitTasks(TaskThread *pProcessor){
-    List *pTasks = &pProcessor->tasks;
-    List *pPendingTasks = &pProcessor->pendingTasks;
+static inline void TaskThread_WaitTasks(TaskThread *pThread){
+    List *pTasks = &pThread->tasks;
+    List *pPendingTasks = &pThread->pendingTasks;
 
-    ThreadLock_Lock(&pProcessor->lock);
+    ThreadLock_Lock(&pThread->lock);
 
     if(TaskThread_HaveTasks(pPendingTasks))
         TaskThread_MoveTasks(pPendingTasks, pTasks);
 
     if(TaskThread_NoTasks(pTasks)){
-        ThreadCondition_Wait(&pProcessor->condition, &pProcessor->lock);
+        ThreadCondition_Wait(&pThread->condition, &pThread->lock);
         TaskThread_MoveTasks(pPendingTasks, pTasks);
     }
 
-    ThreadLock_Unlock(&pProcessor->lock);
+    ThreadLock_Unlock(&pThread->lock);
 }
 
-static inline void TaskThread_RunTasks(TaskThread *pProcessor){
-    DoubleNode *pEntry = (DoubleNode*)&pProcessor->tasks;
+static inline void TaskThread_RunTasks(TaskThread *pThread){
+    DoubleNode *pEntry = (DoubleNode*)&pThread->tasks;
     DoubleNode *pNode = pEntry->pNext;
     Task *pTask;
     while(pNode != pEntry){
@@ -116,10 +116,10 @@ static inline void TaskThread_RunTasks(TaskThread *pProcessor){
     }
 }
 
-static void *TaskThread_Entry(TaskThread *pProcessor){
+static void *TaskThread_Entry(TaskThread *pThread){
     while(true){
-        TaskThread_WaitTasks(pProcessor);
-        TaskThread_RunTasks(pProcessor);
+        TaskThread_WaitTasks(pThread);
+        TaskThread_RunTasks(pThread);
     }
     return null;
 }
