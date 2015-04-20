@@ -27,7 +27,7 @@ DataThread.h:
     A worker thread. Thread calls "Handle()" for each "Data" that you posted.
   "Post()" functions are thread safe.
 
-TaskThread.h.h:
+TaskThread.h:
     A worker thread. You can use it as coroutine.
   Return "false" from "Perform()" will run again at next time.
   'Post()' functions are thread safe.
