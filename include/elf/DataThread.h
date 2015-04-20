@@ -84,8 +84,7 @@ static inline void DataThread_WaitDatas(DataThread *pThread){
 
     if(DataThread_HaveDatas(pPendings))
         DataThread_MoveDatas(pPendings, pDatas);
-
-    if(DataThread_NoDatas(pDatas)){
+    else if(DataThread_NoDatas(pDatas)){
         ThreadCondition_Wait(&pThread->condition, &pThread->lock);
         DataThread_MoveDatas(pPendings, pDatas);
     }

@@ -91,8 +91,7 @@ static inline void TaskThread_WaitTasks(TaskThread *pThread){
 
     if(TaskThread_HaveTasks(pPendings))
         TaskThread_MoveTasks(pPendings, pTasks);
-
-    if(TaskThread_NoTasks(pTasks)){
+    else if(TaskThread_NoTasks(pTasks)){
         ThreadCondition_Wait(&pThread->condition, &pThread->lock);
         TaskThread_MoveTasks(pPendings, pTasks);
     }
