@@ -9,22 +9,7 @@
 #include "List.h"
 #include "Thread.h"
 #include "ThreadCondition.h"
-
-typedef struct structTask Task;
-typedef Bool (* TaskHandler)(Task *pTask);
-typedef void (*TaskFinalize)(Task *pTask);
-
-struct structTask{
-    DoubleNode node;
-    TaskHandler Perform;
-    TaskFinalize Finalize;
-};
-
-static inline void Task_Initialize(Task *pTask,  TaskHandler Perform, TaskFinalize Finalize){
-    pTask->Perform = Perform;
-    pTask->Finalize = Finalize;
-}
-
+#include "Task.h"
 
 typedef struct{
     Thread thread;
