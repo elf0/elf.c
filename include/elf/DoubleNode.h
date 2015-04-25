@@ -56,11 +56,9 @@ static inline void DoubleNode_MoveBuddiesToFront(DoubleNode *pNode, DoubleNode *
 }
 
 static inline void DoubleNode_SwapBuddies(DoubleNode *pNode, DoubleNode *pTargetNode){
-    DoubleNode tmp;
-    DoubleNode_Reset(&tmp);
-    DoubleNode_MoveBuddiesTo(pNode, &tmp);
-    DoubleNode_MoveBuddiesTo(pTargetNode, pNode);
-    DoubleNode_MoveBuddiesTo(&tmp, pTargetNode);
+    DoubleNode tmp = *pNode;
+    *pNode = *pTargetNode;
+    *pTargetNode = tmp;
 }
 
 #endif //DOUBLENODE_H
