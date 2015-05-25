@@ -46,7 +46,7 @@ static inline I32 FileReader_ReadFrom(FileReader *pReader, U64 nOffset, Byte *pB
     return File_ReadFrom(&pReader->file, nOffset, pBuffer, nSize);
 }
 
-static inline Byte *FileReader_Map(FileReader *pReader, const Char *pszPathName){
+static inline const Byte *FileReader_Map(FileReader *pReader, const Char *pszPathName){
     if(!FileReader_Open(pReader, pszPathName))
         return null;
 
@@ -55,13 +55,13 @@ static inline Byte *FileReader_Map(FileReader *pReader, const Char *pszPathName)
         return null;
     }
 
-    Byte *pBegin = (Byte*)mmap(0, pReader->file.meta.st_size, PROT_READ, MAP_SHARED, pReader->file.fd, 0);
+    const Byte *pBegin = (Byte*)mmap(0, pReader->file.meta.st_size, PROT_READ, MAP_SHARED, pReader->file.fd, 0);
     FileReader_Close(pReader);
     if(pBegin == MAP_FAILED)
         return null;
 
     pReader->nOffset = 0;
-    return pReader->file.pBegin = pBegin;
+    return pReader->file.pBegin = (Byte*)pBegin;
 }
 
 static inline void FileReader_Unmap(FileReader *pReader){
