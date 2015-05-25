@@ -7,23 +7,18 @@
 
 #include "File.h"
 
-typedef struct FileReader FileReader;
-typedef I32 (*FileReadFunction)(FileReader *pReader, Byte *pBuffer, U32 nSize);
-
-struct FileReader{
+typedef struct{
     File file;
     U64 nOffset;
-    FileReadFunction Read;
-};
-
-static inline I32 FileReader_DefaultRead(FileReader *pReader, Byte *pBuffer, U32 nSize);
+}FileReader;
 
 static inline Bool FileReader_Open(FileReader *pReader, const Char *pszPathName){
-    if(!File_OpenForRead(&pReader->file, pszPathName))
+    int fd = open((const char*)pszPathName, O_RDONLY);
+    if(fd == -1)
         return false;
 
+    pReader->file.fd = fd;
     pReader->nOffset = 0;
-    pReader->Read = FileReader_DefaultRead;
     return true;
 }
 
@@ -40,11 +35,7 @@ static inline Bool FileReader_ReadMeta(FileReader *pReader){
 }
 
 static inline I32 FileReader_Read(FileReader *pReader, Byte *pBuffer, U32 nSize){
-    return pReader->Read(pReader, pBuffer, nSize);
-}
-
-static inline I32 FileReader_DefaultRead(FileReader *pReader, Byte *pBuffer, U32 nSize){
-    I32 nResult = File_ReadFrom(&pReader->file, pReader->nOffset, pBuffer, nSize);
+    ssize_t nResult = File_ReadFrom(&pReader->file, pReader->nOffset, pBuffer, nSize);
     if(nResult == -1)
         return -1;
 
@@ -52,4 +43,26 @@ static inline I32 FileReader_DefaultRead(FileReader *pReader, Byte *pBuffer, U32
     return nResult;
 }
 
+static inline I32 FileReader_ReadFrom(FileReader *pReader, U64 nOffset, Byte *pBuffer, U32 nSize){
+    return File_ReadFrom(&pReader->file, nOffset, pBuffer, nSize);
+}
+
+static inline Byte *FileReader_Map(FileReader *pReader, const Char *pszPathName){
+    int fd = open((const char*)pszPathName, O_RDONLY);
+    if(fd == -1)
+        return null;
+
+    if(fstat(fd, &pReader->file.meta) != 0){
+        close(fd);
+        return null;
+    }
+
+    Byte *pBegin = (Byte*)mmap(0, pReader->file.meta.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);
+    if(pBegin == MAP_FAILED)
+        return null;
+
+    pReader->nOffset = 0;
+    return pReader->file.pBegin = pBegin;
+}
 #endif // FILEREADER_H

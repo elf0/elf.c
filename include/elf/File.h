@@ -45,28 +45,8 @@ static inline Bool File_Create(File *pFile, const Char *pszPathName){
     return pFile->fd != -1;
 }
 
-static inline Bool File_CreateForWriting(File *pFile, const Char *pszPathName){
-    pFile->fd = open((const char*)pszPathName, O_CREAT | O_TRUNC | O_WRONLY, 0644);
-    return pFile->fd != -1;
-}
-
 static inline Bool File_Open(File *pFile, const Char *pszPathName){
     pFile->fd = open((const char*)pszPathName, O_RDWR);
-    return pFile->fd != -1;
-}
-
-static inline Bool File_OpenForRead(File *pFile, const Char *pszPathName){
-    pFile->fd = open((const char*)pszPathName, O_RDONLY);
-    return pFile->fd != -1;
-}
-
-static inline Bool File_OpenForWriting(File *pFile, const Char *pszPathName){
-    pFile->fd = open((const char*)pszPathName, O_WRONLY);
-    return pFile->fd != -1;
-}
-
-static inline Bool File_OpenForAppending(File *pFile, const Char *pszPathName){
-    pFile->fd = open((const char*)pszPathName, O_APPEND);
     return pFile->fd != -1;
 }
 
@@ -82,29 +62,6 @@ static inline Bool File_Prepare(File *pFile, const Char *pszPathName){
     return pFile->fd != -1;
 }
 
-static inline Bool File_PrepareForWriting(File *pFile, const Char *pszPathName){
-    pFile->fd = open((const char*)pszPathName, O_WRONLY);
-    if(pFile->fd != -1)
-        return true;
-
-    if(errno != ENOENT)
-        return false;
-
-    pFile->fd = open((const char*)pszPathName, O_CREAT | O_WRONLY, 0644);
-    return pFile->fd != -1;
-}
-static inline Bool File_PrepareForAppending(File *pFile, const Char *pszPathName){
-    pFile->fd = open((const char*)pszPathName, O_APPEND);
-    if(pFile->fd != -1)
-        return true;
-
-    if(errno != ENOENT)
-        return false;
-
-    pFile->fd = open((const char*)pszPathName, O_CREAT | O_APPEND, 0644);
-    return pFile->fd != -1;
-}
-
 static inline void File_OpenStdIn(File *pFile){
     pFile->fd = 0;
 }
@@ -115,23 +72,6 @@ static inline void File_OpenStdOut(File *pFile){
 
 static inline void File_OpenStdError(File *pFile){
     pFile->fd = 2;
-}
-
-static inline Byte *File_MapForRead(File *pFile, const Char *pszPathName){
-    I32 fd = open((const char*)pszPathName, O_RDONLY);
-    if(fd == -1)
-        return null;
-
-    if(fstat(fd, &pFile->meta) != 0){
-        close(fd);
-        return null;
-    }
-
-    pFile->pBegin = (Byte*)mmap(0, pFile->meta.st_size, PROT_READ, MAP_SHARED, fd, 0);
-    close(fd);
-    if(pFile->pBegin == MAP_FAILED)
-        return null;
-    return pFile->pBegin;
 }
 
 static inline void File_Unmap(File *pFile){

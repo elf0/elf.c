@@ -24,39 +24,53 @@ static inline I32 FileWriter_Write(FileWriter *pWriter, const Byte *pData, U32 n
 static inline I32 FileWriter_WriteTo(FileWriter *pWriter, U64 nOffset, const Byte *pData, U32 nSize);
 
 static inline Bool FileWriter_Create(FileWriter *pWriter, const Char *pszPathName){
-    pWriter->file.fd = open((const char*)pszPathName, O_CREAT | O_TRUNC | O_WRONLY, 0644);
-    if(pWriter->file.fd == -1)
+    int fd = open((const char*)pszPathName, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+    if(fd == -1)
         return false;
 
+    pWriter->file.fd = fd;
     pWriter->nOffset = 0;
     return true;
 }
 
 static inline Bool FileWriter_Open(FileWriter *pWriter, const Char *pszPathName){
-    pWriter->file.fd = open((const char*)pszPathName, O_WRONLY);
-    if(pWriter->file.fd == -1)
+    int fd = open((const char*)pszPathName, O_WRONLY);
+    if(fd == -1)
         return false;
 
+    pWriter->file.fd = fd;
     pWriter->nOffset = 0;
     return true;
 }
 
 static inline Bool FileWriter_Prepare(FileWriter *pWriter, const Char *pszPathName){
-    pWriter->file.fd = open((const char*)pszPathName, O_WRONLY);
-    if(pWriter->file.fd == -1){
+    int fd = open((const char*)pszPathName, O_WRONLY);
+    if(fd == -1){
         if(errno != ENOENT)
             return false;
 
-        pWriter->file.fd = open((const char*)pszPathName, O_CREAT | O_WRONLY, 0644);
-        if(pWriter->file.fd == -1)
+        fd = open((const char*)pszPathName, O_CREAT | O_WRONLY, 0644);
+        if(fd == -1)
             return false;
     }
 
+    pWriter->file.fd = fd;
     pWriter->nOffset = 0;
     return true;
 }
 
-static inline Bool FileWriter_PrepareForAppend(FileWriter *pWriter, const Char *pszPathName){
+static inline Bool FileWriter_OpenForAppending(FileWriter *pWriter, const Char *pszPathName){
+    if(!FileWriter_Open(pWriter, pszPathName))
+        return false;
+
+    if(FileWriter_SeekToEnd(pWriter))
+        return true;
+
+    FileWriter_Close(pWriter);
+    return false;
+}
+
+static inline Bool FileWriter_PrepareForAppending(FileWriter *pWriter, const Char *pszPathName){
     if(!FileWriter_Prepare(pWriter, pszPathName))
         return false;
 
