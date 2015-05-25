@@ -187,3 +187,4 @@ static inline I32 File_WriteTo(const File *pFile, U64 nOffset, const Byte *pData
     return pwrite(pFile->fd, pData, nSize, nOffset);
 }
 #endif // FILE_H
+
