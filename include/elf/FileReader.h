@@ -13,11 +13,10 @@ typedef struct{
 }FileReader;
 
 static inline Bool FileReader_Open(FileReader *pReader, const Char *pszPathName){
-    int fd = open((const char*)pszPathName, O_RDONLY);
-    if(fd == -1)
+    pReader->file.fd = open((const char*)pszPathName, O_RDONLY);
+    if(pReader->file.fd == -1)
         return false;
 
-    pReader->file.fd = fd;
     pReader->nOffset = 0;
     return true;
 }
@@ -48,17 +47,16 @@ static inline I32 FileReader_ReadFrom(FileReader *pReader, U64 nOffset, Byte *pB
 }
 
 static inline Byte *FileReader_Map(FileReader *pReader, const Char *pszPathName){
-    int fd = open((const char*)pszPathName, O_RDONLY);
-    if(fd == -1)
+    if(!FileReader_Open(pReader, pszPathName))
         return null;
 
-    if(fstat(fd, &pReader->file.meta) != 0){
-        close(fd);
+    if(!FileReader_ReadMeta(pReader)){
+        FileReader_Close(pReader);
         return null;
     }
 
-    Byte *pBegin = (Byte*)mmap(0, pReader->file.meta.st_size, PROT_READ, MAP_SHARED, fd, 0);
-    close(fd);
+    Byte *pBegin = (Byte*)mmap(0, pReader->file.meta.st_size, PROT_READ, MAP_SHARED, pReader->file.fd, 0);
+    FileReader_Close(pReader);
     if(pBegin == MAP_FAILED)
         return null;
 
