@@ -63,4 +63,9 @@ static inline Byte *FileReader_Map(FileReader *pReader, const Char *pszPathName)
     pReader->nOffset = 0;
     return pReader->file.pBegin = pBegin;
 }
+
+static inline void FileReader_Unmap(FileReader *pReader){
+    File_Unmap(&pReader->file);
+}
+
 #endif // FILEREADER_H
