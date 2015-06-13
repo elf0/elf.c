@@ -104,9 +104,9 @@ static inline U8 Char_HexValue(Char c){
     case CASE_CHAR_DIGIT:
         return c - '0';
     case CASE_CHAR_HEX_LETTER_UPPER:
-        return 0x10 + (c - 'A');
+        return 0x0A + (c - 'A');
     case CASE_CHAR_HEX_LETTER_LOWER:
-        return 0x10 + (c - 'a');
+        return 0x0A + (c - 'a');
     }
     return 0xFF;
 }
