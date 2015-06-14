@@ -50,6 +50,11 @@ static inline Byte *Buffer_Data(Buffer *pbBuffer){
     return pbBuffer->pData;
 }
 
+static inline void Buffer_Clear(Buffer *pbBuffer){
+    pbBuffer->pData = pbBuffer->pBegin;
+    pbBuffer->pDataEnd = pbBuffer->pBegin;
+}
+
 static inline U32 Buffer_TailSize(Buffer *pbBuffer){
     return pbBuffer->pEnd - pbBuffer->pDataEnd;
 }
