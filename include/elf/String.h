@@ -487,5 +487,50 @@ static inline Bool String_Equal8(const Char *pLeft, const Char *pRight){
     return *(const U64*)pLeft == *(const U64*)pRight;
 }
 
+static inline const Char *String_ParseIp(const Char *pIp, U32 *pnIp){
+    const Char *p = pIp;
+    U32 nIp = 0;
+    if(!Char_IsDigit(*p))
+        return null;
+
+    p = String_ParseU32(p, &nIp);
+
+    if(*p != '.')
+        return null;
+    ++p;
+
+    if(!Char_IsDigit(*p))
+        return null;
+
+    U32 uValue = 0;
+    p = String_ParseU32(p, &uValue);
+    nIp = (nIp << 8) | uValue;
+
+    if(*p != '.')
+        return 0;
+    ++p;
+
+    if(!Char_IsDigit(*p))
+        return null;
+
+    uValue = 0;
+    p = String_ParseU32(p, &uValue);
+    nIp = (nIp << 8) | uValue;
+
+    if(*p != '.')
+        return 0;
+    ++p;
+
+    if(!Char_IsDigit(*p))
+        return null;
+
+    uValue = 0;
+    p = String_ParseU32(p, &uValue);
+    nIp = (nIp << 8) | uValue;
+
+    *pnIp = nIp;
+    return p;
+}
+
 #endif // STRING_H
 
