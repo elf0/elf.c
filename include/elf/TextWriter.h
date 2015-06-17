@@ -53,7 +53,7 @@ static inline I32 TextWriter_WriteLine(TextWriter *pWriter, const Char *pLine, U
             nNextBlockOffset = TextWriter_Align(nNextBlockOffset);
 
         ptbBlock->nNext = nNextBlockOffset - pWriter->nBlockOffset;
-        ptbBlock->nSum = TextFile_ComputeSum((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));
+        ptbBlock->nSum = TextFile_VerifyCode((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));
         if(!TextWriter_WriteBlockHeader(pWriter))
             return -TextFile_ErrorCode_WriteHeader;
 
@@ -66,7 +66,7 @@ static inline I32 TextWriter_WriteLine(TextWriter *pWriter, const Char *pLine, U
     if(File_Write(&pWriter->file.file, pLine, nSize) != (I32)nSize)
         return -TextFile_ErrorCode_WriteLine;
 
-    ptbBlock->szLines[ptbBlock->nCount].nSum = TextFile_ComputeSum(pLine, pLine + nSize);
+    ptbBlock->szLines[ptbBlock->nCount].nSum = TextFile_VerifyCode(pLine, pLine + nSize);
     ptbBlock->szLines[ptbBlock->nCount].nSize = nSize;
     ++ptbBlock->nCount;
 
@@ -77,7 +77,7 @@ static inline I32 TextWriter_WriteLine(TextWriter *pWriter, const Char *pLine, U
 static inline Bool TextWriter_Close(TextWriter *pWriter){
     if(pWriter->bModifed){
         TextBlock *ptbBlock = &pWriter->file.tbBlock;
-        ptbBlock->nSum = TextFile_ComputeSum((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));
+        ptbBlock->nSum = TextFile_VerifyCode((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));
         if(!TextWriter_WriteBlockHeader(pWriter))
             return false;
     }

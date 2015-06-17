@@ -29,7 +29,7 @@ static inline I32 TextReader_Open(TextReader *pReader, const Char *pszPathName){
     }
 
     TextBlock *ptbBlock = &pReader->file.tbBlock;
-    U32 nSum = TextFile_ComputeSum((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));
+    U32 nSum = TextFile_VerifyCode((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));
 
     if(nSum != ptbBlock->nSum){
         File_Close(&pReader->file.file);
@@ -52,7 +52,7 @@ static inline I32 TextReader_ReadLine(TextReader *pReader, Char *pBuffer, U32 *p
         if(!TextReader_ReadBlockHeader(pReader))
             return -TextFile_ErrorCode_ReadHeader;
 
-        U32 nSum = TextFile_ComputeSum((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));
+        U32 nSum = TextFile_VerifyCode((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));
 
         if(nSum != ptbBlock->nSum)
             return -TextFile_ErrorCode_Verify;
@@ -68,7 +68,7 @@ static inline I32 TextReader_ReadLine(TextReader *pReader, Char *pBuffer, U32 *p
     if(File_Read(&pReader->file.file, pBuffer, pLine->nSize) != pLine->nSize)
         return -TextFile_ErrorCode_ReadLine;
 
-    U32 nSum = TextFile_ComputeSum(pBuffer, pBuffer + pLine->nSize);
+    U32 nSum = TextFile_VerifyCode(pBuffer, pBuffer + pLine->nSize);
 
     if(nSum != pLine->nSum)
         return -TextFile_ErrorCode_Verify;

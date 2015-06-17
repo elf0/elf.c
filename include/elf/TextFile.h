@@ -47,12 +47,13 @@ typedef struct{
     TextBlock tbBlock;
 }TextFile;
 
-static inline U32 TextFile_ComputeSum(const Byte *pBegin, const Byte *pEnd){
-    U32 nSum = 0;
+static inline U32 TextFile_VerifyCode(const Byte *pBegin, const Byte *pEnd){
+    U32 nSequence = 0;
+    U32 nResult = 0;
     const Byte *p = pBegin;
     while(p != pEnd)
-        nSum += *p++;
-    return nSum;
+        nResult += *p++ ^ nSequence++;
+    return nResult;
 }
 
 #endif // TEXTFILE_H
