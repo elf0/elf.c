@@ -71,6 +71,10 @@ static inline void Buffer_Pop(Buffer *pbBuffer, U32 nSize){
     pbBuffer->pData += nSize;
 }
 
+static inline void Buffer_SetData(Buffer *pbBuffer, Byte *pData){
+    pbBuffer->pData = pData;
+}
+
 static inline void Buffer_ForwardData(Buffer *pbBuffer){
     U32 nData = Buffer_DataSize(pbBuffer);
     memmove(pbBuffer->pBegin, pbBuffer->pData, nData);
