@@ -1,148 +1,86 @@
-#ifndef INTEGER_H
-#define INTEGER_H
+#ifndef INTEGER
+#define INTEGER
+
+//License: Public Domain
+//Author: elf
+//EMail: elf198012@gmail.com
 
 #include "Type.h"
 
-static inline U32 U32_Add(U32 uLeft, U32 uRight, U32 *puOverflow){
-    register U32 uOverflow = 0;
-    register U32 uResult;
-
-    asm volatile("addl %[uRight], %[uLeft]\n\t"
-                 "jnb 0f\n\t"
-                 "movl $1, %[uOverflow]\n\t"
-                 "0:\n\t"
-                   : [uResult] "=a" (uResult), [uOverflow] "+d" (uOverflow)
-                 : [uLeft] "a" (uLeft), [uRight] "c" (uRight)
-                 : "cc");
-
-    *puOverflow = uOverflow;
-    return uResult;
+static inline U8 VU61_Bytes(const Byte *pVU61){
+  return (*pVU61 >> 5) + 1;
 }
 
-static inline U64 U64_Add(U64 uLeft, U64 uRight, U64 *puOverflow){
-    register U64 uOverflow = 0;
-    register U64 uResult;
-
-    asm volatile("addq %[uRight], %%rax\n\t"
-                 "jnb 0f\n\t"
-                 "movq $1, %[uOverflow]\n\t"
-                 "0:\n\t"
-                 : [uResult] "=a" (uResult), [uOverflow] "+d" (uOverflow)
-                 : [uLeft] "a" (uLeft), [uRight] "c" (uRight)
-                 : "cc");
-
-    *puOverflow = uOverflow;
-    return uResult;
+//range: [0, 0x1FFFFFFFFFFFFFFF]
+static inline const Byte *VU61_ToU64(const Byte *pVU61, U64 *pU64){
+  const U8 *p = pVU61;
+  U64 nValue = *p & 0x1F;
+  U8 nTail = *p++ >> 5;
+  while(nTail){
+    nValue = (nValue << 8) | *p++;
+    --nTail;
+  }
+  *pU64 = nValue;
+  return p;
 }
 
-static inline U32 U32_Mul(U32 uLeft, U32 uRight, U32 *puOverflow){
-    register U32 uOverflow;
-    register U32 uResult;
-
-    asm volatile(
-                "mull %[uRight]\n\t"
-                : [uResult] "=a" (uResult), [uOverflow] "=d" (uOverflow)
-                : [uLeft] "a" (uLeft), [uRight] "d" (uRight)
-                : "cc");
-
-    *puOverflow = uOverflow;
-    return uResult;
+static inline Bool VU61_Valid(U64 u64){
+  return u64 < 0x2000000000000000;
 }
 
-static inline U64 U64_Mul(U64 uLeft, U64 uRight, U64 *puOverflow){
-    register U64 uOverflow;
-    register U64 uResult;
-
-    asm volatile(
-                "mulq %[uRight]\n\t"
-                : [uResult] "=a" (uResult), [uOverflow] "=d" (uOverflow)
-                : [uLeft] "a" (uLeft), [uRight] "d" (uRight)
-                : "cc");
-
-    *puOverflow = uOverflow;
-    return uResult;
+static inline Bool VU61_Invalid(U64 u64){
+  return u64 > 0x1FFFFFFFFFFFFFFF;
 }
 
-static inline U32 U32_MulAdd(U32 uLeft, U32 uRight, U32 uAdd, U32 *puOverflow){
-    register U32 uOverflow;
-    register U32 uResult;
+//u64 must in range[0, 0x1FFFFFFFFFFFFFFF]. Check it youself!
+static inline const Byte *VU61_FromU64(Byte *pVU61, U64 u64){
+  U8 *p = pVU61;
+  U64 nValue = u64;
+  if(nValue < 0x200000){
+    if(nValue > 0x1F){
+      if(nValue < 0x2000){
+        *p++ = (nValue >> 8) | 0x20;
+      }
+      else{
+        *p++ = (nValue >> 16) | 0x40;
+        *p++ = nValue >> 8;
+      }
+    }
+  }
+  else{
+    if(nValue < 0x2000000000){
+      if(nValue < 0x20000000){
+        *p++ = (nValue >> 24) | 0x60;
+      }
+      else{
+        *p++ = (nValue >> 32) | 0x80;
+        *p++ = nValue >> 24;
+      }
+    }
+    else{
+      if(nValue < 0x20000000000000){
+        if(nValue < 0x200000000000){
+          *p++ = (nValue >> 40) | 0xA0;
+        }
+        else{
+          *p++ = (nValue >> 48) | 0xC0;
+          *p++ = nValue >> 40;
+        }
+      }
+      else{
+        *p++ = (nValue >> 56) | 0xE0;
+        *p++ = nValue >> 48;
+        *p++ = nValue >> 40;
+      }
+      *p++ = nValue >> 32;
+      *p++ = nValue >> 24;
+    }
+    *p++ = nValue >> 16;
+    *p++ = nValue >> 8;
+  }
 
-    asm volatile(
-                "mull %[uRight]\n\t"
-                "addl %[uAdd], %%eax\n\t"
-                "jnb 0f\n\t"
-                "incl %[uOverflow]\n\t"
-                "0:\n\t"
-                : [uResult] "=a" (uResult), [uOverflow] "=d" (uOverflow)
-                : [uLeft] "a" (uLeft), [uRight] "d" (uRight), [uAdd] "c" (uAdd)
-                : "cc");
-
-    *puOverflow = uOverflow;
-    return uResult;
+  *p++ = nValue;
+  return p;
 }
+#endif // INTEGER
 
-static inline U64 U64_MulAdd(U64 uLeft, U64 uRight, U64 uAdd, U64 *puOverflow){
-    register U64 uOverflow;
-    register U64 uResult;
-
-    asm volatile(
-                "mulq %[uRight]\n\t"
-                "addq %[uAdd], %%rax\n\t"
-                "jnb 0f\n\t"
-                "incq %[uOverflow]\n\t"
-                "0:\n\t"
-                : [uResult] "=a" (uResult), [uOverflow] "=d" (uOverflow)
-                : [uLeft] "a" (uLeft), [uRight] "d" (uRight), [uAdd] "c" (uAdd)
-                : "cc");
-
-    *puOverflow = uOverflow;
-    return uResult;
-}
-
-static inline I32 I32_Add(I32 iLeft, I32 iRight, I32 *piOverflow){
-    register I32 iOverflow = 0;
-    register I32 iResult;
-
-    asm volatile("addl %[iRight], %%eax\n\t"
-                 "jno 0f\n\t"
-                 "movl $1, %[iOverflow]\n\t"
-                 "0:\n\t"
-                 : [iResult] "=a" (iResult), [iOverflow] "+d" (iOverflow)
-                 : [iLeft] "a" (iLeft), [iRight] "c" (iRight)
-                 : "cc");
-
-    *piOverflow = iOverflow;
-    return iResult;
-}
-
-static inline I64 I64_Add(I64 iLeft, I64 iRight, I64 *piOverflow){
-    register I64 iOverflow = 0;
-    register I64 iResult;
-
-    asm volatile("addq %[iRight], %%rax\n\t"
-                 "jno 0f\n\t"
-                 "movq $1, %[iOverflow]\n\t"
-                 "0:\n\t"
-                 : [iResult] "=a" (iResult), [iOverflow] "+d" (iOverflow)
-                 : [iLeft] "a" (iLeft), [iRight] "c" (iRight)
-                 : "cc");
-
-    *piOverflow = iOverflow;
-    return iResult;
-}
-
-static inline I32 I32_Mul(I32 iLeft, I32 iRight, I32 *piOverflow){
-    register I32 iOverflow;
-    register I32 iResult;
-
-    asm volatile(
-                "imull %[iRight]\n\t"
-                : [iResult] "=a" (iResult), [iOverflow] "=d" (iOverflow)
-                : [iLeft] "a" (iLeft), [iRight] "d" (iRight)
-                : "cc");
-
-    *piOverflow = iOverflow;
-    return iResult;
-}
-
-#endif // INTEGER_H
