@@ -1,5 +1,39 @@
+#License: Public Domain
+#Author: elf
+#EMail: elf198012@gmail.com
+
 .text
-.globl UI_Add, UI_Sub
+.globl U64_Parse, UI_Add, UI_Sub
+
+U64_Parse:
+movq %rdx, %r8
+movq %rcx, %r9
+xorq %rax, %rax
+xorq %rcx, %rcx
+xorb %dl, %dl
+movq $10, %rbx
+0:
+movb (%rdi), %cl
+subb $0x30, %cl
+js 1f
+cmpb $9, %cl
+jg 1f
+mulq %rbx
+setcb %dl
+jc 2f
+addq %rcx, %rax
+setcb %dl
+jc 2f
+incq %rdi
+decq %rsi
+jnz 0b
+1:
+movq %rax, (%r8)
+2:
+movb %dl, (%r9)
+movq %rdi, %rax
+ret
+
 UI_Add:
 movq (%rsi), %rax
 addq %rax, (%rdi)
@@ -11,7 +45,7 @@ adcq %rax, (%rdi)
 decq %rdx
 jnz 0b
 setcb %al
-retq
+ret
 
 UI_Sub:
 movq (%rsi), %rax
@@ -24,5 +58,5 @@ sbbq %rax, (%rdi)
 decq %rdx
 jnz 0b
 setcb %al
-retq
+ret
 
