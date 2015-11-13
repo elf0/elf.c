@@ -3,7 +3,7 @@
 #EMail: elf198012@gmail.com
 
 .text
-.globl U64_Parse, UI_Add, UI_Sub
+.globl U64_Parse, UI_Add, UI_Sub, UI_Mul64
 
 U64_Parse:
 movq %rdx, %r8
@@ -58,5 +58,26 @@ sbbq %rax, (%rdi)
 decq %rdx
 jnz 0b
 setcb %al
+ret
+
+UI_Mul64:
+movq %rdx, %rcx
+movq (%rdi), %rax
+mulq %rcx
+movq %rdx, %rbx
+movq %rax, (%rdi)
+0:
+leaq 8(%rdi), %rdi
+movq (%rdi), %rax
+mulq %rcx
+addq %rbx, %rax
+jnc 1f
+incq %rdx
+1:
+movq %rdx, %rbx
+movq %rax, (%rdi)
+decq %rsi
+jnz 0b
+movq %rbx, %rax
 ret
 
