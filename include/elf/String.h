@@ -36,8 +36,8 @@ static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd);
 //*puValue MUST be initialized
 static inline const Char *String_ParseU32(const Char *pszNumber, U32 *puValue);
 static inline const Char *String_ParseU64(const Char *pszNumber, U64 *puValue);
-static inline const Char *String_ParseU32_Overflow(const Char *pszNumber, U32 *puValue, Bool *pbOverflow);
-static inline const Char *String_ParseU64_Overflow(const Char *pszNumber, U64 *puValue, Bool *pbOverflow);
+static inline Bool String_ParseU32_Overflow(const Char **ppszNumber, U32 *puValue);
+static inline Bool String_ParseU64_Overflow(const Char **ppszNumber, U64 *puValue);
 //*piValue MUST be initialized
 //Parse '+' and '-' youself
 static inline const Char *String_ParseI32(const Char *pszNumber, I32 *piValue);
@@ -227,8 +227,7 @@ static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSpli
 
 static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd){
     const Char *p = pBegin;
-    U32 uValue = *p - '0';
-    ++p;
+    U32 uValue = *p++ - '0';
 
     while(p != pEnd){
         uValue = 10 * uValue + (*p - '0');
@@ -240,8 +239,7 @@ static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd){
 
 static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd){
     const Char *p = pBegin;
-    U64 uValue = *p - '0';
-    ++p;
+    U64 uValue = *p++ - '0';
 
     while(p != pEnd){
         uValue = 10 * uValue + (*p - '0');
@@ -252,8 +250,8 @@ static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd){
 }
 
 static inline const Char *String_ParseU32(const Char *pszNumber, U32 *puValue){
-    U32 uValue = *puValue;
     const Char *p = pszNumber;
+    U32 uValue = *p++ - '0';
 
     while(Char_IsDigit(*p)){
         uValue = 10 * uValue + (*p - '0');
@@ -265,8 +263,8 @@ static inline const Char *String_ParseU32(const Char *pszNumber, U32 *puValue){
 }
 
 static inline const Char *String_ParseU64(const Char *pszNumber, U64 *puValue){
-    U64 nValue = *puValue;
     const Char *p = pszNumber;
+    U64 nValue = *p++ - '0';
 
     while(Char_IsDigit(*p)){
         nValue = 10 * nValue + (*p - '0');
@@ -277,46 +275,63 @@ static inline const Char *String_ParseU64(const Char *pszNumber, U64 *puValue){
     return p;
 }
 
-static inline const Char *String_ParseU32_Overflow(const Char *pszNumber, U32 *puValue, Bool *pbOverflow){
-    U32 uNewValue;
-    U32 uValue = *puValue;
-    const Char *p = pszNumber;
+static inline Bool String_ParseU32_Overflow(const Char **ppszNumber, U32 *puValue){
+    const Char *p = *ppszNumber;
+    U32 uValue = *p++ - '0';
 
-    while(Char_IsDigit(*p)){
-        uNewValue = 10 * uValue + (*p - '0');
-        if(uNewValue < uValue){
-            *puValue = uValue;
-            *pbOverflow = true;
-            return p;
-        }
-        uValue = uNewValue;
-        ++p;
+//MAX: 4294967295
+#define U32_OVERFLOW_BEFORE_MUL 429496729U
+#define U32_OVERFLOW_BEFORE_ADD 4294967290U
+
+    while(true){
+     I32 iRange = *p - '0';
+     if(iRange < 0 || iRange > 9)
+      break;
+     ++p;
+
+
+     if(uValue < U32_OVERFLOW_BEFORE_MUL)
+      uValue = uValue * 10 + iRange;
+     else if(uValue > U32_OVERFLOW_BEFORE_MUL || iRange > 5){
+      *ppszNumber = --p;
+      *puValue = uValue;
+      return true;
+     }else
+      uValue = U32_OVERFLOW_BEFORE_ADD + iRange;
     }
 
+    *ppszNumber = p;
     *puValue = uValue;
-    *pbOverflow = false;
-    return p;
+    return false;
 }
 
-static inline const Char *String_ParseU64_Overflow(const Char *pszNumber, U64 *puValue, Bool *pbOverflow){
-    U64 uNewValue;
-    U64 uValue = *puValue;
-    const Char *p = pszNumber;
+static inline Bool String_ParseU64_Overflow(const Char **ppszNumber, U64 *puValue){
+    const Char *p = *ppszNumber;
+    U64 uValue = *p++ - '0';
 
-    while(Char_IsDigit(*p)){
-        uNewValue = 10 * uValue + (*p - '0');
-        if(uNewValue < uValue){
-            *puValue = uValue;
-            *pbOverflow = true;
-            return p;
-        }
-        uValue = uNewValue;
-        ++p;
+//MAX: 18446744073709551615
+#define U64_OVERFLOW_BEFORE_MUL 1844674407370955161LLU
+#define U64_OVERFLOW_BEFORE_ADD 18446744073709551610LLU
+
+    while(true){
+     I32 iRange = *p - '0';
+     if(iRange < 0 || iRange > 9)
+      break;
+     ++p;
+
+     if(uValue < U64_OVERFLOW_BEFORE_MUL)
+      uValue = uValue * 10 + iRange;
+     else if(uValue > U64_OVERFLOW_BEFORE_MUL || iRange > 5){
+      *ppszNumber = --p;
+      *puValue = uValue;
+      return true;
+     }else
+      uValue = U64_OVERFLOW_BEFORE_ADD + iRange;
     }
 
+    *ppszNumber = p;
     *puValue = uValue;
-    *pbOverflow = false;
-    return p;
+    return false;
 }
 
 static inline const Char *String_ParseI32(const Char *pszNumber, I32 *piValue){
