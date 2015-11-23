@@ -33,11 +33,8 @@ static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSpli
 //Digits string
 static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd);
 static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd);
-//*puValue MUST be initialized
-static inline const Char *String_ParseU32(const Char *pszNumber, U32 *puValue);
-static inline const Char *String_ParseU64(const Char *pszNumber, U64 *puValue);
-static inline Bool String_ParseU32_Overflow(const Char **ppszNumber, U32 *puValue);
-static inline Bool String_ParseU64_Overflow(const Char **ppszNumber, U64 *puValue);
+static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue);
+static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue);
 //*piValue MUST be initialized
 //Parse '+' and '-' youself
 static inline const Char *String_ParseI32(const Char *pszNumber, I32 *piValue);
@@ -242,40 +239,14 @@ static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd){
     U64 uValue = *p++ - '0';
 
     while(p != pEnd){
-        uValue = 10 * uValue + (*p - '0');
-        ++p;
+        uValue = 10 * uValue + (*p++ - '0');
+//        ++p;
     }
 
     return uValue;
 }
 
-static inline const Char *String_ParseU32(const Char *pszNumber, U32 *puValue){
-    const Char *p = pszNumber;
-    U32 uValue = *p++ - '0';
-
-    while(Char_IsDigit(*p)){
-        uValue = 10 * uValue + (*p - '0');
-        ++p;
-    }
-
-    *puValue = uValue;
-    return p;
-}
-
-static inline const Char *String_ParseU64(const Char *pszNumber, U64 *puValue){
-    const Char *p = pszNumber;
-    U64 nValue = *p++ - '0';
-
-    while(Char_IsDigit(*p)){
-        nValue = 10 * nValue + (*p - '0');
-        ++p;
-    }
-
-    *puValue = nValue;
-    return p;
-}
-
-static inline Bool String_ParseU32_Overflow(const Char **ppszNumber, U32 *puValue){
+static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
     U32 uValue = *p++ - '0';
 
@@ -305,7 +276,7 @@ static inline Bool String_ParseU32_Overflow(const Char **ppszNumber, U32 *puValu
     return false;
 }
 
-static inline Bool String_ParseU64_Overflow(const Char **ppszNumber, U64 *puValue){
+static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
     U64 uValue = *p++ - '0';
 
@@ -508,17 +479,19 @@ static inline const Char *String_ParseIp(const Char *pIp, U32 *pnIp){
     if(!Char_IsDigit(*p))
         return null;
 
-    p = String_ParseU32(p, &nIp);
+    if(String_ParseU32(&p, &nIp))
+     return null;
 
     if(*p != '.')
-        return null;
+     return null;
     ++p;
 
     if(!Char_IsDigit(*p))
         return null;
 
     U32 uValue = 0;
-    p = String_ParseU32(p, &uValue);
+    if(String_ParseU32(&p, &uValue))
+     return null;
     nIp = (nIp << 8) | uValue;
 
     if(*p != '.')
@@ -529,7 +502,8 @@ static inline const Char *String_ParseIp(const Char *pIp, U32 *pnIp){
         return null;
 
     uValue = 0;
-    p = String_ParseU32(p, &uValue);
+    if(String_ParseU32(&p, &uValue))
+     return null;
     nIp = (nIp << 8) | uValue;
 
     if(*p != '.')
@@ -540,7 +514,8 @@ static inline const Char *String_ParseIp(const Char *pIp, U32 *pnIp){
         return null;
 
     uValue = 0;
-    p = String_ParseU32(p, &uValue);
+    if(String_ParseU32(&p, &uValue))
+     return null;
     nIp = (nIp << 8) | uValue;
 
     *pnIp = nIp;
