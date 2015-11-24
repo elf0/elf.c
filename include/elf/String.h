@@ -39,6 +39,8 @@ static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd);
 static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd);
 
 //'**ppszNumber' MUST be a valid digit.
+static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue);
+static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue);
 static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue);
 static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue);
 
@@ -61,6 +63,8 @@ static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
 static inline Bool String_Equal8(const Char *pLeft, const Char *pRight);
+
+static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp);
 
 static inline const Char *String_Find(const Char *pBegin, const Char *pEnd, Char value){
     const Char *p = pBegin;
@@ -255,6 +259,66 @@ static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd){
     }
 
     return uValue;
+}
+
+static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue){
+    const Char *p = *ppszNumber;
+    U8 uValue = *p++ - '0';
+
+//Max: 255
+#define U8_OVERFLOW_BEFORE_MUL 25U
+#define U8_OVERFLOW_BEFORE_ADD 250U
+
+    while(true){
+     I32 iRange = *p - '0';
+     if(iRange < 0 || iRange > 9)
+      break;
+     ++p;
+
+
+     if(uValue < U8_OVERFLOW_BEFORE_MUL)
+      uValue = uValue * 10 + iRange;
+     else if(uValue > U8_OVERFLOW_BEFORE_MUL || iRange > 5){
+      *ppszNumber = --p;
+      *puValue = uValue;
+      return true;
+     }else
+      uValue = U8_OVERFLOW_BEFORE_ADD + iRange;
+    }
+
+    *ppszNumber = p;
+    *puValue = uValue;
+    return false;
+}
+
+static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue){
+    const Char *p = *ppszNumber;
+    U16 uValue = *p++ - '0';
+
+//Max: 65535
+#define U16_OVERFLOW_BEFORE_MUL 6553U
+#define U16_OVERFLOW_BEFORE_ADD 65530U
+
+    while(true){
+     I32 iRange = *p - '0';
+     if(iRange < 0 || iRange > 9)
+      break;
+     ++p;
+
+
+     if(uValue < U16_OVERFLOW_BEFORE_MUL)
+      uValue = uValue * 10 + iRange;
+     else if(uValue > U16_OVERFLOW_BEFORE_MUL || iRange > 5){
+      *ppszNumber = --p;
+      *puValue = uValue;
+      return true;
+     }else
+      uValue = U16_OVERFLOW_BEFORE_ADD + iRange;
+    }
+
+    *ppszNumber = p;
+    *puValue = uValue;
+    return false;
 }
 
 static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
@@ -560,53 +624,73 @@ static inline Bool String_Equal8(const Char *pLeft, const Char *pRight){
     return *(const U64*)pLeft == *(const U64*)pRight;
 }
 
-static inline const Char *String_ParseIp(const Char *pIp, U32 *pnIp){
-    const Char *p = pIp;
-    U32 nIp = 0;
-    if(!Char_IsDigit(*p))
-        return null;
+static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp){
+ const Char *p = *ppIp;
 
-    if(String_ParseU32(&p, &nIp))
-     return null;
+ if(!Char_IsDigit(*p))
+  return false;
+ 
+ union{
+  U32 uIp;
+  U8 szIp[4];
+ }ip;
 
-    if(*p != '.')
-     return null;
-    ++p;
+ if(String_ParseU8(&p, &ip.szIp[0])){
+  *ppIp = p;
+  return false;
+ }
 
-    if(!Char_IsDigit(*p))
-        return null;
+ if(*p != '.'){
+  *ppIp = p;
+  return false;
+ }
+ ++p;
 
-    U32 uValue = 0;
-    if(String_ParseU32(&p, &uValue))
-     return null;
-    nIp = (nIp << 8) | uValue;
+ if(!Char_IsDigit(*p)){
+  *ppIp = p;
+  return false;
+ }
 
-    if(*p != '.')
-        return 0;
-    ++p;
+ if(String_ParseU8(&p, &ip.szIp[1])){
+  *ppIp = p;
+  return false;
+ }
 
-    if(!Char_IsDigit(*p))
-        return null;
+ if(*p != '.'){
+  *ppIp = p;
+  return false;
+ }
+ ++p;
 
-    uValue = 0;
-    if(String_ParseU32(&p, &uValue))
-     return null;
-    nIp = (nIp << 8) | uValue;
+ if(!Char_IsDigit(*p)){
+  *ppIp = p;
+  return false;
+ }
 
-    if(*p != '.')
-        return 0;
-    ++p;
+ if(String_ParseU8(&p, &ip.szIp[2])){
+  *ppIp = p;
+  return false;
+ }
 
-    if(!Char_IsDigit(*p))
-        return null;
+ if(*p != '.'){
+  *ppIp = p;
+  return false;
+ }
+ ++p;
 
-    uValue = 0;
-    if(String_ParseU32(&p, &uValue))
-     return null;
-    nIp = (nIp << 8) | uValue;
+ if(!Char_IsDigit(*p)){
+  *ppIp = p;
+  return false;
+ }
 
-    *pnIp = nIp;
-    return p;
+ if(String_ParseU8(&p, &ip.szIp[3])){
+  *ppIp = p;
+  return false;
+ }
+
+ *ppIp = p;
+ *puIp = ip.uIp;
+ return true;
 }
 
 #endif // STRING_H
