@@ -31,16 +31,31 @@ static inline const Char *String_TrimEnd(const Char *pBegin, Char *pEnd, Char va
 static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext);
 
 //Digits string
+
+//From 'pBegin' to 'pEnd' MUST be a valid U32 number.
 static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd);
+
+//From 'pBegin' to 'pEnd' MUST be a valid U64 number.
 static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd);
+
+//'**ppszNumber' MUST be a valid digit.
 static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue);
 static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue);
-//Parse '+' youself
+
+//Parse '+' youself.
+//'**ppszNumber' MUST be a valid digit.
 static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValue);
+
 //Parse '-' youself
+//'**ppszNumber' MUST be a valid digit.
 static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue);
+
+//Parse '0x' prefix youself
+//'**ppszNumber' MUST be a valid hex digit.
+static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue);
+static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue);
 
 static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
 static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
@@ -435,22 +450,46 @@ static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValu
     return false;
 }
 
-static inline const Char *String_ParseHexU32(const Char *pszNumber, U32 *puValue){
-    U32 u32 = *puValue;
-    const Char *p = pszNumber;
+static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
+    const Char *p = *ppszNumber;
+    p = String_Skip(p, '0');
+    if(!Char_IsHex(*p)){
+     *ppszNumber = p;
+     *puValue = 0;
+     return false;
+    }
+
+    U32 uCount = 0;
+    U32 u32 = 0;
 
     while(true){
         switch(*p){
         default:
+            *ppszNumber = p;
             *puValue = u32;
-            return p;
+            return false;
         case CASE_CHAR_DIGIT:
+         if(uCount++ == 8){
+          *ppszNumber = p;
+          *puValue = u32;
+          return true;
+         }
             u32 = (u32 << 4) | (*p - '0');
             break;
         case CASE_CHAR_HEX_LETTER_UPPER:
+         if(uCount++ == 8){
+          *ppszNumber = p;
+          *puValue = u32;
+          return true;
+         }
             u32 = (u32 << 4) | (10 + (*p - 'A'));
             break;
         case CASE_CHAR_HEX_LETTER_LOWER:
+         if(uCount++ == 8){
+          *ppszNumber = p;
+          *puValue = u32;
+          return true;
+         }
             u32 = (u32 << 4) | (10 + (*p - 'a'));
             break;
         }
@@ -458,24 +497,48 @@ static inline const Char *String_ParseHexU32(const Char *pszNumber, U32 *puValue
     }
 }
 
-static inline const Char *String_ParseHexU64(const Char *pszNumber, U64 *puValue){
-    U64 u64 = *puValue;
-    const Char *p = pszNumber;
+static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
+    const Char *p = *ppszNumber;
+    p = String_Skip(p, '0');
+    if(!Char_IsHex(*p)){
+     *ppszNumber = p;
+     *puValue = 0;
+     return false;
+    }
+
+    U32 uCount = 0;
+    U64 u64 = 0;
 
     while(true){
         switch(*p){
         default:
+            *ppszNumber = p;
             *puValue = u64;
-            return p;
+            return false;
         case CASE_CHAR_DIGIT:
+         if(uCount++ == 16){
+          *ppszNumber = p;
+          *puValue = u64;
+          return true;
+         }
             u64 = (u64 << 4) | (*p - '0');
             break;
         case CASE_CHAR_HEX_LETTER_UPPER:
+         if(uCount++ == 16){
+          *ppszNumber = p;
+          *puValue = u64;
+          return true;
+         }
             u64 = (u64 << 4) | (10 + (*p - 'A'));
             break;
         case CASE_CHAR_HEX_LETTER_LOWER:
-            u64 = (u64 << 4) | (10 + (*p - 'a'));
-            break;
+         if(uCount++ == 16){
+          *ppszNumber = p;
+          *puValue = u64;
+          return true;
+         }
+         u64 = (u64 << 4) | (10 + (*p - 'a'));
+         break;
         }
         ++p;
     }
