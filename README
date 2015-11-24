@@ -3,7 +3,7 @@ human.c
 
 C-based platform/library for human being. It distributed under the 'Public Domain' license.
 String.h:
-    Many utilities(Find, Parse number..) for string. They are faster.
+    Many utilities(Find, Parse number, Parse ip..) for string. They are faster.
 
 List.h:
     A double linked list.
