@@ -30,6 +30,11 @@ static inline const Char *String_SkipAlpha(const Char *p);
 static inline const Char *String_TrimEnd(const Char *pBegin, Char *pEnd, Char value);
 static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext);
 
+static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
+static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
+static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
+static inline Bool String_Equal8(const Char *pLeft, const Char *pRight);
+
 //Digits string
 
 //From 'pBegin' to 'pEnd' MUST be a valid U32 number.
@@ -51,6 +56,10 @@ static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValu
 static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue);
 
+//Parse '0b' prefix youself
+static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue);
+static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue);
+
 //Parse '0o' prefix youself
 static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue);
 static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue);
@@ -58,11 +67,6 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue);
 //Parse '0x' prefix youself
 static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue);
 static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue);
-
-static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
-static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
-static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
-static inline Bool String_Equal8(const Char *pLeft, const Char *pRight);
 
 static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp);
 
@@ -499,6 +503,58 @@ static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValu
 
     *ppszNumber = p;
     *piValue = iValue;
+    return false;
+}
+
+static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
+    const Char *p = String_Skip(*ppszNumber, '0');
+    U32 uValue = 0;
+    //Max: 11111111111111111111111111111111
+#define BINARY_U32_OVERFLOW_BEFORE_MUL 0x7FFFFFFFU
+
+    while(true){
+        I32 iRange = *p - '0';
+        if(iRange < 0 || iRange > 1)
+            break;
+        ++p;
+
+        if(uValue > BINARY_U32_OVERFLOW_BEFORE_MUL){
+            *ppszNumber = --p;
+            *puValue = uValue;
+            return true;
+        }
+        else
+            uValue = (uValue << 1) + iRange;
+    }
+
+    *ppszNumber = p;
+    *puValue = uValue;
+    return false;
+}
+
+static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
+    const Char *p = String_Skip(*ppszNumber, '0');
+    U64 uValue = 0;
+    //Max: 1111111111111111111111111111111111111111111111111111111111111111
+#define BINARY_U64_OVERFLOW_BEFORE_MUL 0x7FFFFFFFFFFFFFFFLLU
+
+    while(true){
+        I32 iRange = *p - '0';
+        if(iRange < 0 || iRange > 1)
+            break;
+        ++p;
+
+        if(uValue > BINARY_U64_OVERFLOW_BEFORE_MUL){
+            *ppszNumber = --p;
+            *puValue = uValue;
+            return true;
+        }
+        else
+            uValue = (uValue << 1) + iRange;
+    }
+
+    *ppszNumber = p;
+    *puValue = uValue;
     return false;
 }
 
