@@ -211,7 +211,7 @@ static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd){
 }
 
 static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U8 uValue = 0;
     //Max: 255
 #define U8_OVERFLOW_BEFORE_MUL 25U
@@ -240,7 +240,7 @@ static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue){
 }
 
 static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U16 uValue = 0;
     //Max: 65535
 #define U16_OVERFLOW_BEFORE_MUL 6553U
@@ -269,7 +269,7 @@ static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue){
 }
 
 static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U32 uValue = 0;
     //Max: 4294967295
 #define U32_OVERFLOW_BEFORE_MUL 429496729U
@@ -298,7 +298,7 @@ static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
 }
 
 static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+    const Char *p = *ppszNumber;
     U64 uValue = 0;
     //Max: 18446744073709551615
 #define U64_OVERFLOW_BEFORE_MUL 1844674407370955161LLU
@@ -326,7 +326,7 @@ static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
 }
 
 static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+    const Char *p = *ppszNumber;
     I32 iValue = 0;
     //Max: 2147483647
 #define I32_POSITIVE_OVERFLOW_BEFORE_MUL 214748364
@@ -355,7 +355,7 @@ static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValu
 }
 
 static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+    const Char *p = *ppszNumber;
     I64 iValue = 0;
     //Max: 9223372036854775807
 #define I64_POSITIVE_OVERFLOW_BEFORE_MUL 922337203685477580LL
@@ -384,7 +384,7 @@ static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValu
 }
 
 static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I32 iValue = 0;
     //Min: -2147483648
 #define I32_NEGATIVE_OVERFLOW_BEFORE_MUL -214748364
@@ -413,7 +413,7 @@ static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValu
 }
 
 static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I64 iValue = 0;
     //Min: -9223372036854775808
 #define I64_NEGATIVE_OVERFLOW_BEFORE_MUL -922337203685477580LL
@@ -445,7 +445,7 @@ static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValu
 #define I64_MIN 0x8000000000000000LL
 
 static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U32 uValue = 0;
     //Max: 0b11111111111111111111111111111111
 #define BINARY_U32_OVERFLOW_BEFORE_MUL 0x7FFFFFFFU
@@ -471,7 +471,7 @@ static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
 }
 
 static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U64 uValue = 0;
     //Max: 0b1111111111111111111111111111111111111111111111111111111111111111
 #define BINARY_U64_OVERFLOW_BEFORE_MUL 0x7FFFFFFFFFFFFFFFLLU
@@ -497,7 +497,7 @@ static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
 }
 
 static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U32 uValue = 0;
     //Max: 0o37777777777
 #define OCTAL_U32_OVERFLOW_BEFORE_MUL 03777777777U
@@ -523,7 +523,7 @@ static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
 }
 
 static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U64 uValue = 0;
     //Max: 0o1777777777777777777777
 #define OCTAL_U64_OVERFLOW_BEFORE_MUL 0177777777777777777777LLU
@@ -549,7 +549,7 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
 }
 
 static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U32 uValue = 0;
     //Max: 0xFFFFFFFF
 #define HEX_U32_OVERFLOW_BEFORE_MUL 0xFFFFFFFU
@@ -590,7 +590,7 @@ static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
 }
 
 static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U64 uValue = 0;
     //Max: 0xFFFFFFFFFFFFFFFF
 #define HEX_U64_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFLLU
@@ -631,7 +631,7 @@ static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
 }
 
 static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I32 iValue = 0;
     //Max: 0b1111111111111111111111111111111
 #define BINARY_I32_OVERFLOW_BEFORE_MUL 0x3FFFFFFF
@@ -657,7 +657,7 @@ static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *
 }
 
 static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
 
     I32 iValue = 0;
     //Min: -0b10000000000000000000000000000000
@@ -685,7 +685,7 @@ static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *
 }
 
 static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I64 iValue = 0;
     //Max: 0b111111111111111111111111111111111111111111111111111111111111111
 #define BINARY_I64_OVERFLOW_BEFORE_MUL 0x3FFFFFFFFFFFFFFFLL
@@ -711,7 +711,7 @@ static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *
 }
 
 static inline Bool String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I64 iValue = 0;
     //Min: -0b1000000000000000000000000000000000000000000000000000000000000000
 #define BINARY_I64_NEGATIVE_OVERFLOW_BEFORE_MUL -0x4000000000000000
@@ -739,7 +739,7 @@ static inline Bool String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *
 }
 
 static inline Bool String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U32 iValue = 0;
     //Max: 0o17777777777
 #define OCTAL_I32_POSITIVE_OVERFLOW_BEFORE_MUL 0xFFFFFFF
@@ -766,7 +766,7 @@ static inline Bool String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *p
 }
 
 static inline Bool String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I32 iValue = 0;
     //Min: -0o20000000000
 #define OCTAL_I32_NEGATIVE_OVERFLOW_BEFORE_MUL -0x10000000
@@ -794,7 +794,7 @@ static inline Bool String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *p
 }
 
 static inline Bool String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     U64 iValue = 0;
     //Max: 0o777777777777777777777
 #define OCTAL_I64_POSITIVE_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFLL
@@ -820,7 +820,7 @@ static inline Bool String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *p
 }
 
 static inline Bool String_ParseOctalI64_Negative(const Char **ppszNumber, I64 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I64 iValue = 0;
     //Min: -0o1000000000000000000000
 #define OCTAL_I64_NEGATIVE_OVERFLOW_BEFORE_MUL -0x1000000000000000LL
@@ -847,7 +847,7 @@ static inline Bool String_ParseOctalI64_Negative(const Char **ppszNumber, I64 *p
 }
 
 static inline Bool String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I32 iValue = 0;
     //Max: 0x7FFFFFFF
 #define HEX_I32_POSITIVE_OVERFLOW_BEFORE_MUL 0x7FFFFFF
@@ -888,7 +888,7 @@ static inline Bool String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piV
 }
 
 static inline Bool String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I32 iValue = 0;
 
 #define HEX_I32_NEGATIVE_OVERFLOW_BEFORE_MUL -0x8000000
@@ -934,7 +934,7 @@ static inline Bool String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piV
 }
 
 static inline Bool String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I64 iValue = 0;
     //Max: 0x7FFFFFFFFFFFFFFF
 #define HEX_I64_POSITIVE_OVERFLOW_BEFORE_MUL 0x7FFFFFFFFFFFFFFLL
@@ -975,7 +975,7 @@ static inline Bool String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piV
 }
 
 static inline Bool String_ParseHexI64_Negative(const Char **ppszNumber, I64 *piValue){
-    const Char *p = String_Skip(*ppszNumber, '0');
+        const Char *p = *ppszNumber;
     I64 iValue = 0;
 
 #define HEX_I64_NEGATIVE_OVERFLOW_BEFORE_MUL -0x800000000000000LL
