@@ -68,6 +68,12 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue);
 static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue);
 static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue);
 
+//Parse '0x', '+0x', '-0x' prefix youself
+static inline Bool String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piValue);
+static inline Bool String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piValue);
+static inline Bool String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piValue);
+static inline Bool String_ParseHexI64_Negative(const Char **ppszNumber, I64 *piValue);
+
 static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp);
 
 static inline const Char *String_Find(const Char *pBegin, const Char *pEnd, Char value){
@@ -686,6 +692,214 @@ static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
                 return true;
             }
             uValue = (uValue << 4) | (10 + (*p - 'a'));
+            break;
+        }
+        ++p;
+    }
+}
+
+static inline Bool String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piValue){
+    const Char *p = String_Skip(*ppszNumber, '0');
+    I32 iValue = 0;
+    //Max: 7FFFFFFF
+#define HEX_POSITIVE_I32_OVERFLOW_BEFORE_MUL 0x7FFFFFF
+
+    while(true){
+        switch(*p){
+        default:
+            *ppszNumber = p;
+            *piValue = iValue;
+            return false;
+        case CASE_CHAR_DIGIT:
+            if(iValue > HEX_POSITIVE_I32_OVERFLOW_BEFORE_MUL){
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            iValue = (iValue << 4) | (*p - '0');
+            break;
+        case CASE_CHAR_HEX_LETTER_UPPER:
+            if(iValue > HEX_POSITIVE_I32_OVERFLOW_BEFORE_MUL){
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            iValue = (iValue << 4) | (10 + (*p - 'A'));
+            break;
+        case CASE_CHAR_HEX_LETTER_LOWER:
+            if(iValue > HEX_POSITIVE_I32_OVERFLOW_BEFORE_MUL){
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            iValue = (iValue << 4) | (10 + (*p - 'a'));
+            break;
+        }
+        ++p;
+    }
+}
+
+static inline Bool String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piValue){
+    const Char *p = String_Skip(*ppszNumber, '0');
+    I32 iValue;
+    switch(*p){
+    default:
+        *ppszNumber = p;
+        *piValue = 0;
+        return false;
+    case CASE_CHAR_DIGIT:
+        iValue = '0' - *p;
+        break;
+    case CASE_CHAR_HEX_LETTER_UPPER:
+        iValue = -10 + ('A' - *p);
+        break;
+    case CASE_CHAR_HEX_LETTER_LOWER:
+        iValue = -10 + ('a' - *p);
+        break;
+    }
+    ++p;
+
+#define HEX_NEGATIVE_I32_OVERFLOW_MAX -0x80000000
+#define HEX_NEGATIVE_I32_OVERFLOW_BEFORE_MUL -0x8000000
+
+    while(true){
+        switch(*p){
+        default:
+            *ppszNumber = p;
+            *piValue = iValue;
+            return false;
+        case CASE_CHAR_DIGIT:
+            if(iValue > HEX_NEGATIVE_I32_OVERFLOW_BEFORE_MUL)
+                iValue = (iValue << 4) + ('0' - *p);
+            else if(iValue < HEX_NEGATIVE_I32_OVERFLOW_BEFORE_MUL || *p != '0'){
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            else
+                iValue = HEX_NEGATIVE_I32_OVERFLOW_MAX;
+            break;
+        case CASE_CHAR_HEX_LETTER_UPPER:
+            if(iValue > HEX_NEGATIVE_I32_OVERFLOW_BEFORE_MUL)
+                iValue = (iValue << 4) + (10 + ('A' - *p));
+            else{
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            break;
+        case CASE_CHAR_HEX_LETTER_LOWER:
+            if(iValue > HEX_NEGATIVE_I32_OVERFLOW_BEFORE_MUL)
+                iValue = (iValue << 4) + (10 + ('a' - *p));
+            else{
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            break;
+        }
+        ++p;
+    }
+}
+
+static inline Bool String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piValue){
+    const Char *p = String_Skip(*ppszNumber, '0');
+    I64 iValue = 0;
+    //Max: 0x7FFFFFFFFFFFFFFF
+#define HEX_POSITIVE_I64_OVERFLOW_BEFORE_MUL 0x7FFFFFFFFFFFFFFLL
+
+    while(true){
+        switch(*p){
+        default:
+            *ppszNumber = p;
+            *piValue = iValue;
+            return false;
+        case CASE_CHAR_DIGIT:
+            if(iValue > HEX_POSITIVE_I64_OVERFLOW_BEFORE_MUL){
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            iValue = (iValue << 4) | (*p - '0');
+            break;
+        case CASE_CHAR_HEX_LETTER_UPPER:
+            if(iValue > HEX_POSITIVE_I64_OVERFLOW_BEFORE_MUL){
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            iValue = (iValue << 4) | (10 + (*p - 'A'));
+            break;
+        case CASE_CHAR_HEX_LETTER_LOWER:
+            if(iValue > HEX_POSITIVE_I64_OVERFLOW_BEFORE_MUL){
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            iValue = (iValue << 4) | (10 + (*p - 'a'));
+            break;
+        }
+        ++p;
+    }
+}
+
+static inline Bool String_ParseHexI64_Negative(const Char **ppszNumber, I64 *piValue){
+    const Char *p = String_Skip(*ppszNumber, '0');
+    I64 iValue;
+    switch(*p){
+    default:
+        *ppszNumber = p;
+        *piValue = 0;
+        return false;
+    case CASE_CHAR_DIGIT:
+        iValue = '0' - *p;
+        break;
+    case CASE_CHAR_HEX_LETTER_UPPER:
+        iValue = -10 + ('A' - *p);
+        break;
+    case CASE_CHAR_HEX_LETTER_LOWER:
+        iValue = -10 + ('a' - *p);
+        break;
+    }
+    ++p;
+
+#define HEX_NEGATIVE_I64_OVERFLOW_MAX -0x8000000000000000LL
+#define HEX_NEGATIVE_I64_OVERFLOW_BEFORE_MUL -0x800000000000000LL
+
+    while(true){
+        switch(*p){
+        default:
+            *ppszNumber = p;
+            *piValue = iValue;
+            return false;
+        case CASE_CHAR_DIGIT:
+            if(iValue > HEX_NEGATIVE_I64_OVERFLOW_BEFORE_MUL)
+                iValue = (iValue << 4) + ('0' - *p);
+            else if(iValue < HEX_NEGATIVE_I64_OVERFLOW_BEFORE_MUL || *p != '0'){
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            else
+                iValue = HEX_NEGATIVE_I64_OVERFLOW_MAX;
+            break;
+        case CASE_CHAR_HEX_LETTER_UPPER:
+            if(iValue > HEX_NEGATIVE_I64_OVERFLOW_BEFORE_MUL)
+                iValue = (iValue << 4) + (-10 + ('A' - *p));
+            else{
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
+            break;
+        case CASE_CHAR_HEX_LETTER_LOWER:
+            if(iValue > HEX_NEGATIVE_I64_OVERFLOW_BEFORE_MUL)
+                iValue = (iValue << 4) + (-10 + ('a' - *p));
+            else{
+                *ppszNumber = p;
+                *piValue = iValue;
+                return true;
+            }
             break;
         }
         ++p;
