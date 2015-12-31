@@ -35,6 +35,10 @@ static inline void DPool_Finalize(DPool *pPool){
     pPool->size = 0;
 }
 
+static inline U32 DPool_Size(DPool *pPool){
+    return pPool->size;
+}
+
 static inline Byte *DPool_Pop(DPool *pPool){
     if(Stack_NotEmpty((Stack*)pPool))
         return (Byte*)Stack_Pop((Stack*)pPool) + sizeof(StackNode);
