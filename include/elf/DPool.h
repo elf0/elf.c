@@ -14,7 +14,7 @@ typedef struct{
 }DPool;
 
 static inline void DPool_Initialize(DPool *pPool, U32 size){
-    Stack_Initialize((Stack*)pBuffer);
+    Stack_Initialize((Stack*)pPool);
     pPool->size = size;
 }
 
@@ -27,7 +27,7 @@ static inline void DPool_Clear(DPool *pPool){
         free(pFreeNode);
     }
 
-    *(StackNode**)pPool = (StackNode*)pPool;
+    Stack_Clear((Stack*)pPool);
 }
 
 static inline void DPool_Finalize(DPool *pPool){
