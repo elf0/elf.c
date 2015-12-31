@@ -28,13 +28,17 @@ static inline Bool Stack_NotEmpty(Stack *pStack){
  return pStack->pTop != (StackNode*)pStack;
 }
 
+static inline StackNode *Stack_Top(Stack *pStack){
+ return (StackNode*)pStack;
+}
+
 static inline void Stack_Push(Stack *pStack, StackNode *pNode){
  pNode->pNext = pStack->pTop;
  pStack->pTop = pNode;
 }
 
 static inline StackNode *Stack_Pop(Stack *pStack){
- StackNode *pNode = pStack->pTop;
+ StackNode *pNode = (StackNode*)pStack;
  pStack->pTop = pNode->pNext;
  return pNode;
 }
