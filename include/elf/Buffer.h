@@ -38,6 +38,10 @@ static inline Byte *Buffer_Begin(Buffer *pbBuffer){
     return pbBuffer->pBegin;
 }
 
+static inline Byte *Buffer_End(Buffer *pbBuffer){
+    return pbBuffer->pEnd;
+}
+
 static inline Bool Buffer_HasData(Buffer *pbBuffer){
     return pbBuffer->pData != pbBuffer->pDataEnd;
 }
@@ -48,6 +52,10 @@ static inline U32 Buffer_DataSize(Buffer *pbBuffer){
 
 static inline Byte *Buffer_Data(Buffer *pbBuffer){
     return pbBuffer->pData;
+}
+
+static inline Byte *Buffer_DataEnd(Buffer *pbBuffer){
+    return pbBuffer->pDataEnd;
 }
 
 static inline void Buffer_Clear(Buffer *pbBuffer){
