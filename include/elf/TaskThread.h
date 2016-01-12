@@ -13,25 +13,26 @@
 
 typedef struct{
     Thread thread;
-    ThreadLock lock;
-    ThreadCondition condition;
     List tasks;
-    List pendings;
+    List *pPendings;
+    ThreadLock *pLock;
+    ThreadCondition *pCondition;
+    Bool bContinue;
 }TaskThread;
 
 static void *TaskThread_Entry(TaskThread *pThread);
 
-static inline void TaskThread_Initialize(TaskThread *pThread){
+static inline void TaskThread_Initialize(TaskThread *pThread, ThreadLock *pLock, ThreadCondition *pCondition, List *pPendingTasks){
     Thread_Initialize((Thread*)pThread, (ThreadEntry)TaskThread_Entry);
-    ThreadLock_Initialize(&pThread->lock);
-    ThreadCondition_Initialize(&pThread->condition);
     List_Initialize(&pThread->tasks);
-    List_Initialize(&pThread->pendings);
+    pThread->pLock = pLock;
+    pThread->pCondition = pCondition;
+    pThread->pPendings = pPendingTasks;
+    pThread->bContinue = true;
 }
 
 static inline void TaskThread_Finalize(TaskThread *pThread){
-    ThreadCondition_Finalize(&pThread->condition);
-    ThreadLock_Finalize(&pThread->lock);
+    pThread->bContinue = false;
 }
 
 static inline Bool TaskThread_Run(TaskThread *pThread){
@@ -39,20 +40,22 @@ static inline Bool TaskThread_Run(TaskThread *pThread){
 }
 
 static inline void TaskThread_Post(TaskThread *pThread, Task *pTask){
-    ThreadLock_Lock(&pThread->lock);
-    List_Push(&pThread->pendings, (DoubleNode*)pTask);
-    ThreadLock_Unlock(&pThread->lock);
+    ThreadLock *pLock = pThread->pLock;
+    ThreadLock_Lock(pLock);
+    List_Push(pThread->pPendings, (DoubleNode*)pTask);
+    ThreadLock_Unlock(pLock);
 
-    ThreadCondition_Signal(&pThread->condition);
+    ThreadCondition_Signal(pThread->pCondition);
 }
 
 //Do not post Empty task list
 static inline void TaskThread_PostTasks(TaskThread *pThread, List *pTasks){
-    ThreadLock_Lock(&pThread->lock);
-    List_MoveTo(pTasks, &pThread->pendings);
-    ThreadLock_Unlock(&pThread->lock);
+    ThreadLock *pLock = pThread->pLock;
+    ThreadLock_Lock(pLock);
+    List_MoveTo(pTasks, pThread->pPendings);
+    ThreadLock_Unlock(pLock);
 
-    ThreadCondition_Signal(&pThread->condition);
+    ThreadCondition_Signal(pThread->pCondition);
 }
 
 //Internal
@@ -66,22 +69,6 @@ static inline Bool TaskThread_NoTasks(List *pTasks){
 
 static inline void TaskThread_MoveTasks(List *pPendings, List *pTasks){
     List_MoveTo(pPendings, pTasks);
-}
-
-static inline void TaskThread_WaitTasks(TaskThread *pThread){
-    List *pTasks = &pThread->tasks;
-    List *pPendings = &pThread->pendings;
-
-    ThreadLock_Lock(&pThread->lock);
-
-    if(TaskThread_HaveTasks(pPendings))
-        TaskThread_MoveTasks(pPendings, pTasks);
-    else if(TaskThread_NoTasks(pTasks)){
-        ThreadCondition_Wait(&pThread->condition, &pThread->lock);
-        TaskThread_MoveTasks(pPendings, pTasks);
-    }
-
-    ThreadLock_Unlock(&pThread->lock);
 }
 
 static inline void TaskThread_RunTasks(TaskThread *pThread){
@@ -101,8 +88,28 @@ static inline void TaskThread_RunTasks(TaskThread *pThread){
 }
 
 static void *TaskThread_Entry(TaskThread *pThread){
-    while(true){
-        TaskThread_WaitTasks(pThread);
+    List *pTasks = &pThread->tasks;
+    List *pPendings = pThread->pPendings;
+    ThreadLock *pLock = pThread->pLock;
+    ThreadCondition *pCondition = pThread->pCondition;
+
+    while(pThread->bContinue){
+        ThreadLock_Lock(pLock);
+
+        if(TaskThread_HaveTasks(pPendings))
+            TaskThread_MoveTasks(pPendings, pTasks);
+        else if(TaskThread_NoTasks(pTasks)){
+            ThreadCondition_Wait(pCondition, pLock);
+            if(pThread->bContinue)
+                TaskThread_MoveTasks(pPendings, pTasks);
+            else{
+                ThreadLock_Unlock(pLock);
+                break;
+            }
+        }
+
+        ThreadLock_Unlock(pLock);
+
         TaskThread_RunTasks(pThread);
     }
     return null;
