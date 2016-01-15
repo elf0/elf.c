@@ -46,7 +46,7 @@ static inline Byte *DPool_Pop(DPool *pPool){
         return (Byte*)malloc(sizeof(StackNode) + pPool->size) + sizeof(StackNode);
 }
 
-static inline Byte *DPool_Push(DPool *pPool, Byte *pBuffer){
+static inline void DPool_Push(DPool *pPool, Byte *pBuffer){
     Stack_Push((Stack*)pPool, (StackNode*)(pBuffer - sizeof(StackNode)));
 }
 
