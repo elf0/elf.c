@@ -88,7 +88,7 @@ static inline Bool String_ParseHexI64_Negative(const Char **ppszNumber, I64 *piV
 
 static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp);
 
-#include "String.i"
+#include "_String.h"
 
 #endif // STRING_H
 
