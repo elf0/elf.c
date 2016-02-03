@@ -82,11 +82,11 @@ static inline Byte *MappedFile_SetSize(MappedFile *pFile, U64 nSize){
   File *pfFile = &pFile->file;
   munmap(pFile->pBegin, pfFile->meta.st_size);
   if(!File_SetSize(pfFile, nSize))
-    return null;
+    return pFile->pBegin = null;
   pfFile->meta.st_size = nSize;
 
-  pFile->pBegin = (Byte*)mmap(null, nSize, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
-  return pFile->pBegin != MAP_FAILED? pFile->pBegin : null;
+  Byte *pBegin = (Byte*)mmap(null, nSize, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
+  return  pFile->pBegin = pBegin != MAP_FAILED? pBegin: null;
 }
 
 #endif // MAPPEDFILE_H
