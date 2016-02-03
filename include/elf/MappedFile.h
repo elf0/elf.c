@@ -18,8 +18,12 @@ static inline Byte *MappedFile_Open(MappedFile *pFile, const Char *szPath){
     return null;
   }
 
-  pFile->pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
-  return pFile->pBegin != MAP_FAILED? pFile->pBegin : null;
+  Byte *pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
+  if(pBegin == MAP_FAILED){
+    File_Close(pfFile);
+    return null;
+  }
+  return pFile->pBegin = pBegin;
 }
 
 static inline Byte *MappedFile_Prepare(MappedFile *pFile, const Char *szPath){
@@ -32,8 +36,12 @@ static inline Byte *MappedFile_Prepare(MappedFile *pFile, const Char *szPath){
     return null;
   }
 
-  pFile->pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
-  return pFile->pBegin != MAP_FAILED? pFile->pBegin : null;
+  Byte *pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
+  if(pBegin == MAP_FAILED){
+    File_Close(pfFile);
+    return null;
+  }
+  return pFile->pBegin = pBegin;
 }
 
 static inline const Byte *MappedFile_OpenForRead(MappedFile *pFile, const Char *szPath){
@@ -46,8 +54,12 @@ static inline const Byte *MappedFile_OpenForRead(MappedFile *pFile, const Char *
     return null;
   }
 
-  pFile->pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ, MAP_SHARED, pfFile->fd, 0);
-  return pFile->pBegin != MAP_FAILED? pFile->pBegin : null;
+  Byte *pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ, MAP_SHARED, pfFile->fd, 0);
+  if(pBegin == MAP_FAILED){
+    File_Close(pfFile);
+    return null;
+  }
+  return pFile->pBegin = pBegin;
 }
 
 static inline void MappedFile_Close(MappedFile *pFile){
