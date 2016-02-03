@@ -146,8 +146,12 @@ static inline Bool File_SetSize(File *pFile, U64 nSize){
   return ftruncate(pFile->fd, nSize) == 0;
 }
 
-static inline Bool File_Commit(File *pFile){
+static inline Bool File_Flush(File *pFile){
   return fsync(pFile->fd) == 0;
+}
+
+static inline Bool File_FlushData(File *pFile){
+  return fdatasync(pFile->fd) == 0;
 }
 
 static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 nSize){
