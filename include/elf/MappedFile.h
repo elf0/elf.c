@@ -1,0 +1,78 @@
+#ifndef MAPPEDFILE_H
+#define MAPPEDFILE_H
+
+#include "File.h"
+
+typedef struct{
+  File file;
+  Byte *pBegin;
+}MappedFile;
+
+static inline Byte *MappedFile_Open(MappedFile *pFile, const Char *szPath){
+  File *pfFile = &pFile->file;
+  if(!File_Open(pfFile, szPath))
+    return null;
+
+  if(!File_ReadMeta(pfFile)){
+    File_Close(pfFile);
+    return null;
+  }
+
+  pFile->pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
+  return pFile->pBegin != MAP_FAILED? pFile->pBegin : null;
+}
+
+static inline Byte *MappedFile_Prepare(MappedFile *pFile, const Char *szPath){
+  File *pfFile = &pFile->file;
+  if(!File_Prepare(pfFile, szPath))
+    return null;
+
+  if(!File_ReadMeta(pfFile)){
+    File_Close(pfFile);
+    return null;
+  }
+
+  pFile->pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
+  return pFile->pBegin != MAP_FAILED? pFile->pBegin : null;
+}
+
+static inline const Byte *MappedFile_OpenForRead(MappedFile *pFile, const Char *szPath){
+  File *pfFile = &pFile->file;
+  if(!File_OpenForRead(pfFile, szPath))
+    return null;
+
+  if(!File_ReadMeta(pfFile)){
+    File_Close(pfFile);
+    return null;
+  }
+
+  pFile->pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ, MAP_SHARED, pfFile->fd, 0);
+  return pFile->pBegin != MAP_FAILED? pFile->pBegin : null;
+}
+
+static inline void MappedFile_Close(MappedFile *pFile){
+  munmap(pFile->pBegin, pFile->file.meta.st_size);
+  File_Close(&pFile->file);
+}
+
+static inline Byte *MappedFile_Address(MappedFile *pFile, U64 offset){
+  return pFile->pBegin + offset;
+}
+
+static inline U64 MappedFile_GetSize(MappedFile *pFile){
+  return File_GetSize(&pFile->file);
+}
+
+static inline Byte *MappedFile_SetSize(MappedFile *pFile, U64 nSize){
+  File *pfFile = &pFile->file;
+  munmap(pFile->pBegin, pfFile->meta.st_size);
+  if(!File_SetSize(pfFile, nSize))
+    return null;
+  pfFile->meta.st_size = nSize;
+
+  pFile->pBegin = (Byte*)mmap(null, nSize, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
+  return pFile->pBegin != MAP_FAILED? pFile->pBegin : null;
+}
+
+#endif // MAPPEDFILE_H
+
