@@ -89,5 +89,18 @@ static inline Byte *MappedFile_SetSize(MappedFile *pFile, U64 nSize){
   return  pFile->pBegin = pBegin != MAP_FAILED? pBegin: null;
 }
 
+static inline Bool MappedFile_Flush(MappedFile *pFile){
+  return File_Flush(&pFile->file);
+}
+
+static inline Bool MappedFile_FlushData(MappedFile *pFile){
+  return File_FlushData(&pFile->file);
+}
+
+static inline Bool MappedFile_FlushRange(MappedFile *pFile, Byte *pBegin, U64 uOffset){
+//  long lPageSize = sysconf(_SC_PAGESIZE);
+  return msync(pBegin, uOffset, MS_SYNC) == 0;
+}
+
 #endif // MAPPEDFILE_H
 
