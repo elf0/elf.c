@@ -7,20 +7,24 @@
 
 #include "Type.h"
 
+static inline U8 VU61_TailBytes(const Byte *pVU61){
+  return *pVU61 >> 5;
+}
+
 static inline U8 VU61_Bytes(const Byte *pVU61){
-  return (*pVU61 >> 5) + 1;
+  return 1 + VU61_TailBytes(pVU61);
 }
 
 //range: [0, 0x1FFFFFFFFFFFFFFF]
 static inline const Byte *VU61_ToU64(const Byte *pVU61, U64 *pU64){
   const U8 *p = pVU61;
-  U64 nValue = *p & 0x1F;
-  U8 nTail = *p++ >> 5;
-  while(nTail){
-    nValue = (nValue << 8) | *p++;
-    --nTail;
-  }
-  *pU64 = nValue;
+  U64 uValue = *p & 0x1F;
+  U8 uTail = VU61_TailBytes(p++);
+
+  while(uTail--)
+    uValue = (uValue << 8) | *p++;
+
+  *pU64 = uValue;
   return p;
 }
 
@@ -34,53 +38,20 @@ static inline Bool VU61_Invalid(U64 u64){
 
 //u64 must in range[0, 0x1FFFFFFFFFFFFFFF]. Check it youself!
 static inline const Byte *VU61_FromU64(Byte *pVU61, U64 u64){
-  U8 *p = pVU61;
-  U64 nValue = u64;
-  if(nValue < 0x200000){
-    if(nValue > 0x1F){
-      if(nValue < 0x2000){
-        *p++ = (nValue >> 8) | 0x20;
-      }
-      else{
-        *p++ = (nValue >> 16) | 0x40;
-        *p++ = nValue >> 8;
-      }
-    }
-  }
-  else{
-    if(nValue < 0x2000000000){
-      if(nValue < 0x20000000){
-        *p++ = (nValue >> 24) | 0x60;
-      }
-      else{
-        *p++ = (nValue >> 32) | 0x80;
-        *p++ = nValue >> 24;
-      }
-    }
-    else{
-      if(nValue < 0x20000000000000){
-        if(nValue < 0x200000000000){
-          *p++ = (nValue >> 40) | 0xA0;
-        }
-        else{
-          *p++ = (nValue >> 48) | 0xC0;
-          *p++ = nValue >> 40;
-        }
-      }
-      else{
-        *p++ = (nValue >> 56) | 0xE0;
-        *p++ = nValue >> 48;
-        *p++ = nValue >> 40;
-      }
-      *p++ = nValue >> 32;
-      *p++ = nValue >> 24;
-    }
-    *p++ = nValue >> 16;
-    *p++ = nValue >> 8;
+  U8 uShift = 56;
+  while(u64 >> uShift == 0){
+    if(!(uShift -= 8))
+      break;
   }
 
-  *p++ = nValue;
+
+  U8 *p = pVU61;
+  *p++ = uShift >> 3 << 5 | u64 >> uShift;
+  while(uShift)
+    *p++ = u64 >> (uShift -= 8);
+
   return p;
 }
+
 #endif // INTEGER
 
