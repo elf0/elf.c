@@ -1,5 +1,5 @@
-#ifndef INTEGER
-#define INTEGER
+#ifndef VU61_H
+#define VU61_H
 
 //License: Public Domain
 //Author: elf
@@ -53,5 +53,5 @@ static inline const Byte *VU61_FromU64(Byte *pVU61, U64 u64){
   return p;
 }
 
-#endif // INTEGER
+#endif //VU61_H
 
