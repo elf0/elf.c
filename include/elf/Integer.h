@@ -46,7 +46,7 @@ static inline const Byte *VU61_FromU64(Byte *pVU61, U64 u64){
 
 
   U8 *p = pVU61;
-  *p++ = uShift >> 3 << 5 | u64 >> uShift;
+  *p++ = uShift << 2 | u64 >> uShift;
   while(uShift)
     *p++ = u64 >> (uShift -= 8);
 
