@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
+#include <sys/uio.h>
 #include "Type.h"
 
 typedef struct{
@@ -122,8 +122,8 @@ static inline void File_Close(File *pFile){
   pFile->fd = -1;
 }
 
-static inline I64 File_Seek(File *pFile, U64 nOffset){
-  return lseek(pFile->fd, nOffset, SEEK_SET);
+static inline I64 File_Seek(File *pFile, U64 uOffset){
+  return lseek(pFile->fd, uOffset, SEEK_SET);
 }
 
 static inline I64 File_Offset(File *pFile){
@@ -158,16 +158,37 @@ static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 nSize){
   return read(pFile->fd, pBuffer, nSize);
 }
 
-static inline I32 File_ReadFrom(const File *pFile, U64 nOffset, Byte *pBuffer, U32 nSize){
-  return pread(pFile->fd, pBuffer, nSize, nOffset);
+static inline I32 File_ReadFrom(const File *pFile, U64 uOffset, Byte *pBuffer, U32 nSize){
+  return pread(pFile->fd, pBuffer, nSize, uOffset);
 }
 
 static inline I32 File_Write(const File *pFile, const Byte *pData, U32 nSize){
   return write(pFile->fd, pData, nSize);
 }
 
-static inline I32 File_WriteTo(const File *pFile, U64 nOffset, const Byte *pData, U32 nSize){
-  return pwrite(pFile->fd, pData, nSize, nOffset);
+static inline I32 File_WriteTo(const File *pFile, U64 uOffset, const Byte *pData, U32 nSize){
+  return pwrite(pFile->fd, pData, nSize, uOffset);
+}
+
+typedef struct{
+  Byte *pData;
+  size_t uBytes;
+}FileData;
+
+static inline I32 File_ReadDatas(const File *pFile, const FileData *szBuffers, U32 uBuffers){
+  return readv(pFile->fd, szBuffers, uBuffers);
+}
+
+static inline I32 File_ReadDatasFrom(const File *pFile, U64 uOffset, const FileData *szBuffers, U32 uBuffers){
+  return preadv(pFile->fd, szBuffers, uBuffers, uOffset);
+}
+
+static inline I32 File_WriteDatas(const File *pFile, const FileData *szDatas, U32 uDatas){
+  return writev(pFile->fd, szDatas, uDatas);
+}
+
+static inline I32 File_WriteDatasTo(const File *pFile, U64 uOffset, const FileData *szDatas, U32 uDatas){
+  return pwritev(pFile->fd, szDatas, uDatas, uOffset);
 }
 #endif // FILE_H
 
