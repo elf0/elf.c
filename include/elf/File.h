@@ -176,19 +176,19 @@ typedef struct{
 }FileData;
 
 static inline I32 File_ReadDatas(const File *pFile, const FileData *szBuffers, U32 uBuffers){
-  return readv(pFile->fd, szBuffers, uBuffers);
+  return readv(pFile->fd, (struct iovec*)szBuffers, uBuffers);
 }
 
 static inline I32 File_ReadDatasFrom(const File *pFile, U64 uOffset, const FileData *szBuffers, U32 uBuffers){
-  return preadv(pFile->fd, szBuffers, uBuffers, uOffset);
+  return preadv(pFile->fd, (struct iovec*)szBuffers, uBuffers, uOffset);
 }
 
 static inline I32 File_WriteDatas(const File *pFile, const FileData *szDatas, U32 uDatas){
-  return writev(pFile->fd, szDatas, uDatas);
+  return writev(pFile->fd, (struct iovec*)szDatas, uDatas);
 }
 
 static inline I32 File_WriteDatasTo(const File *pFile, U64 uOffset, const FileData *szDatas, U32 uDatas){
-  return pwritev(pFile->fd, szDatas, uDatas, uOffset);
+  return pwritev(pFile->fd, (struct iovec*)szDatas, uDatas, uOffset);
 }
 #endif // FILE_H
 
