@@ -5,6 +5,8 @@
 //Author: elf
 //EMail: elf198012@gmail.com
 
+#include <time.h>
+
 #define MILLISECONDS_PER_SECOND 1000
 #define MICROSECONDS_PER_SECOND 1000000
 #define NANOSECONDS_PER_SECOND 1000000000
