@@ -2,13 +2,14 @@
 #define MAPPEDFILE_H
 
 #include "File.h"
+#include <sys/mman.h>
 
 typedef struct{
   File file;
   Byte *pBegin;
-}MappedFile;
+}MMFile;
 
-static inline Byte *MappedFile_Open(MappedFile *pFile, const Char *szPath){
+static inline Byte *MMFile_Open(MMFile *pFile, const Char *szPath){
   File *pfFile = &pFile->file;
   if(!File_Open(pfFile, szPath))
     return null;
@@ -26,7 +27,7 @@ static inline Byte *MappedFile_Open(MappedFile *pFile, const Char *szPath){
   return pFile->pBegin = pBegin;
 }
 
-static inline Byte *MappedFile_Prepare(MappedFile *pFile, const Char *szPath){
+static inline Byte *MMFile_Prepare(MMFile *pFile, const Char *szPath){
   File *pfFile = &pFile->file;
   if(!File_Prepare(pfFile, szPath))
     return null;
@@ -44,7 +45,7 @@ static inline Byte *MappedFile_Prepare(MappedFile *pFile, const Char *szPath){
   return pFile->pBegin = pBegin;
 }
 
-static inline const Byte *MappedFile_OpenForRead(MappedFile *pFile, const Char *szPath){
+static inline const Byte *MMFile_OpenForRead(MMFile *pFile, const Char *szPath){
   File *pfFile = &pFile->file;
   if(!File_OpenForRead(pfFile, szPath))
     return null;
@@ -62,7 +63,7 @@ static inline const Byte *MappedFile_OpenForRead(MappedFile *pFile, const Char *
   return pFile->pBegin = pBegin;
 }
 
-static inline void MappedFile_Close(MappedFile *pFile){
+static inline void MMFile_Close(MMFile *pFile){
   if(pFile->pBegin){
     munmap(pFile->pBegin, pFile->file.meta.st_size);
     pFile->pBegin = null;
@@ -70,15 +71,15 @@ static inline void MappedFile_Close(MappedFile *pFile){
   File_Close(&pFile->file);
 }
 
-static inline Byte *MappedFile_Address(MappedFile *pFile, U64 offset){
+static inline Byte *MMFile_Address(MMFile *pFile, U64 offset){
   return pFile->pBegin + offset;
 }
 
-static inline U64 MappedFile_GetSize(MappedFile *pFile){
+static inline U64 MMFile_GetSize(MMFile *pFile){
   return File_GetSize(&pFile->file);
 }
 
-static inline Byte *MappedFile_SetSize(MappedFile *pFile, U64 nSize){
+static inline Byte *MMFile_SetSize(MMFile *pFile, U64 nSize){
   File *pfFile = &pFile->file;
   munmap(pFile->pBegin, pfFile->meta.st_size);
   if(!File_SetSize(pfFile, nSize))
@@ -89,15 +90,15 @@ static inline Byte *MappedFile_SetSize(MappedFile *pFile, U64 nSize){
   return  pFile->pBegin = pBegin != MAP_FAILED? pBegin: null;
 }
 
-static inline Bool MappedFile_Flush(MappedFile *pFile){
+static inline Bool MMFile_Flush(MMFile *pFile){
   return File_Flush(&pFile->file);
 }
 
-static inline Bool MappedFile_FlushData(MappedFile *pFile){
+static inline Bool MMFile_FlushData(MMFile *pFile){
   return File_FlushData(&pFile->file);
 }
 
-static inline Bool MappedFile_FlushRange(MappedFile *pFile, Byte *pBegin, U64 uOffset){
+static inline Bool MMFile_FlushRange(MMFile *pFile, Byte *pBegin, U64 uOffset){
 //  long lPageSize = sysconf(_SC_PAGESIZE);
   return msync(pBegin, uOffset, MS_SYNC) == 0;
 }
