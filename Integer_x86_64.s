@@ -1,6 +1,6 @@
 #License: Public Domain
 #Author: elf
-#EMail: elf198012@gmail.com
+#EMail: elf@elf0.org
 
 .text
 .globl U64_Parse, UI_Add, UI_Sub, UI_Mul64

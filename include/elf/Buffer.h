@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf198012@gmail.com
+//EMail: elf@elf0.org
 
 #include <string.h>
 #include "Type.h"

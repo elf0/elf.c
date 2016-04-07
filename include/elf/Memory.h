@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf198012@gmail.com
+//EMail: elf@elf0.org
 
 //OS memory management
 //TODO: Move this file to 'os'/'platform' directory, use conditional compilation.

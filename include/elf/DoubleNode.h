@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf198012@gmail.com
+//EMail: elf@elf0.org
 
 typedef struct struct_DoubleNode DoubleNode;
 struct struct_DoubleNode{
