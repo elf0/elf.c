@@ -190,10 +190,8 @@ static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd){
     const Char *p = pBegin;
     U32 uValue = *p++ - '0';
 
-    while(p != pEnd){
+    while(p != pEnd)
         uValue = 10 * uValue + (*p++ - '0');
-        //        ++p;
-    }
 
     return uValue;
 }
@@ -202,36 +200,36 @@ static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd){
     const Char *p = pBegin;
     U64 uValue = *p++ - '0';
 
-    while(p != pEnd){
+    while(p != pEnd)
         uValue = 10 * uValue + (*p++ - '0');
-        //        ++p;
-    }
+
 
     return uValue;
 }
 
 static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue){
     const Char *p = *ppszNumber;
-    U8 uValue = 0;
+    U8 uValue = *puValue;
     //Max: 255
 #define U8_OVERFLOW_BEFORE_MUL 25U
 #define U8_OVERFLOW_BEFORE_ADD 250U
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 9)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 9)
             break;
+
         ++p;
 
 
         if(uValue < U8_OVERFLOW_BEFORE_MUL)
-            uValue = uValue * 10 + iRange;
-        else if(uValue > U8_OVERFLOW_BEFORE_MUL || iRange > 5){
+            uValue = uValue * 10 + uRange;
+        else if(uValue > U8_OVERFLOW_BEFORE_MUL || uRange > 5){
             *ppszNumber = --p;
             *puValue = uValue;
             return true;
         }else
-            uValue = U8_OVERFLOW_BEFORE_ADD + iRange;
+            uValue = U8_OVERFLOW_BEFORE_ADD + uRange;
     }
 
     *ppszNumber = p;
@@ -241,26 +239,26 @@ static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue){
 
 static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue){
     const Char *p = *ppszNumber;
-    U16 uValue = 0;
+    U16 uValue = *puValue;
     //Max: 65535
 #define U16_OVERFLOW_BEFORE_MUL 6553U
 #define U16_OVERFLOW_BEFORE_ADD 65530U
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 9)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 9)
             break;
         ++p;
 
 
         if(uValue < U16_OVERFLOW_BEFORE_MUL)
-            uValue = uValue * 10 + iRange;
-        else if(uValue > U16_OVERFLOW_BEFORE_MUL || iRange > 5){
+            uValue = uValue * 10 + uRange;
+        else if(uValue > U16_OVERFLOW_BEFORE_MUL || uRange > 5){
             *ppszNumber = --p;
             *puValue = uValue;
             return true;
         }else
-            uValue = U16_OVERFLOW_BEFORE_ADD + iRange;
+            uValue = U16_OVERFLOW_BEFORE_ADD + uRange;
     }
 
     *ppszNumber = p;
@@ -270,26 +268,26 @@ static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue){
 
 static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
-    U32 uValue = 0;
+    U32 uValue = *puValue;
     //Max: 4294967295
 #define U32_OVERFLOW_BEFORE_MUL 429496729U
 #define U32_OVERFLOW_BEFORE_ADD 4294967290U
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 9)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 9)
             break;
         ++p;
 
 
         if(uValue < U32_OVERFLOW_BEFORE_MUL)
-            uValue = uValue * 10 + iRange;
-        else if(uValue > U32_OVERFLOW_BEFORE_MUL || iRange > 5){
+            uValue = uValue * 10 + uRange;
+        else if(uValue > U32_OVERFLOW_BEFORE_MUL || uRange > 5){
             *ppszNumber = --p;
             *puValue = uValue;
             return true;
         }else
-            uValue = U32_OVERFLOW_BEFORE_ADD + iRange;
+            uValue = U32_OVERFLOW_BEFORE_ADD + uRange;
     }
 
     *ppszNumber = p;
@@ -299,25 +297,26 @@ static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
 
 static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
-    U64 uValue = 0;
+    U64 uValue = *puValue;
+
     //Max: 18446744073709551615
 #define U64_OVERFLOW_BEFORE_MUL 1844674407370955161LLU
 #define U64_OVERFLOW_BEFORE_ADD 18446744073709551610LLU
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 9)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 9)
             break;
         ++p;
 
         if(uValue < U64_OVERFLOW_BEFORE_MUL)
-            uValue = uValue * 10 + iRange;
-        else if(uValue > U64_OVERFLOW_BEFORE_MUL || iRange > 5){
+            uValue = uValue * 10 + uRange;
+        else if(uValue > U64_OVERFLOW_BEFORE_MUL || uRange > 5){
             *ppszNumber = --p;
             *puValue = uValue;
             return true;
         }else
-            uValue = U64_OVERFLOW_BEFORE_ADD + iRange;
+            uValue = U64_OVERFLOW_BEFORE_ADD + uRange;
     }
 
     *ppszNumber = p;
@@ -327,26 +326,26 @@ static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
 
 static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
-    I32 iValue = 0;
+    I32 iValue = *piValue;
     //Max: 2147483647
 #define I32_POSITIVE_OVERFLOW_BEFORE_MUL 214748364
 #define I32_POSITIVE_OVERFLOW_BEFORE_ADD 2147483640
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 9)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 9)
             break;
         ++p;
 
 
         if(iValue < I32_POSITIVE_OVERFLOW_BEFORE_MUL)
-            iValue = iValue * 10 + iRange;
-        else if(iValue > I32_POSITIVE_OVERFLOW_BEFORE_MUL || iRange > 7){
+            iValue = iValue * 10 + uRange;
+        else if(iValue > I32_POSITIVE_OVERFLOW_BEFORE_MUL || uRange > 7){
             *ppszNumber = --p;
             *piValue = iValue;
             return true;
         }else
-            iValue = I32_POSITIVE_OVERFLOW_BEFORE_ADD + iRange;
+            iValue = I32_POSITIVE_OVERFLOW_BEFORE_ADD + uRange;
     }
 
     *ppszNumber = p;
@@ -356,26 +355,26 @@ static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValu
 
 static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
-    I64 iValue = 0;
+    I64 iValue = *piValue;
     //Max: 9223372036854775807
 #define I64_POSITIVE_OVERFLOW_BEFORE_MUL 922337203685477580LL
 #define I64_POSITIVE_OVERFLOW_BEFORE_ADD 9223372036854775800LL
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 9)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 9)
             break;
         ++p;
 
 
         if(iValue < I64_POSITIVE_OVERFLOW_BEFORE_MUL)
-            iValue = iValue * 10 + iRange;
-        else if(iValue > I64_POSITIVE_OVERFLOW_BEFORE_MUL || iRange > 7){
+            iValue = iValue * 10 + uRange;
+        else if(iValue > I64_POSITIVE_OVERFLOW_BEFORE_MUL || uRange > 7){
             *ppszNumber = --p;
             *piValue = iValue;
             return true;
         }else
-            iValue = I64_POSITIVE_OVERFLOW_BEFORE_ADD + iRange;
+            iValue = I64_POSITIVE_OVERFLOW_BEFORE_ADD + uRange;
     }
 
     *ppszNumber = p;
@@ -385,26 +384,26 @@ static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValu
 
 static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
-    I32 iValue = 0;
+    I32 iValue = *piValue;
     //Min: -2147483648
 #define I32_NEGATIVE_OVERFLOW_BEFORE_MUL -214748364
 #define I32_NEGATIVE_OVERFLOW_BEFORE_ADD -2147483640
 
     while(true){
-        I32 iRange = '0' - *p;
-        if(iRange > 0 || iRange < -9)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 9)
             break;
         ++p;
 
 
         if(iValue > I32_NEGATIVE_OVERFLOW_BEFORE_MUL)
-            iValue = iValue * 10 + iRange;
-        else if(iValue < I32_NEGATIVE_OVERFLOW_BEFORE_MUL || iRange < -8){
+            iValue = iValue * 10 - uRange;
+        else if(iValue < I32_NEGATIVE_OVERFLOW_BEFORE_MUL || uRange > 8){
             *ppszNumber = --p;
             *piValue = iValue;
             return true;
         }else
-            iValue = I32_NEGATIVE_OVERFLOW_BEFORE_ADD + iRange;
+            iValue = I32_NEGATIVE_OVERFLOW_BEFORE_ADD - uRange;
     }
 
     *ppszNumber = p;
@@ -414,26 +413,26 @@ static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValu
 
 static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
-    I64 iValue = 0;
+    I64 iValue = *piValue;
     //Min: -9223372036854775808
 #define I64_NEGATIVE_OVERFLOW_BEFORE_MUL -922337203685477580LL
 #define I64_NEGATIVE_OVERFLOW_BEFORE_ADD -9223372036854775800LL
 
     while(true){
-        I32 iRange = '0' - *p;
-        if(iRange > 0 || iRange < -9)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 9)
             break;
         ++p;
 
 
         if(iValue > I64_NEGATIVE_OVERFLOW_BEFORE_MUL)
-            iValue = iValue * 10 + iRange;
-        else if(iValue < I64_NEGATIVE_OVERFLOW_BEFORE_MUL || iRange < -8){
+            iValue = iValue * 10 - uRange;
+        else if(iValue < I64_NEGATIVE_OVERFLOW_BEFORE_MUL || uRange > 8){
             *ppszNumber = --p;
             *piValue = iValue;
             return true;
         }else
-            iValue = I64_NEGATIVE_OVERFLOW_BEFORE_ADD + iRange;
+            iValue = I64_NEGATIVE_OVERFLOW_BEFORE_ADD - uRange;
     }
 
     *ppszNumber = p;
@@ -446,14 +445,15 @@ static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValu
 
 static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
-    U32 uValue = 0;
+    U32 uValue = *puValue;
     //Max: 0b11111111111111111111111111111111
 #define BINARY_U32_OVERFLOW_BEFORE_MUL 0x7FFFFFFFU
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange != 0 && iRange != 1)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 1)
             break;
+
         ++p;
 
         if(uValue > BINARY_U32_OVERFLOW_BEFORE_MUL){
@@ -462,7 +462,7 @@ static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
             return true;
         }
 
-        uValue = (uValue << 1) + iRange;
+        uValue = (uValue << 1) + uRange;
     }
 
     *ppszNumber = p;
@@ -472,13 +472,13 @@ static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
 
 static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
-    U64 uValue = 0;
+    U64 uValue = *puValue;
     //Max: 0b1111111111111111111111111111111111111111111111111111111111111111
 #define BINARY_U64_OVERFLOW_BEFORE_MUL 0x7FFFFFFFFFFFFFFFLLU
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange != 0 && iRange != 1)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 1)
             break;
         ++p;
 
@@ -488,7 +488,7 @@ static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
             return true;
         }
 
-        uValue = (uValue << 1) + iRange;
+        uValue = (uValue << 1) + uRange;
     }
 
     *ppszNumber = p;
@@ -498,13 +498,13 @@ static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
 
 static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
-    U32 uValue = 0;
+    U32 uValue = *puValue;
     //Max: 0o37777777777
 #define OCTAL_U32_OVERFLOW_BEFORE_MUL 03777777777U
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 7)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 7)
             break;
         ++p;
 
@@ -514,7 +514,7 @@ static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
             return true;
         }
 
-        uValue = (uValue << 3) + iRange;
+        uValue = (uValue << 3) + uRange;
     }
 
     *ppszNumber = p;
@@ -524,13 +524,13 @@ static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
 
 static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
-    U64 uValue = 0;
+    U64 uValue = *puValue;
     //Max: 0o1777777777777777777777
 #define OCTAL_U64_OVERFLOW_BEFORE_MUL 0177777777777777777777LLU
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 7)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 7)
             break;
         ++p;
 
@@ -540,7 +540,7 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
             return true;
         }
 
-        uValue = (uValue << 3) + iRange;
+        uValue = (uValue << 3) + uRange;
     }
 
     *ppszNumber = p;
@@ -550,7 +550,7 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
 
 static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
-    U32 uValue = 0;
+    U32 uValue = *puValue;
     //Max: 0xFFFFFFFF
 #define HEX_U32_OVERFLOW_BEFORE_MUL 0xFFFFFFFU
 
@@ -591,7 +591,7 @@ static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
 
 static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
-    U64 uValue = 0;
+    U64 uValue = *puValue;
     //Max: 0xFFFFFFFFFFFFFFFF
 #define HEX_U64_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFLLU
 
@@ -632,13 +632,13 @@ static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
 
 static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
-    I32 iValue = 0;
+    I32 iValue = *piValue;
     //Max: 0b1111111111111111111111111111111
 #define BINARY_I32_OVERFLOW_BEFORE_MUL 0x3FFFFFFF
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange != 0 && iRange != 1)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 1)
             break;
         ++p;
 
@@ -648,7 +648,7 @@ static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *
             return true;
         }
 
-        iValue = (iValue << 1) + iRange;
+        iValue = (iValue << 1) + uRange;
     }
 
     *ppszNumber = p;
@@ -659,13 +659,13 @@ static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *
 static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
 
-    I32 iValue = 0;
+    I32 iValue = *piValue;
     //Min: -0b10000000000000000000000000000000
 #define BINARY_I32_NEGATIVE_OVERFLOW_BEFORE_MUL -0x40000000
 
     while(true){
-        I32 iRange = '0' - *p;
-        if(iRange != 0 && iRange != -1)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 1)
             break;
         ++p;
 
@@ -676,7 +676,7 @@ static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *
             return true;
         }
 
-        iValue = (iValue << 1) + iRange;
+        iValue = (iValue << 1) - uRange;
     }
 
     *ppszNumber = p;
@@ -686,13 +686,13 @@ static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *
 
 static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
-    I64 iValue = 0;
+    I64 iValue = *piValue;
     //Max: 0b111111111111111111111111111111111111111111111111111111111111111
 #define BINARY_I64_OVERFLOW_BEFORE_MUL 0x3FFFFFFFFFFFFFFFLL
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange != 0 && iRange != 1)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 1)
             break;
         ++p;
 
@@ -702,7 +702,7 @@ static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *
             return true;
         }
 
-        iValue = (iValue << 1) + iRange;
+        iValue = (iValue << 1) + uRange;
     }
 
     *ppszNumber = p;
@@ -712,19 +712,19 @@ static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *
 
 static inline Bool String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
-    I64 iValue = 0;
+    I64 iValue = *piValue;
     //Min: -0b1000000000000000000000000000000000000000000000000000000000000000
 #define BINARY_I64_NEGATIVE_OVERFLOW_BEFORE_MUL -0x4000000000000000
 
     while(true){
-        I32 iRange = '0' - *p;
-        if(iRange != 0 && iRange != -1)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 1)
             break;
         ++p;
 
         if(iValue > BINARY_I64_NEGATIVE_OVERFLOW_BEFORE_MUL)
-            iValue = (iValue << 1) + iRange;
-        else if(iValue < BINARY_I64_NEGATIVE_OVERFLOW_BEFORE_MUL || iRange != 0){
+            iValue = (iValue << 1) - uRange;
+        else if(iValue < BINARY_I64_NEGATIVE_OVERFLOW_BEFORE_MUL || uRange != 0){
             *ppszNumber = --p;
             *piValue = iValue;
             return true;
@@ -745,8 +745,8 @@ static inline Bool String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *p
 #define OCTAL_I32_POSITIVE_OVERFLOW_BEFORE_MUL 0xFFFFFFF
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 7)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 7)
             break;
         ++p;
 
@@ -756,7 +756,7 @@ static inline Bool String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *p
             return true;
         }
 
-        iValue = (iValue << 3) + iRange;
+        iValue = (iValue << 3) + uRange;
     }
 
     *ppszNumber = p;
@@ -772,14 +772,14 @@ static inline Bool String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *p
 #define OCTAL_I32_NEGATIVE_OVERFLOW_BEFORE_MUL -0x10000000
 
     while(true){
-        I32 iRange = '0' - *p;
-        if(iRange > 0 || iRange < -7)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 7)
             break;
         ++p;
 
         if(iValue > OCTAL_I32_NEGATIVE_OVERFLOW_BEFORE_MUL)
-            iValue = (iValue << 3) + iRange;
-        else if(iValue < OCTAL_I32_NEGATIVE_OVERFLOW_BEFORE_MUL || iRange != 0){
+            iValue = (iValue << 3) - uRange;
+        else if(iValue < OCTAL_I32_NEGATIVE_OVERFLOW_BEFORE_MUL || uRange != 0){
             *ppszNumber = --p;
             *piValue = iValue;
             return true;
@@ -800,8 +800,8 @@ static inline Bool String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *p
 #define OCTAL_I64_POSITIVE_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFLL
 
     while(true){
-        I32 iRange = *p - '0';
-        if(iRange < 0 || iRange > 7)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 7)
             break;
         ++p;
 
@@ -811,7 +811,7 @@ static inline Bool String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *p
             return true;
         }
 
-        iValue = (iValue << 3) + iRange;
+        iValue = (iValue << 3) + uRange;
     }
 
     *ppszNumber = p;
@@ -826,13 +826,13 @@ static inline Bool String_ParseOctalI64_Negative(const Char **ppszNumber, I64 *p
 #define OCTAL_I64_NEGATIVE_OVERFLOW_BEFORE_MUL -0x1000000000000000LL
 
     while(true){
-        I32 iRange = '0' - *p;
-        if(iRange > 0 || iRange < -7)
+        U8 uRange = *p - (Char)'0';
+        if(uRange > 7)
             break;
         ++p;
         if(iValue > OCTAL_I64_NEGATIVE_OVERFLOW_BEFORE_MUL)
-            iValue = (iValue << 3) + iRange;
-        else if(iValue < OCTAL_I64_NEGATIVE_OVERFLOW_BEFORE_MUL || iRange != 0){
+            iValue = (iValue << 3) - uRange;
+        else if(iValue < OCTAL_I64_NEGATIVE_OVERFLOW_BEFORE_MUL || uRange != 0){
             *ppszNumber = --p;
             *piValue = iValue;
             return true;

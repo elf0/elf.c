@@ -52,7 +52,7 @@ static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue);
 static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValue);
 
-//Parse '-' youself
+//Parse '-*' youself
 static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue);
 
@@ -68,13 +68,13 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue);
 static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue);
 static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue);
 
-//Parse '0b', '+0b', '-0b' prefix youself
+//Parse '0b', '+0b', '-0b*' prefix youself
 static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *piValue);
 static inline Bool String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *piValue);
 
-//Parse '0o', '+0o', '-0o' prefix youself
+//Parse '0o', '+0o', '-0o*' prefix youself
 static inline Bool String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *piValue);
 static inline Bool String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *piValue);
