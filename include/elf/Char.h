@@ -36,11 +36,13 @@
     '0': case CASE_CHAR_NONZERODIGIT
 
 static inline Bool Char_IsUpper(Char c){
-    return c >= 'A' && c <= 'Z';
+  U8 uRange = c - (Char)'A';
+  return uRange < 26;
 }
 
 static inline Bool Char_IsLower(Char c){
-    return c >= 'a' && c <= 'z';
+  U8 uRange = c - (Char)'a';
+  return uRange < 26;
 }
 
 static inline Bool Char_IsAlpha(Char c){
@@ -52,11 +54,13 @@ static inline Bool Char_IsAlpha(Char c){
 }
 
 static inline Bool Char_IsDigit(Char c){
-    return c >= '0' && c <= '9';
+  U8 uRange = c - (Char)'0';
+  return uRange < 10;
 }
 
 static inline Bool Char_IsNotDigit(Char c){
-    return c < '0' || c > '9';
+  U8 uRange = c - (Char)'0';
+  return uRange > 9;
 }
 
 static inline Bool Char_IsHexLetterUpper(Char c){

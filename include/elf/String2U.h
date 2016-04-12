@@ -7,10 +7,10 @@
 
 //String to unsigned integer
 
-//From 'pBegin' to 'pEnd' MUST be a valid U32 number.
+//From 'pBegin' to 'pEnd' MUST be a valid number string.
+static inline U8 String_ToU8(const Char *pBegin, const Char *pEnd);
+static inline U16 String_ToU16(const Char *pBegin, const Char *pEnd);
 static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd);
-
-//From 'pBegin' to 'pEnd' MUST be a valid U64 number.
 static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd);
 
 static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue);
@@ -33,6 +33,26 @@ static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue);
 
 static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp);
 ////////////////////////////////////////////////////////////////
+static inline U8 String_ToU8(const Char *pBegin, const Char *pEnd){
+    const Char *p = pBegin;
+    U8 uValue = *p++ - '0';
+
+    while(p != pEnd)
+        uValue = 10 * uValue + (*p++ - '0');
+
+    return uValue;
+}
+
+static inline U16 String_ToU16(const Char *pBegin, const Char *pEnd){
+    const Char *p = pBegin;
+    U16 uValue = *p++ - '0';
+
+    while(p != pEnd)
+        uValue = 10 * uValue + (*p++ - '0');
+
+    return uValue;
+}
+
 static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd){
     const Char *p = pBegin;
     U32 uValue = *p++ - '0';
@@ -424,70 +444,72 @@ static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue){
 static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp){
     const Char *p = *ppIp;
 
-    if(!Char_IsDigit(*p))
-        return false;
+    if(Char_IsNotDigit(*p))
+        return true;
 
     union{
         U32 uIp;
         U8 szIp[4];
     }ip;
 
+    ip.uIp = 0;
+
     if(String_ParseU8(&p, &ip.szIp[0])){
         *ppIp = p;
-        return false;
+        return true;
     }
 
     if(*p != '.'){
         *ppIp = p;
-        return false;
+        return true;
     }
     ++p;
 
-    if(!Char_IsDigit(*p)){
+    if(Char_IsNotDigit(*p)){
         *ppIp = p;
-        return false;
+        return true;
     }
 
     if(String_ParseU8(&p, &ip.szIp[1])){
         *ppIp = p;
-        return false;
+        return true;
     }
 
     if(*p != '.'){
         *ppIp = p;
-        return false;
+        return true;
     }
     ++p;
 
-    if(!Char_IsDigit(*p)){
+    if(Char_IsNotDigit(*p)){
         *ppIp = p;
-        return false;
+        return true;
     }
 
     if(String_ParseU8(&p, &ip.szIp[2])){
         *ppIp = p;
-        return false;
+        return true;
     }
 
     if(*p != '.'){
         *ppIp = p;
-        return false;
+        return true;
     }
     ++p;
 
-    if(!Char_IsDigit(*p)){
+    if(Char_IsNotDigit(*p)){
         *ppIp = p;
-        return false;
+        return true;
     }
 
     if(String_ParseU8(&p, &ip.szIp[3])){
         *ppIp = p;
-        return false;
+        return true;
     }
 
     *ppIp = p;
     *puIp = ip.uIp;
-    return true;
+    return false;
 }
 
 #endif // STRING2U_H
