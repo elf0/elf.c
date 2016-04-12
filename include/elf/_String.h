@@ -590,47 +590,55 @@ static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
     }
 }
 
+//Max: 0xFFFFFFFFFFFFFFFF
+#define HEX_U64_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFLLU
+
 static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
     U64 uValue = *puValue;
-    //Max: 0xFFFFFFFFFFFFFFFF
-#define HEX_U64_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFLLU
-
+    Bool bOverflow = false;
+    U8 uRange;
     while(true){
-        switch(*p){
-        default:
-            *ppszNumber = p;
-            *puValue = uValue;
-            return false;
-        case CASE_CHAR_DIGIT:
-            if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
-                *ppszNumber = p;
-                *puValue = uValue;
-                return true;
-            }
-            uValue = (uValue << 4) | (*p - '0');
-            break;
-        case CASE_CHAR_HEX_LETTER_UPPER:
-            if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
-                *ppszNumber = p;
-                *puValue = uValue;
-                return true;
-            }
-            uValue = (uValue << 4) | (10 + (*p - 'A'));
-            break;
-        case CASE_CHAR_HEX_LETTER_LOWER:
-            if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
-                *ppszNumber = p;
-                *puValue = uValue;
-                return true;
-            }
-            uValue = (uValue << 4) | (10 + (*p - 'a'));
-            break;
+      uRange = *p - (Char)'0';
+      if(uRange < 10){
+        if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
+          bOverflow = true;
+          break;
         }
-        ++p;
-    }
-}
+        else
+          uValue = uValue << 4 | uRange;
+      }
+      else{
+        uRange -= 17;
+        if(uRange < 6){
+          if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
+            bOverflow = true;
+            break;
+          }
+          else
+            uValue = uValue << 4 | (uRange + 10);
+        }
+        else{
+          uRange -= 32;
+          if(uRange > 5)
+            break;
 
+          if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
+            bOverflow = true;
+            break;
+          }
+          else
+            uValue = uValue << 4 | (uRange + 10);
+        }
+      }
+
+      ++p;
+    }
+
+    *ppszNumber = p;
+    *puValue = uValue;
+    return bOverflow;
+}
 
 static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
@@ -667,7 +675,6 @@ static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue){
     *puValue = uValue;
     return bOverflow;
 }
-
 
 static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
