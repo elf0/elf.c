@@ -67,6 +67,7 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue);
 //Parse '0x' prefix youself
 static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue);
 static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue);
+static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue);
 
 //Parse '0b', '+0b', '-0b*' prefix youself
 static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue);

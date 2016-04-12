@@ -307,7 +307,6 @@ static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
         U8 uRange = *p - (Char)'0';
         if(uRange > 9)
             break;
-        ++p;
 
         if(uValue < U64_OVERFLOW_BEFORE_MUL)
             uValue = uValue * 10 + uRange;
@@ -317,6 +316,8 @@ static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
             return true;
         }else
             uValue = U64_OVERFLOW_BEFORE_ADD + uRange;
+
+        ++p;
     }
 
     *ppszNumber = p;
@@ -629,6 +630,44 @@ static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
         ++p;
     }
 }
+
+
+static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue){
+    const Char *p = *ppszNumber;
+    U64 uValue = *puValue;
+    Bool bOverflow = false;
+    U8 uRange;
+    while(true){
+      uRange = *p - (Char)'0';
+      if(uRange < 10){
+        if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
+          bOverflow = true;
+          break;
+        }
+        else
+          uValue = uValue << 4 | uRange;
+      }
+      else{
+        uRange -= 17;
+        if(uRange > 5)
+          break;
+
+        if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
+          bOverflow = true;
+          break;
+        }
+        else
+          uValue = uValue << 4 | (uRange + 10);
+      }
+
+      ++p;
+    }
+
+    *ppszNumber = p;
+    *puValue = uValue;
+    return bOverflow;
+}
+
 
 static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
