@@ -66,17 +66,17 @@ static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue){
         if(uRange > 9)
             break;
 
-        ++p;
-
 
         if(uValue < U8_OVERFLOW_BEFORE_MUL)
             uValue = uValue * 10 + uRange;
         else if(uValue > U8_OVERFLOW_BEFORE_MUL || uRange > 5){
-            *ppszNumber = --p;
+            *ppszNumber = p;
             *puValue = uValue;
             return true;
         }else
             uValue = U8_OVERFLOW_BEFORE_ADD + uRange;
+
+        ++p;
     }
 
     *ppszNumber = p;
@@ -95,17 +95,18 @@ static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue){
         U8 uRange = *p - (Char)'0';
         if(uRange > 9)
             break;
-        ++p;
 
 
         if(uValue < U16_OVERFLOW_BEFORE_MUL)
             uValue = uValue * 10 + uRange;
         else if(uValue > U16_OVERFLOW_BEFORE_MUL || uRange > 5){
-            *ppszNumber = --p;
+            *ppszNumber = p;
             *puValue = uValue;
             return true;
         }else
             uValue = U16_OVERFLOW_BEFORE_ADD + uRange;
+
+        ++p;
     }
 
     *ppszNumber = p;
@@ -124,17 +125,18 @@ static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
         U8 uRange = *p - (Char)'0';
         if(uRange > 9)
             break;
-        ++p;
 
 
         if(uValue < U32_OVERFLOW_BEFORE_MUL)
             uValue = uValue * 10 + uRange;
         else if(uValue > U32_OVERFLOW_BEFORE_MUL || uRange > 5){
-            *ppszNumber = --p;
+            *ppszNumber = p;
             *puValue = uValue;
             return true;
         }else
             uValue = U32_OVERFLOW_BEFORE_ADD + uRange;
+
+        ++p;
     }
 
     *ppszNumber = p;
@@ -158,7 +160,7 @@ static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
         if(uValue < U64_OVERFLOW_BEFORE_MUL)
             uValue = uValue * 10 + uRange;
         else if(uValue > U64_OVERFLOW_BEFORE_MUL || uRange > 5){
-            *ppszNumber = --p;
+            *ppszNumber = p;
             *puValue = uValue;
             return true;
         }else
@@ -186,15 +188,15 @@ static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
         if(uRange > 1)
             break;
 
-        ++p;
-
         if(uValue > BINARY_U32_OVERFLOW_BEFORE_MUL){
-            *ppszNumber = --p;
+            *ppszNumber = p;
             *puValue = uValue;
             return true;
         }
 
         uValue = (uValue << 1) + uRange;
+
+        ++p;
     }
 
     *ppszNumber = p;
@@ -212,15 +214,16 @@ static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
         U8 uRange = *p - (Char)'0';
         if(uRange > 1)
             break;
-        ++p;
 
         if(uValue > BINARY_U64_OVERFLOW_BEFORE_MUL){
-            *ppszNumber = --p;
+            *ppszNumber = p;
             *puValue = uValue;
             return true;
         }
 
         uValue = (uValue << 1) + uRange;
+
+        ++p;
     }
 
     *ppszNumber = p;
@@ -238,15 +241,16 @@ static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
         U8 uRange = *p - (Char)'0';
         if(uRange > 7)
             break;
-        ++p;
 
         if(uValue > OCTAL_U32_OVERFLOW_BEFORE_MUL){
-            *ppszNumber = --p;
+            *ppszNumber = p;
             *puValue = uValue;
             return true;
         }
 
         uValue = (uValue << 3) + uRange;
+
+        ++p;
     }
 
     *ppszNumber = p;
@@ -264,15 +268,16 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
         U8 uRange = *p - (Char)'0';
         if(uRange > 7)
             break;
-        ++p;
 
         if(uValue > OCTAL_U64_OVERFLOW_BEFORE_MUL){
-            *ppszNumber = --p;
+            *ppszNumber = p;
             *puValue = uValue;
             return true;
         }
 
         uValue = (uValue << 3) + uRange;
+
+        ++p;
     }
 
     *ppszNumber = p;
