@@ -25,6 +25,9 @@ typedef U8 Bool;
 #define false 0
 #define true  1
 
+//Error code
+typedef U8 E8;
+
 typedef Byte* Pointer;
 #define null  0
 
