@@ -7,6 +7,10 @@
 
 #include "Type.h"
 
+static inline Bool Char_InRange(Char cValue, Char cMin, Char cSize){
+  return (cValue - cMin) < cSize;
+}
+
 #define CASE_CHAR_HEX_LETTER_UPPER \
     'A': case 'B': case 'C': case 'D': case 'E': case 'F'
 
@@ -36,13 +40,11 @@
     '0': case CASE_CHAR_NONZERODIGIT
 
 static inline Bool Char_IsUpper(Char c){
-  U8 uRange = c - (Char)'A';
-  return uRange < 26;
+  return Char_InRange(c, (Char)'A', 26);
 }
 
 static inline Bool Char_IsLower(Char c){
-  U8 uRange = c - (Char)'a';
-  return uRange < 26;
+    return Char_InRange(c, (Char)'a', 26);
 }
 
 static inline Bool Char_IsAlpha(Char c){
@@ -54,8 +56,7 @@ static inline Bool Char_IsAlpha(Char c){
 }
 
 static inline Bool Char_IsDigit(Char c){
-  U8 uRange = c - (Char)'0';
-  return uRange < 10;
+    return Char_InRange(c, (Char)'0', 10);
 }
 
 static inline Bool Char_IsNotDigit(Char c){
