@@ -8,11 +8,11 @@
 #include "Type.h"
 
 static inline Bool Char_InRange(Char cValue, Char cMin, U8 uSize){
-  return (cValue - cMin) < uSize;
+  return (U8)(cValue - cMin) < uSize;
 }
 
 static inline Bool Char_NotInRange(Char cValue, Char cMin, U8 uMax){
-  return (cValue - cMin) > uMax;
+  return (U8)(cValue - cMin) > uMax;
 }
 
 #define CASE_CHAR_HEX_LETTER_UPPER \
