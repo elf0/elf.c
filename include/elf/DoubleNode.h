@@ -50,8 +50,8 @@ static inline void DoubleNode_MoveBuddiesTo(DoubleNode *pNode, DoubleNode *pTarg
 }
 
 static inline void DoubleNode_MoveBuddiesToFront(DoubleNode *pNode, DoubleNode *pTargetNode){
-    DoubleNode_LinkPrev(pNode->pNext, pTargetNode);
     DoubleNode_LinkNext(pNode->pPrev, pTargetNode->pNext);
+    DoubleNode_LinkPrev(pNode->pNext, pTargetNode);
     DoubleNode_Reset(pNode);
 }
 
