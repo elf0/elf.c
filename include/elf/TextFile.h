@@ -38,7 +38,7 @@ typedef struct{
     TextLine szLines[MAX_BLOCK_LINES];
 }TextBlock;
 
-static inline Bool TextBlock_Full(const TextBlock *ptbBlock){
+static inline B TextBlock_Full(const TextBlock *ptbBlock){
     return ptbBlock->nCount == MAX_BLOCK_LINES;
 }
 

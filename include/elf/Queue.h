@@ -22,11 +22,11 @@ static inline void Queue_Initialize(Queue *pQueue){
  pQueue->pLast = (QueueNode*)pQueue;
 }
 
-static inline Bool Queue_Empty(Queue *pQueue){
+static inline B Queue_Empty(Queue *pQueue){
  return pQueue->pFirst == (QueueNode*)pQueue;
 }
 
-static inline Bool Queue_NotEmpty(Queue *pQueue){
+static inline B Queue_NotEmpty(Queue *pQueue){
  return pQueue->pFirst != (QueueNode*)pQueue;
 }
 

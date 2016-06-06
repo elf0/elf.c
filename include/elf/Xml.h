@@ -41,10 +41,10 @@ static inline XmlResult Xml_ParseAttribute(void *pContext, Char **ppBegin, Char 
                                            XmlAttribute_Handler onAttribute);
 static inline XmlResult Xml_ParseEndTag(void *pContext, Char **ppBegin, Char *pEnd, Xml_Handler onEndTag);
 static inline XmlResult Xml_ParseProcessingInstruction(void *pContext, Char **ppBegin, Char *pEnd, Xml_Handler onProcessingInstruction);
-static inline Bool Xml_IsWhiteSpace(Char c);
+static inline B Xml_IsWhiteSpace(Char c);
 static inline Char *Xml_SkipWhiteSpace(Char *p);
-static inline Bool Xml_IsNameStartChar(Char c);
-static inline Bool Xml_IsNameChar(Char c);
+static inline B Xml_IsNameStartChar(Char c);
+static inline B Xml_IsNameChar(Char c);
 static inline Char *Xml_SkipName(Char *p);
 
 static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd,
@@ -80,7 +80,7 @@ static inline XmlResult Xml_Parse(void *pContext, Char **ppBegin, Char *pEnd,
     return r;
 }
 
-static inline Bool Xml_IsWhiteSpace(Char c){
+static inline B Xml_IsWhiteSpace(Char c){
     switch(c){
     case 0x09:case 0x0A:case 0x0D:case 0x20:
         return true;
@@ -239,7 +239,7 @@ static inline XmlResult Xml_ParseEndTag(void *pContext, Char **ppBegin, Char *pE
 #define CASE_XML_NAME_CHAR \
     CASE_XML_NAME_START_CHAR: case '-': case '.': CASE_CHAR_DIGIT: case 0xB7
 
-static inline Bool Xml_IsNameStartChar(Char c){
+static inline B Xml_IsNameStartChar(Char c){
     switch(c){
 CASE_XML_NAME_START_CHAR:
     return true;
@@ -247,7 +247,7 @@ CASE_XML_NAME_START_CHAR:
     return false;
 }
 
-static inline Bool Xml_IsNameChar(Char c){
+static inline B Xml_IsNameChar(Char c){
     switch(c){
 CASE_XML_NAME_CHAR:
     return true;

@@ -41,11 +41,11 @@ static inline size_t MPool_Peak(MPool *pPool){
  return pPool->pLast - pPool->pBegin;
 }
 
-static inline Bool MPool_UnusedEmpty(MPool *pPool){
+static inline B MPool_UnusedEmpty(MPool *pPool){
  return pPool->pLast == pPool->pEnd;
 }
 
-static inline Bool MPool_UnusedNotEmpty(MPool *pPool){
+static inline B MPool_UnusedNotEmpty(MPool *pPool){
  return pPool->pLast != pPool->pEnd;
 }
 
@@ -55,11 +55,11 @@ static inline void *MPool_PopUnused(MPool *pPool){
  return pObject;
 }
 
-static inline Bool MPool_UsedEmpty(MPool *pPool){
+static inline B MPool_UsedEmpty(MPool *pPool){
  return pPool->pUsedEntry == null;
 }
 
-static inline Bool MPool_UsedNotEmpty(MPool *pPool){
+static inline B MPool_UsedNotEmpty(MPool *pPool){
  return pPool->pUsedEntry != null;
 }
 
@@ -69,11 +69,11 @@ static inline void *MPool_PopUsed(MPool *pPool){
  return pObject;
 }
 
-static inline Bool MPool_Empty(MPool *pPool){
+static inline B MPool_Empty(MPool *pPool){
  return MPool_UsedEmpty(pPool) && MPool_UnusedEmpty(pPool);
 }
 
-static inline Bool MPool_NotEmpty(MPool *pPool){
+static inline B MPool_NotEmpty(MPool *pPool){
  return MPool_UsedNotEmpty(pPool) || MPool_UnusedNotEmpty(pPool);
 }
 

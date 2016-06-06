@@ -42,7 +42,7 @@ static inline void DataThread_Finalize(DataThread *pThread){
     ThreadLock_Finalize(&pThread->lock);
 }
 
-static inline Bool DataThread_Run(DataThread *pThread){
+static inline B DataThread_Run(DataThread *pThread){
     return Thread_Run((Thread*)pThread);
 }
 
@@ -64,11 +64,11 @@ static inline void DataThread_PostDatas(DataThread *pThread, List *pDatas){
 }
 
 //Internal
-static inline Bool DATATHREAD_HaveDatas(List *pDatas){
+static inline B DATATHREAD_HaveDatas(List *pDatas){
     return List_NotEmpty(pDatas);
 }
 
-static inline Bool DataThread_NoDatas(List *pDatas){
+static inline B DataThread_NoDatas(List *pDatas){
     return List_Empty(pDatas);
 }
 

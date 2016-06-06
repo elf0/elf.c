@@ -44,7 +44,7 @@ typedef I32 I;
 typedef F32 F;
 #endif
 
-typedef U8 Bool;
+typedef U8 B;
 #define false 0
 #define true  1
 

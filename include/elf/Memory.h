@@ -37,11 +37,11 @@ static inline void Memory_Free(Memory *pMemory){
 //16 bytes alignment
 #define PLATFORM_ALIGNMENT 16
 
-static inline Bool Memory_NotAligned(size_t nSize){
+static inline B Memory_NotAligned(size_t nSize){
  return nSize & (PLATFORM_ALIGNMENT - 1);
 }
 
-static inline Bool Memory_Aligned(size_t nSize){
+static inline B Memory_Aligned(size_t nSize){
  return !Memory_NotAligned(nSize);
 }
 

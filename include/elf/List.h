@@ -19,11 +19,11 @@ static inline void List_Initialize(List *pList){
     List_Reset(pList);
 }
 
-static inline Bool List_Empty(const List *pList){
+static inline B List_Empty(const List *pList){
     return DoubleNode_Alone((DoubleNode*)pList);
 }
 
-static inline Bool List_NotEmpty(const List *pList){
+static inline B List_NotEmpty(const List *pList){
     return DoubleNode_NotAlone((DoubleNode*)pList);
 }
 
@@ -35,19 +35,19 @@ static inline DoubleNode *List_Back(const List *pList){
     return pList->entry.pPrev;
 }
 
-static inline Bool List_First(const List *pList, const DoubleNode *pNode){
+static inline B List_First(const List *pList, const DoubleNode *pNode){
     return pNode->pPrev == ((DoubleNode*)pList);
 }
 
-static inline Bool List_NotFirst(const List *pList, const DoubleNode *pNode){
+static inline B List_NotFirst(const List *pList, const DoubleNode *pNode){
     return pNode->pPrev != ((DoubleNode*)pList);
 }
 
-static inline Bool List_Last(const List *pList, const DoubleNode *pNode){
+static inline B List_Last(const List *pList, const DoubleNode *pNode){
     return pNode->pNext == ((DoubleNode*)pList);
 }
 
-static inline Bool List_NotLast(const List *pList, const DoubleNode *pNode){
+static inline B List_NotLast(const List *pList, const DoubleNode *pNode){
     return pNode->pNext != ((DoubleNode*)pList);
 }
 

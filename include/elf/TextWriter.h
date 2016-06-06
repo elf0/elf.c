@@ -18,12 +18,12 @@
 typedef struct{
     TextFile file;
     U64 nBlockOffset;
-    Bool bModifed;
+    B bModifed;
 }TextWriter;
 
 #define OFFSET_ALIGNMENT 16
 
-static inline Bool TextWriter_NotAligned(U64 nValue){
+static inline B TextWriter_NotAligned(U64 nValue){
  return nValue & (OFFSET_ALIGNMENT - 1);
 }
 
@@ -31,7 +31,7 @@ static inline U64 TextWriter_Align(U64 nValue){
  return (nValue & ~(OFFSET_ALIGNMENT - 1)) + OFFSET_ALIGNMENT;
 }
 
-static inline Bool TextWriter_Create(TextWriter *pWriter, const Char *pszPathName){
+static inline B TextWriter_Create(TextWriter *pWriter, const Char *pszPathName){
     memset(pWriter, 0, sizeof(TextWriter));
 
     if(!File_CreateForWrite(&pWriter->file.file, pszPathName))
@@ -41,7 +41,7 @@ static inline Bool TextWriter_Create(TextWriter *pWriter, const Char *pszPathNam
     return true;
 }
 
-static inline Bool TextWriter_WriteBlockHeader(TextWriter *pWriter){
+static inline B TextWriter_WriteBlockHeader(TextWriter *pWriter){
     return File_WriteAt(&pWriter->file.file, (const Byte*)&pWriter->file.tbBlock, sizeof(TextBlock), pWriter->nBlockOffset) == sizeof(TextBlock);
 }
 
@@ -74,7 +74,7 @@ static inline I32 TextWriter_WriteLine(TextWriter *pWriter, const Char *pLine, U
     return TextFile_ResultCode_Ok;
 }
 
-static inline Bool TextWriter_Close(TextWriter *pWriter){
+static inline B TextWriter_Close(TextWriter *pWriter){
     if(pWriter->bModifed){
         TextBlock *ptbBlock = &pWriter->file.tbBlock;
         ptbBlock->nSum = TextFile_VerifyCode((const Byte*)ptbBlock + 3, (const Byte*)(ptbBlock + 1));

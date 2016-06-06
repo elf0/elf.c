@@ -86,7 +86,7 @@ static inline ResultOfHttpParsing HttpClient_ParseFieldLine(HttpClient *pClient,
 static ResultOfHttpParsing HttpClient_ParseMessageBody(HttpClient *pClient, const Char *pBegin, Char *pEnd);
 static ResultOfHttpParsing HttpClient_ParseChunk(HttpClient *pClient, const Char *pBegin, Char *pEnd);
 static ResultOfHttpParsing HttpClient_ParseChunkedData(HttpClient *pClient, const Char *pBegin, Char *pEnd);
-static inline Bool ParseFieldContent(HttpClient *pClient, const Char *pName, const Char *pNameEnd, const Char *pValue, const Char *pValueEnd);
+static inline B ParseFieldContent(HttpClient *pClient, const Char *pName, const Char *pNameEnd, const Char *pValue, const Char *pValueEnd);
 
 static inline void HttpClient_Initialize(HttpClient *pClient, DataHandler onVersion,
                                          DataHandler onStatusCode,
@@ -357,7 +357,7 @@ static ResultOfHttpParsing HttpClient_ParseChunkedData(HttpClient *pClient, cons
     return rohpOk;
 }
 
-static inline Bool ParseFieldContent(HttpClient *pClient, const Char *pName, const Char *pNameEnd, const Char *pValue, const Char *pValueEnd){
+static inline B ParseFieldContent(HttpClient *pClient, const Char *pName, const Char *pNameEnd, const Char *pValue, const Char *pValueEnd){
     U32 nNameSize = pNameEnd - pName;
     switch(nNameSize){
     case 13:

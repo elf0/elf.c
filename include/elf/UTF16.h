@@ -7,19 +7,19 @@
 
 typedef U16 UTF16;
 
-//static inline Bool UTF16_IsSurrogate(UTF16 c){
+//static inline B UTF16_IsSurrogate(UTF16 c){
 // return (c >> 11) == 0x1B;
 //}
 
-static inline Bool UTF16_IsBasic(UTF16 c){
+static inline B UTF16_IsBasic(UTF16 c){
  return (c >> 11) != 0x1B;
 }
 
-static inline Bool UTF16_IsLead(UTF16 c){
+static inline B UTF16_IsLead(UTF16 c){
  return (c >> 10) == 0x36;
 }
 
-static inline Bool UTF16_IsTrail(UTF16 c){
+static inline B UTF16_IsTrail(UTF16 c){
  return (c >> 10) == 0x37;
 }
 

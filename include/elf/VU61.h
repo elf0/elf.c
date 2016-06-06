@@ -28,11 +28,11 @@ static inline const Byte *VU61_ToU64(const Byte *pVU61, U64 *pU64){
   return p;
 }
 
-static inline Bool VU61_Valid(U64 u64){
+static inline B VU61_Valid(U64 u64){
   return u64 < 0x2000000000000000;
 }
 
-static inline Bool VU61_Invalid(U64 u64){
+static inline B VU61_Invalid(U64 u64){
   return u64 > 0x1FFFFFFFFFFFFFFF;
 }
 

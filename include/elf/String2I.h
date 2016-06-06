@@ -8,33 +8,33 @@
 //String to integer
 
 //Parse '+' youself.
-static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValue);
-static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValue);
+static inline B String_ParseI32_Positive(const Char **ppszNumber, I32 *piValue);
+static inline B String_ParseI64_Positive(const Char **ppszNumber, I64 *piValue);
 
 //Parse '-*' youself
-static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue);
-static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue);
+static inline B String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue);
+static inline B String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue);
 
 
 //Parse '0b', '+0b', '-0b*' prefix youself
-static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue);
-static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *piValue);
-static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *piValue);
-static inline Bool String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *piValue);
+static inline B String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue);
+static inline B String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *piValue);
+static inline B String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *piValue);
+static inline B String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *piValue);
 
 //Parse '0o', '+0o', '-0o*' prefix youself
-static inline Bool String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *piValue);
-static inline Bool String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *piValue);
-static inline Bool String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *piValue);
-static inline Bool String_ParseOctalI64_Negative(const Char **ppszNumber, I64 *piValue);
+static inline B String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *piValue);
+static inline B String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *piValue);
+static inline B String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *piValue);
+static inline B String_ParseOctalI64_Negative(const Char **ppszNumber, I64 *piValue);
 
 //Parse '0x', '+0x', '-0x' prefix youself
-static inline Bool String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piValue);
-static inline Bool String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piValue);
-static inline Bool String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piValue);
-static inline Bool String_ParseHexI64_Negative(const Char **ppszNumber, I64 *piValue);
+static inline B String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piValue);
+static inline B String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piValue);
+static inline B String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piValue);
+static inline B String_ParseHexI64_Negative(const Char **ppszNumber, I64 *piValue);
 ////////////////////////////////////////////////////////////////
-static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValue){
+static inline B String_ParseI32_Positive(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
     I32 iValue = *piValue;
     //Max: 2147483647
@@ -63,7 +63,7 @@ static inline Bool String_ParseI32_Positive(const Char **ppszNumber, I32 *piValu
     return false;
 }
 
-static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValue){
+static inline B String_ParseI64_Positive(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
     I64 iValue = *piValue;
     //Max: 9223372036854775807
@@ -92,7 +92,7 @@ static inline Bool String_ParseI64_Positive(const Char **ppszNumber, I64 *piValu
     return false;
 }
 
-static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue){
+static inline B String_ParseI32_Negative(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
     I32 iValue = *piValue;
     //Min: -2147483648
@@ -121,7 +121,7 @@ static inline Bool String_ParseI32_Negative(const Char **ppszNumber, I32 *piValu
     return false;
 }
 
-static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue){
+static inline B String_ParseI64_Negative(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
     I64 iValue = *piValue;
     //Min: -9223372036854775808
@@ -151,7 +151,7 @@ static inline Bool String_ParseI64_Negative(const Char **ppszNumber, I64 *piValu
 }
 
 
-static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue){
+static inline B String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
     I32 iValue = *piValue;
     //Max: 0b1111111111111111111111111111111
@@ -177,7 +177,7 @@ static inline Bool String_ParseBinaryI32_Positive(const Char **ppszNumber, I32 *
     return false;
 }
 
-static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *piValue){
+static inline B String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
 
     I32 iValue = *piValue;
@@ -205,7 +205,7 @@ static inline Bool String_ParseBinaryI32_Negative(const Char **ppszNumber, I32 *
     return false;
 }
 
-static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *piValue){
+static inline B String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
     I64 iValue = *piValue;
     //Max: 0b111111111111111111111111111111111111111111111111111111111111111
@@ -231,7 +231,7 @@ static inline Bool String_ParseBinaryI64_Positive(const Char **ppszNumber, I64 *
     return false;
 }
 
-static inline Bool String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *piValue){
+static inline B String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
     I64 iValue = *piValue;
     //Min: -0b1000000000000000000000000000000000000000000000000000000000000000
@@ -259,7 +259,7 @@ static inline Bool String_ParseBinaryI64_Negative(const Char **ppszNumber, I64 *
     return false;
 }
 
-static inline Bool String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *piValue){
+static inline B String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
     U32 iValue = 0;
     //Max: 0o17777777777
@@ -286,7 +286,7 @@ static inline Bool String_ParseOctalI32_Positive(const Char **ppszNumber, I32 *p
 
 }
 
-static inline Bool String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *piValue){
+static inline B String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
     I32 iValue = 0;
     //Min: -0o20000000000
@@ -314,7 +314,7 @@ static inline Bool String_ParseOctalI32_Negative(const Char **ppszNumber, I32 *p
     return false;
 }
 
-static inline Bool String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *piValue){
+static inline B String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
     U64 iValue = 0;
     //Max: 0o777777777777777777777
@@ -340,7 +340,7 @@ static inline Bool String_ParseOctalI64_Positive(const Char **ppszNumber, I64 *p
     return false;
 }
 
-static inline Bool String_ParseOctalI64_Negative(const Char **ppszNumber, I64 *piValue){
+static inline B String_ParseOctalI64_Negative(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
     I64 iValue = 0;
     //Min: -0o1000000000000000000000
@@ -367,7 +367,7 @@ static inline Bool String_ParseOctalI64_Negative(const Char **ppszNumber, I64 *p
     return false;
 }
 
-static inline Bool String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piValue){
+static inline B String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
     I32 iValue = 0;
     //Max: 0x7FFFFFFF
@@ -408,7 +408,7 @@ static inline Bool String_ParseHexI32_Positive(const Char **ppszNumber, I32 *piV
     }
 }
 
-static inline Bool String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piValue){
+static inline B String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piValue){
     const Char *p = *ppszNumber;
     I32 iValue = 0;
 
@@ -454,7 +454,7 @@ static inline Bool String_ParseHexI32_Negative(const Char **ppszNumber, I32 *piV
     }
 }
 
-static inline Bool String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piValue){
+static inline B String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
     I64 iValue = 0;
     //Max: 0x7FFFFFFFFFFFFFFF
@@ -495,7 +495,7 @@ static inline Bool String_ParseHexI64_Positive(const Char **ppszNumber, I64 *piV
     }
 }
 
-static inline Bool String_ParseHexI64_Negative(const Char **ppszNumber, I64 *piValue){
+static inline B String_ParseHexI64_Negative(const Char **ppszNumber, I64 *piValue){
     const Char *p = *ppszNumber;
     I64 iValue = 0;
 

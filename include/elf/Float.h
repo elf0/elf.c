@@ -20,15 +20,15 @@ static inline F32 F32_NegativeInfinity(){
 
 #define F32_NEGATIVE_INFINITY F32_NegativeInfinity()
 
-static inline Bool F32_IsNan(F32 fValue){
+static inline B F32_IsNan(F32 fValue){
     return fValue != fValue;
 }
 
-static inline Bool F32_IsPositiveInfinity(F32 fValue){
+static inline B F32_IsPositiveInfinity(F32 fValue){
     return *(U32*)&fValue == F32_BINARY_POSITIVE_INFINITY;
 }
 
-static inline Bool F32_IsNegativeInfinity(F32 fValue){
+static inline B F32_IsNegativeInfinity(F32 fValue){
     return *(U32*)&fValue == F32_BINARY_NEGATIVE_INFINITY;
 }
 
@@ -49,15 +49,15 @@ static inline F64 F64_NegativeInfinity(){
 
 #define F64_NEGATIVE_INFINITY F64_NegativeInfinity()
 
-static inline Bool F64_IsNan(F64 fValue){
+static inline B F64_IsNan(F64 fValue){
     return fValue != fValue;
 }
 
-static inline Bool F64_IsPositiveInfinity(F64 fValue){
+static inline B F64_IsPositiveInfinity(F64 fValue){
     return *(U64*)&fValue == F64_BINARY_POSITIVE_INFINITY;
 }
 
-static inline Bool F64_IsNegativeInfinity(F64 fValue){
+static inline B F64_IsNegativeInfinity(F64 fValue){
     return *(U64*)&fValue == F64_BINARY_NEGATIVE_INFINITY;
 }
 #endif // FLOAT_H

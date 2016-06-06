@@ -30,7 +30,7 @@ static inline void Buffer_Finalize(Buffer *pbBuffer){
     pbBuffer->pBegin = null;
 }
 
-static inline Bool Buffer_IsFinalized(Buffer *pbBuffer){
+static inline B Buffer_IsFinalized(Buffer *pbBuffer){
     return pbBuffer->pBegin == null;
 }
 
@@ -42,7 +42,7 @@ static inline Byte *Buffer_End(Buffer *pbBuffer){
     return pbBuffer->pEnd;
 }
 
-static inline Bool Buffer_HasData(Buffer *pbBuffer){
+static inline B Buffer_HasData(Buffer *pbBuffer){
     return pbBuffer->pData != pbBuffer->pDataEnd;
 }
 

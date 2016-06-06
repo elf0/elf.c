@@ -21,11 +21,11 @@ static inline void CountedList_Initialize(CountedList *pList){
     CountedList_Reset(pList);
 }
 
-static inline Bool CountedList_Empty(const CountedList *pList){
+static inline B CountedList_Empty(const CountedList *pList){
     return List_Empty((List*)pList);
 }
 
-static inline Bool CountedList_NotEmpty(const CountedList *pList){
+static inline B CountedList_NotEmpty(const CountedList *pList){
     return List_NotEmpty((List*)pList);
 }
 
@@ -33,19 +33,19 @@ static inline U CountedList_GetCount(const CountedList *pList){
     return pList->nCount;
 }
 
-static inline Bool CountedList_First(const CountedList *pList, const DoubleNode *pNode){
+static inline B CountedList_First(const CountedList *pList, const DoubleNode *pNode){
     return List_First((List*)pList, pNode);
 }
 
-static inline Bool CountedList_NotFirst(const CountedList *pList, const DoubleNode *pNode){
+static inline B CountedList_NotFirst(const CountedList *pList, const DoubleNode *pNode){
     return List_NotFirst((List*)pList, pNode);
 }
 
-static inline Bool CountedList_Last(const CountedList *pList, const DoubleNode *pNode){
+static inline B CountedList_Last(const CountedList *pList, const DoubleNode *pNode){
     return List_Last((List*)pList, pNode);
 }
 
-static inline Bool CountedList_NotLast(const CountedList *pList, const DoubleNode *pNode){
+static inline B CountedList_NotLast(const CountedList *pList, const DoubleNode *pNode){
     return List_NotLast((List*)pList, pNode);
 }
 

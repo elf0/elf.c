@@ -39,7 +39,7 @@ static inline void FixedTaskThread_Finalize(FixedTaskThread *pThread){
     ThreadLock_Finalize(&pThread->lock);
 }
 
-static inline Bool FixedTaskThread_Run(FixedTaskThread *pThread){
+static inline B FixedTaskThread_Run(FixedTaskThread *pThread){
     return Thread_Run((Thread*)pThread);
 }
 
@@ -61,11 +61,11 @@ static inline void FixedTaskThread_PostTasks(FixedTaskThread *pThread, List *pTa
 }
 
 //Internal
-static inline Bool FixedTaskThread_HaveTasks(List *pTasks){
+static inline B FixedTaskThread_HaveTasks(List *pTasks){
     return List_NotEmpty(pTasks);
 }
 
-static inline Bool FixedTaskThread_NoTasks(List *pTasks){
+static inline B FixedTaskThread_NoTasks(List *pTasks){
     return List_Empty(pTasks);
 }
 

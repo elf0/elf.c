@@ -27,11 +27,11 @@ static inline void Stack_Initialize(Stack *pStack){
  Stack_Clear(pStack);
 }
 
-static inline Bool Stack_Empty(Stack *pStack){
+static inline B Stack_Empty(Stack *pStack){
  return pStack->pTop == (StackNode*)pStack;
 }
 
-static inline Bool Stack_NotEmpty(Stack *pStack){
+static inline B Stack_NotEmpty(Stack *pStack){
  return pStack->pTop != (StackNode*)pStack;
 }
 

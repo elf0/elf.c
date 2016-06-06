@@ -29,15 +29,15 @@ static inline size_t PStack_Count(PStack *pStack){
  return pStack->ppEnd - pStack->ppCur;
 }
 
-static inline Bool PStack_Full(PStack *pStack){
+static inline B PStack_Full(PStack *pStack){
  return pStack->ppCur == pStack->ppBegin;
 }
 
-static inline Bool PStack_Empty(PStack *pStack){
+static inline B PStack_Empty(PStack *pStack){
  return pStack->ppCur == pStack->ppEnd;
 }
 
-static inline Bool PStack_NotEmpty(PStack *pStack){
+static inline B PStack_NotEmpty(PStack *pStack){
  return pStack->ppCur != pStack->ppEnd;
 }
 

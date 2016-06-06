@@ -8,7 +8,7 @@
 #include "DoubleNode.h"
 
 typedef struct structTask Task;
-typedef Bool (* TaskHandler)(Task *pTask);
+typedef B (* TaskHandler)(Task *pTask);
 typedef void (*TaskFinalize)(Task *pTask);
 
 struct structTask{

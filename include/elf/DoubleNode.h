@@ -35,11 +35,11 @@ static inline void DoubleNode_Reset(DoubleNode *pNode){
     pNode->pPrev = pNode->pNext = pNode;
 }
 
-static inline Bool DoubleNode_Alone(const DoubleNode *pNode){
+static inline B DoubleNode_Alone(const DoubleNode *pNode){
     return pNode->pNext == pNode;
 }
 
-static inline Bool DoubleNode_NotAlone(const DoubleNode *pNode){
+static inline B DoubleNode_NotAlone(const DoubleNode *pNode){
     return pNode->pNext != pNode;
 }
 

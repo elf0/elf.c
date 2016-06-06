@@ -17,7 +17,7 @@ typedef struct{
     List *pPendings;
     ThreadLock *pLock;
     ThreadCondition *pCondition;
-    Bool bContinue;
+    B bContinue;
 }TaskThread;
 
 static void *TaskThread_Entry(TaskThread *pThread);
@@ -35,7 +35,7 @@ static inline void TaskThread_Finalize(TaskThread *pThread){
     pThread->bContinue = false;
 }
 
-static inline Bool TaskThread_Run(TaskThread *pThread){
+static inline B TaskThread_Run(TaskThread *pThread){
     return Thread_Run((Thread*)pThread);
 }
 
@@ -59,11 +59,11 @@ static inline void TaskThread_PostTasks(TaskThread *pThread, List *pTasks){
 }
 
 //Internal
-static inline Bool TaskThread_HaveTasks(List *pTasks){
+static inline B TaskThread_HaveTasks(List *pTasks){
     return List_NotEmpty(pTasks);
 }
 
-static inline Bool TaskThread_NoTasks(List *pTasks){
+static inline B TaskThread_NoTasks(List *pTasks){
     return List_Empty(pTasks);
 }
 

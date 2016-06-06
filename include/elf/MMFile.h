@@ -90,15 +90,15 @@ static inline Byte *MMFile_SetSize(MMFile *pFile, U64 nSize){
   return  pFile->pBegin = pBegin != MAP_FAILED? pBegin: null;
 }
 
-static inline Bool MMFile_Flush(MMFile *pFile){
+static inline B MMFile_Flush(MMFile *pFile){
   return File_Flush(&pFile->file);
 }
 
-static inline Bool MMFile_FlushData(MMFile *pFile){
+static inline B MMFile_FlushData(MMFile *pFile){
   return File_FlushData(&pFile->file);
 }
 
-static inline Bool MMFile_FlushRange(MMFile *pFile, Byte *pBegin, U64 uOffset){
+static inline B MMFile_FlushRange(MMFile *pFile, Byte *pBegin, U64 uOffset){
 //  long lPageSize = sysconf(_SC_PAGESIZE);
   return msync(pBegin, uOffset, MS_SYNC) == 0;
 }

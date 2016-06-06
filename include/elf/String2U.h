@@ -13,25 +13,25 @@ static inline U16 String_ToU16(const Char *pBegin, const Char *pEnd);
 static inline U32 String_ToU32(const Char *pBegin, const Char *pEnd);
 static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd);
 
-static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue);
-static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue);
-static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue);
-static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue);
+static inline B String_ParseU8(const Char **ppszNumber, U8 *puValue);
+static inline B String_ParseU16(const Char **ppszNumber, U16 *puValue);
+static inline B String_ParseU32(const Char **ppszNumber, U32 *puValue);
+static inline B String_ParseU64(const Char **ppszNumber, U64 *puValue);
 
 //Parse '0b' prefix youself
-static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue);
-static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue);
+static inline B String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue);
+static inline B String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue);
 
 //Parse '0o' prefix youself
-static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue);
-static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue);
+static inline B String_ParseOctalU32(const Char **ppszNumber, U32 *puValue);
+static inline B String_ParseOctalU64(const Char **ppszNumber, U64 *puValue);
 
 //Parse '0x' prefix youself
-static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue);
-static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue);
-static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue);
+static inline B String_ParseHexU32(const Char **ppszNumber, U32 *puValue);
+static inline B String_ParseHexU64(const Char **ppszNumber, U64 *puValue);
+static inline B String_ParseUHexU64(const Char **ppszNumber, U64 *puValue);
 
-static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp);
+static inline B String_ParseIp(const Char **ppIp, U32 *puIp);
 ////////////////////////////////////////////////////////////////
 static inline U8 String_ToU8(const Char *pBegin, const Char *pEnd){
     const Char *p = pBegin;
@@ -74,7 +74,7 @@ static inline U64 String_ToU64(const Char *pBegin, const Char *pEnd){
     return uValue;
 }
 
-static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue){
+static inline B String_ParseU8(const Char **ppszNumber, U8 *puValue){
     const Char *p = *ppszNumber;
     U8 uValue = *puValue;
     //Max: 255
@@ -104,7 +104,7 @@ static inline Bool String_ParseU8(const Char **ppszNumber, U8 *puValue){
     return false;
 }
 
-static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue){
+static inline B String_ParseU16(const Char **ppszNumber, U16 *puValue){
     const Char *p = *ppszNumber;
     U16 uValue = *puValue;
     //Max: 65535
@@ -134,7 +134,7 @@ static inline Bool String_ParseU16(const Char **ppszNumber, U16 *puValue){
     return false;
 }
 
-static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
+static inline B String_ParseU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
     U32 uValue = *puValue;
     //Max: 4294967295
@@ -164,7 +164,7 @@ static inline Bool String_ParseU32(const Char **ppszNumber, U32 *puValue){
     return false;
 }
 
-static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
+static inline B String_ParseU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
     U64 uValue = *puValue;
 
@@ -197,7 +197,7 @@ static inline Bool String_ParseU64(const Char **ppszNumber, U64 *puValue){
 #define I32_MIN 0x80000000
 #define I64_MIN 0x8000000000000000LL
 
-static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
+static inline B String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
     U32 uValue = *puValue;
     //Max: 0b11111111111111111111111111111111
@@ -224,7 +224,7 @@ static inline Bool String_ParseBinaryU32(const Char **ppszNumber, U32 *puValue){
     return false;
 }
 
-static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
+static inline B String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
     U64 uValue = *puValue;
     //Max: 0b1111111111111111111111111111111111111111111111111111111111111111
@@ -251,7 +251,7 @@ static inline Bool String_ParseBinaryU64(const Char **ppszNumber, U64 *puValue){
     return false;
 }
 
-static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
+static inline B String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
     U32 uValue = *puValue;
     //Max: 0o37777777777
@@ -278,7 +278,7 @@ static inline Bool String_ParseOctalU32(const Char **ppszNumber, U32 *puValue){
     return false;
 }
 
-static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
+static inline B String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
     U64 uValue = *puValue;
     //Max: 0o1777777777777777777777
@@ -308,10 +308,10 @@ static inline Bool String_ParseOctalU64(const Char **ppszNumber, U64 *puValue){
 //Max: 0xFFFFFFFF
 #define HEX_U32_OVERFLOW_BEFORE_MUL 0xFFFFFFFU
 
-static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
+static inline B String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
     const Char *p = *ppszNumber;
     U32 uValue = *puValue;
-    Bool bOverflow = false;
+    B bOverflow = false;
     U8 uRange;
     while(true){
       uRange = *p - (Char)'0';
@@ -358,10 +358,10 @@ static inline Bool String_ParseHexU32(const Char **ppszNumber, U32 *puValue){
 //Max: 0xFFFFFFFFFFFFFFFF
 #define HEX_U64_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFLLU
 
-static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
+static inline B String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
     U64 uValue = *puValue;
-    Bool bOverflow = false;
+    B bOverflow = false;
     U8 uRange;
     while(true){
       uRange = *p - (Char)'0';
@@ -405,10 +405,10 @@ static inline Bool String_ParseHexU64(const Char **ppszNumber, U64 *puValue){
     return bOverflow;
 }
 
-static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue){
+static inline B String_ParseUHexU64(const Char **ppszNumber, U64 *puValue){
     const Char *p = *ppszNumber;
     U64 uValue = *puValue;
-    Bool bOverflow = false;
+    B bOverflow = false;
     U8 uRange;
     while(true){
       uRange = *p - (Char)'0';
@@ -441,7 +441,7 @@ static inline Bool String_ParseUHexU64(const Char **ppszNumber, U64 *puValue){
     return bOverflow;
 }
 
-static inline Bool String_ParseIp(const Char **ppIp, U32 *puIp){
+static inline B String_ParseIp(const Char **ppIp, U32 *puIp){
     const Char *p = *ppIp;
 
     if(Char_IsNotDigit(*p))

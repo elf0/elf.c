@@ -28,11 +28,11 @@ static inline const Byte *VU30_ToU32(const Byte *pVU30, U32 *pU32){
   return p;
 }
 
-static inline Bool VU30_Valid(U32 u32){
+static inline B VU30_Valid(U32 u32){
   return u32 < 0x40000000;
 }
 
-static inline Bool VU30_Invalid(U32 u32){
+static inline B VU30_Invalid(U32 u32){
   return u32 > 0x3FFFFFFF;
 }
 

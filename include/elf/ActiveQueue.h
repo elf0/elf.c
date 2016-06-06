@@ -23,11 +23,11 @@ static inline void ActiveQueue_Initialize(ActiveQueue *pQueue){
     CountedList_Initialize((CountedList*)pQueue);
 }
 
-static inline Bool ActiveQueue_Empty(const ActiveQueue *pQueue){
+static inline B ActiveQueue_Empty(const ActiveQueue *pQueue){
     return CountedList_Empty((CountedList*)pQueue);
 }
 
-static inline Bool ActiveQueue_NotEmpty(const ActiveQueue *pQueue){
+static inline B ActiveQueue_NotEmpty(const ActiveQueue *pQueue){
     return CountedList_NotEmpty((CountedList*)pQueue);
 }
 

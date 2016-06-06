@@ -19,7 +19,7 @@ typedef struct RBTreeNode RBTreeNode;
 
 static inline void RBTree_Initialize(RBTree *pTree);
 static inline RBTreeNode *RBTree_Find(RBTree *pTree, RBTreeKey nKey);
-static inline Bool RBTree_Insert(RBTree *pTree, RBTreeNode *pNew);
+static inline B RBTree_Insert(RBTree *pTree, RBTreeNode *pNew);
 
 //Internal
 struct RBTreeNode{
@@ -37,10 +37,10 @@ struct RBTreeNode{
 #define RBTREE_NODE_PARENT(pNode) (*(RBTreeNode**)pNode)
 #define RBTREE_NODE_SET_PARENT(pNode, pParent) (RBTREE_NODE_PARENT(pNode) = pParent)
 
-typedef Bool (*RBTree_Insert_Function) (RBTree *pTree, RBTreeNode *pNode);
+typedef B (*RBTree_Insert_Function) (RBTree *pTree, RBTreeNode *pNode);
 
-static Bool RBTree_InsertRoot(RBTree *pTree, RBTreeNode *pNew);
-static Bool RBTree_InsertChild(RBTree *pTree, RBTreeNode *pNew);
+static B RBTree_InsertRoot(RBTree *pTree, RBTreeNode *pNew);
+static B RBTree_InsertChild(RBTree *pTree, RBTreeNode *pNew);
 static inline void RBTree_Balance(RBTree *pTree, RBTreeNode *pNode, RBTreeNode *pSentinel);
 static inline void RBTree_LeftRotate(RBTree *pTree, RBTreeNode *pNode, RBTreeNode *pSentinel);
 static inline void RBTree_RightRotate(RBTree *pTree, RBTreeNode *pNode, RBTreeNode *pSentinel);
@@ -76,11 +76,11 @@ static inline RBTreeNode *RBTree_Find(RBTree *pTree, RBTreeKey nKey){
     return null;
 }
 
-static inline Bool RBTree_Insert(RBTree *pTree, RBTreeNode *pNew){
+static inline B RBTree_Insert(RBTree *pTree, RBTreeNode *pNew){
     return pTree->fInsert(pTree, pNew);
 }
 
-static Bool RBTree_InsertRoot(RBTree *pTree, RBTreeNode *pNew){
+static B RBTree_InsertRoot(RBTree *pTree, RBTreeNode *pNew){
     //    Assert(offsetof(RBTree, pRoot) == 0);
     //    Assert(offsetof(RBTreeNode, pParent) == 0);
 
@@ -95,7 +95,7 @@ static Bool RBTree_InsertRoot(RBTree *pTree, RBTreeNode *pNew){
     return true;
 }
 
-static Bool RBTree_InsertChild(RBTree *pTree, RBTreeNode *pNew){
+static B RBTree_InsertChild(RBTree *pTree, RBTreeNode *pNew){
     RBTreeNode *pSentinel = &pTree->ndSentinel;
     RBTreeNode *pNode = RBTREE_ROOT(pTree);
 

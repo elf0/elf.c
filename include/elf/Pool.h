@@ -46,11 +46,11 @@ static inline size_t Pool_UnusedCount(Pool *pPool){
  return (pPool->pEnd - pPool->pLast)/pPool->nObjectSize;
 }
 
-static inline Bool Pool_UnusedEmpty(Pool *pPool){
+static inline B Pool_UnusedEmpty(Pool *pPool){
  return pPool->pLast == pPool->pEnd;
 }
 
-static inline Bool Pool_UnusedNotEmpty(Pool *pPool){
+static inline B Pool_UnusedNotEmpty(Pool *pPool){
  return pPool->pLast != pPool->pEnd;
 }
 
@@ -66,15 +66,15 @@ static inline size_t Pool_UsedCount(Pool *pPool){
  return PStack_Count(&pPool->used);
 }
 
-static inline Bool Pool_UsedFull(Pool *pPool){
+static inline B Pool_UsedFull(Pool *pPool){
  return PStack_Full(&pPool->used);
 }
 
-static inline Bool Pool_UsedEmpty(Pool *pPool){
+static inline B Pool_UsedEmpty(Pool *pPool){
  return PStack_Empty(&pPool->used);
 }
 
-static inline Bool Pool_UsedNotEmpty(Pool *pPool){
+static inline B Pool_UsedNotEmpty(Pool *pPool){
  return PStack_NotEmpty(&pPool->used);
 }
 
@@ -87,11 +87,11 @@ static inline size_t Pool_Size(Pool *pPool){
  return PStack_Size(&pPool->used);
 }
 
-static inline Bool Pool_Empty(Pool *pPool){
+static inline B Pool_Empty(Pool *pPool){
  return Pool_UsedEmpty(pPool) && Pool_UnusedEmpty(pPool);
 }
 
-static inline Bool Pool_NotEmpty(Pool *pPool){
+static inline B Pool_NotEmpty(Pool *pPool){
  return Pool_UsedNotEmpty(pPool) || Pool_UnusedNotEmpty(pPool);
 }
 

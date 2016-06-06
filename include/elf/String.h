@@ -12,14 +12,14 @@ typedef void (*String_EventHandler)(void *pContext, const Char *pBegin, const Ch
 static inline const Char *String_Find(const Char *pBegin, const Char *pEnd, Char value);
 static inline const Char *String_FindLast(const Char *pBegin, const Char *pEnd, Char value);
 static inline const Char *String_FindSub(const Char *pBegin, const Char *pEnd, const Char *pSub, U32 nSubSize);
-static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize);
-static inline Bool String_StartsWith2(const Char *pBegin, U32 nSize, const Char *pPrefix);
-static inline Bool String_StartsWith4(const Char *pBegin, U32 nSize, const Char *pPrefix);
-static inline Bool String_StartsWith8(const Char *pBegin, U32 nSize, const Char *pPrefix);
-static inline Bool String_EndsWith(const Char *pBegin, U32 nSize, const Char *pSuffix, U32 nSuffixSize);
-static inline Bool String_EndsWith2(const Char *pEnd, U32 nSize, const Char *pSuffix);
-static inline Bool String_EndsWith4(const Char *pEnd, U32 nSize, const Char *pSuffix);
-static inline Bool String_EndsWith8(const Char *pEnd, U32 nSize, const Char *pSuffix);
+static inline B String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize);
+static inline B String_StartsWith2(const Char *pBegin, U32 nSize, const Char *pPrefix);
+static inline B String_StartsWith4(const Char *pBegin, U32 nSize, const Char *pPrefix);
+static inline B String_StartsWith8(const Char *pBegin, U32 nSize, const Char *pPrefix);
+static inline B String_EndsWith(const Char *pBegin, U32 nSize, const Char *pSuffix, U32 nSuffixSize);
+static inline B String_EndsWith2(const Char *pEnd, U32 nSize, const Char *pSuffix);
+static inline B String_EndsWith4(const Char *pEnd, U32 nSize, const Char *pSuffix);
+static inline B String_EndsWith8(const Char *pEnd, U32 nSize, const Char *pSuffix);
 static inline const Char *String_Skip(const Char *p, const Char value);
 static inline const Char *String_SkipBackward(const Char *p, Char value);
 static inline const Char *String_SkipUntil(const Char *p, Char value);
@@ -31,10 +31,10 @@ static inline const Char *String_SkipAlpha(const Char *p);
 static inline const Char *String_TrimEnd(const Char *pBegin, Char *pEnd, Char value);
 static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSplitter, String_EventHandler onSubString, void *pContext);
 
-static inline Bool String_Equal2(const Char *pLeft, const Char *pRight);
-static inline Bool String_Equal4(const Char *pLeft, const Char *pRight);
-static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
-static inline Bool String_Equal8(const Char *pLeft, const Char *pRight);
+static inline B String_Equal2(const Char *pLeft, const Char *pRight);
+static inline B String_Equal4(const Char *pLeft, const Char *pRight);
+static inline B String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2);
+static inline B String_Equal8(const Char *pLeft, const Char *pRight);
 
 
 ////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ static inline const Char *String_FindSub(const Char *pBegin, const Char *pEnd, c
     return null;
 }
 
-static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize){
+static inline B String_StartsWith(const Char *pBegin, U32 nSize, const Char *pPrefix, U32 nPrefixSize){
     if(nPrefixSize > nSize)
         return false;
 
@@ -86,19 +86,19 @@ static inline Bool String_StartsWith(const Char *pBegin, U32 nSize, const Char *
     return true;
 }
 
-static inline Bool String_StartsWith2(const Char *pBegin, U32 nSize, const Char *pPrefix){
+static inline B String_StartsWith2(const Char *pBegin, U32 nSize, const Char *pPrefix){
     return nSize > 1 && String_Equal2(pBegin, pPrefix);
 }
 
-static inline Bool String_StartsWith4(const Char *pBegin, U32 nSize, const Char *pPrefix){
+static inline B String_StartsWith4(const Char *pBegin, U32 nSize, const Char *pPrefix){
     return nSize > 3 && String_Equal4(pBegin, pPrefix);
 }
 
-static inline Bool String_StartsWith8(const Char *pBegin, U32 nSize, const Char *pPrefix){
+static inline B String_StartsWith8(const Char *pBegin, U32 nSize, const Char *pPrefix){
     return nSize > 7 && String_Equal8(pBegin, pPrefix);
 }
 
-static inline Bool String_EndsWith(const Char *pBegin, U32 nSize, const Char *pSuffix, U32 nSuffixSize){
+static inline B String_EndsWith(const Char *pBegin, U32 nSize, const Char *pSuffix, U32 nSuffixSize){
     if(nSuffixSize > nSize)
         return false;
 
@@ -114,15 +114,15 @@ static inline Bool String_EndsWith(const Char *pBegin, U32 nSize, const Char *pS
     return true;
 }
 
-static inline Bool String_EndsWith2(const Char *pEnd, U32 nSize, const Char *pSuffix){
+static inline B String_EndsWith2(const Char *pEnd, U32 nSize, const Char *pSuffix){
     return nSize > 1 && String_Equal2(pEnd - 2, pSuffix);
 }
 
-static inline Bool String_EndsWith4(const Char *pEnd, U32 nSize, const Char *pSuffix){
+static inline B String_EndsWith4(const Char *pEnd, U32 nSize, const Char *pSuffix){
     return nSize > 3 && String_Equal4(pEnd - 4, pSuffix);
 }
 
-static inline Bool String_EndsWith8(const Char *pEnd, U32 nSize, const Char *pSuffix){
+static inline B String_EndsWith8(const Char *pEnd, U32 nSize, const Char *pSuffix){
     return nSize > 7 && String_Equal8(pEnd - 8, pSuffix);
 }
 
@@ -215,19 +215,19 @@ static inline void String_Split(const Char *pBegin, const Char *pEnd, Char cSpli
     }
 }
 
-static inline Bool String_Equal2(const Char *pLeft, const Char *pRight){
+static inline B String_Equal2(const Char *pLeft, const Char *pRight){
     return *(const U16*)pLeft == *(const U16*)pRight;
 }
 
-static inline Bool String_Equal4(const Char *pLeft, const Char *pRight){
+static inline B String_Equal4(const Char *pLeft, const Char *pRight){
     return *(const U32*)pLeft == *(const U32*)pRight;
 }
 
-static inline Bool String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2){
+static inline B String_Equal6(const Char *pLeft, const Char *pRight4, const Char *pRight2){
     return String_Equal4(pLeft, pRight4) && String_Equal2(pLeft + 4, pRight2);
 }
 
-static inline Bool String_Equal8(const Char *pLeft, const Char *pRight){
+static inline B String_Equal8(const Char *pLeft, const Char *pRight){
     return *(const U64*)pLeft == *(const U64*)pRight;
 }
 
