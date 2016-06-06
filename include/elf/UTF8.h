@@ -5,11 +5,10 @@
 //Author: elf
 //EMail: elf@elf0.org
 
-typedef U8  UTF8;
 
-static inline UTF8 *UTF8_GetValidValue(UTF8 *pBegin, UTF8 *pEnd, U32 *pValue){
-  UTF8 *p = pBegin;
-  U32 value = *p++;
+static inline C *UTF8_GetValidValue(C *pBegin, C *pEnd, C32 *pValue){
+  C *p = pBegin;
+  C32 value = *p++;
   if(value < 0x80);//0xxxxxxx
   else if(value < 0xC2)
     return null;
@@ -43,9 +42,9 @@ static inline UTF8 *UTF8_GetValidValue(UTF8 *pBegin, UTF8 *pEnd, U32 *pValue){
 }
 
 //caller must input valid utf-8 string
-static inline UTF8 *UTF8_GetMultibytesValue(UTF8 *pString, U32 *pValue){
-  UTF8 *p = pString;
-  U32 value = *p++;
+static inline C *UTF8_GetMultibytesValue(C *pString, C32 *pValue){
+  C *p = pString;
+  C32 value = *p++;
 
   if(value < 0xE0)//110xxxxx 10xxxxxx
     value = (value & 0x001F) << 6;
@@ -68,9 +67,9 @@ static inline UTF8 *UTF8_GetMultibytesValue(UTF8 *pString, U32 *pValue){
 }
 
 //caller must input valid utf-8 string
-static inline UTF8 *UTF8_GetValue(UTF8 *pString, U32 *pValue){
-  UTF8 *p = pString;
-  U32 value = *p++;
+static inline C *UTF8_GetValue(C *pString, C32 *pValue){
+  C *p = pString;
+  C32 value = *p++;
   if(value < 0x80);//0xxxxxxx
   else{
     if(value < 0xE0)//110xxxxx 10xxxxxx
@@ -95,8 +94,8 @@ static inline UTF8 *UTF8_GetValue(UTF8 *pString, U32 *pValue){
 
 //pBuffer size should >= 4 bytes
 //caller must input valid utf value
-static inline UTF8 *UTF_To8(U32 value, UTF8 *pBuffer){
-  UTF8 *p = pBuffer;
+static inline C *UTF_To8(C32 value, C *pBuffer){
+  C *p = pBuffer;
   if(value < 0x80){//0xxxxxxx
     *p = value;
     return ++p;
