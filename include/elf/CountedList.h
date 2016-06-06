@@ -83,9 +83,14 @@ static inline DoubleNode *CountedList_PopBack(CountedList *pList){
     return pNode;
 }
 
+static inline void CountedList_MoveNodeToBack(CountedList *pList, DoubleNode *pNode){
+    List_MoveNodeToBack((List*)pList, pNode);
+}
+
 static inline void CountedList_MoveNodeToFront(CountedList *pList, DoubleNode *pNode){
     List_MoveNodeToFront((List*)pList, pNode);
 }
+
 //move to back
 static inline void CountedList_MoveTo(CountedList *pList, CountedList *pTargetList){
     List_MoveTo((List*)pList, (List*)pTargetList);

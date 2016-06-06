@@ -81,6 +81,11 @@ static inline DoubleNode *List_PopBack (List *pList){
     return pNode;
 }
 
+static inline void List_MoveNodeToBack(List *pList, DoubleNode *pNode){
+    List_Remove(pNode);
+    List_Push(pList, pNode);
+}
+
 static inline void List_MoveNodeToFront(List *pList, DoubleNode *pNode){
     List_Remove(pNode);
     List_PushFront(pList, pNode);
