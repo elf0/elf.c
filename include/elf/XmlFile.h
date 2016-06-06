@@ -14,7 +14,7 @@
 
 //Api
 typedef void (*XmlFile_ErrorHandler)(void *pContext, XmlResult xrError, size_t nOffset);
-int XmlFile_Parse(void *pContext, const Char *pszFileName, Xml_Handler onProcessingInstruction, Xml_Handler onStartTag,
+int XmlFile_Parse(void *pContext, const C *pszFileName, Xml_Handler onProcessingInstruction, Xml_Handler onStartTag,
                   XmlAttribute_Handler onAttribute, Xml_Handler onEndTag, Xml_Handler onContent, XmlFile_ErrorHandler onError){
     int fd = open((const char*)pszFileName, O_RDONLY);
     if(fd == -1)
@@ -36,7 +36,7 @@ int XmlFile_Parse(void *pContext, const Char *pszFileName, Xml_Handler onProcess
     }
 
     Byte *pEnd = pBegin + st.st_size - 1;
-    Char cEnd = *pEnd;
+    C cEnd = *pEnd;
 
     Byte *p = pBegin;
     XmlResult r = Xml_Parse(pContext, &p, pEnd, onProcessingInstruction, onStartTag, onAttribute, onEndTag, onContent);

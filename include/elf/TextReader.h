@@ -15,7 +15,7 @@ typedef struct{
 
 static inline B TextReader_ReadBlockHeader(TextReader *pReader);
 
-static inline I32 TextReader_Open(TextReader *pReader, const Char *pszPathName){
+static inline I32 TextReader_Open(TextReader *pReader, const C *pszPathName){
     if(!File_OpenForRead(&pReader->file.file, pszPathName))
         return -TextFile_ErrorCode_Open;
 
@@ -42,7 +42,7 @@ static inline B TextReader_ReadBlockHeader(TextReader *pReader){
     return File_ReadAt(&pReader->file.file, (Byte*)&pReader->file.tbBlock, sizeof(TextBlock), pReader->nBlockOffset) == sizeof(TextBlock);
 }
 
-static inline I32 TextReader_ReadLine(TextReader *pReader, Char *pBuffer, U32 *pnSize){
+static inline I32 TextReader_ReadLine(TextReader *pReader, C *pBuffer, U32 *pnSize){
     TextBlock *ptbBlock = &pReader->file.tbBlock;
     if(pReader->nLine == ptbBlock->nCount){
         if(ptbBlock->nNext == 0)

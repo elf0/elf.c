@@ -19,7 +19,7 @@
 #endif
 
 typedef unsigned char      Byte;
-typedef unsigned char      Char;
+typedef unsigned char      C;
 
 typedef unsigned char      U8;
 typedef unsigned short     U16;

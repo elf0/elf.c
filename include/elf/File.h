@@ -24,28 +24,28 @@ typedef struct{
 #endif
 }File;
 
-static inline B File_Exists(const Char *szPath){
+static inline B File_Exists(const C *szPath){
 #ifdef __linux__
   return access((const char*)szPath, F_OK) == 0;
 #else
 #endif
 }
 
-static inline B File_Delete(const Char *szPath){
+static inline B File_Delete(const C *szPath){
 #ifdef __linux__
   return unlink((const char*)szPath) == 0;
 #else
 #endif
 }
 
-static inline B File_Link(const Char *pszOldName, const Char *pszNewName){
+static inline B File_Link(const C *pszOldName, const C *pszNewName){
 #ifdef __linux__
   return link((const char*)pszOldName, (const char*)pszNewName) == 0;
 #else
 #endif
 }
 
-static inline B File_Rename(const Char *pszOldName, const Char *pszNewName){
+static inline B File_Rename(const C *pszOldName, const C *pszNewName){
 #ifdef __linux__
   if(!File_Link(pszOldName, pszNewName))
     return false;
@@ -54,7 +54,7 @@ static inline B File_Rename(const Char *pszOldName, const Char *pszNewName){
 #endif
 }
 
-static inline B File_Create(File *pFile, const Char *szPath){
+static inline B File_Create(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_RDWR, 0644);
   return pFile->fd != -1;
@@ -62,7 +62,7 @@ static inline B File_Create(File *pFile, const Char *szPath){
 #endif
 }
 
-static inline B File_Open(File *pFile, const Char *szPath){
+static inline B File_Open(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_RDWR);
   return pFile->fd != -1;
@@ -70,7 +70,7 @@ static inline B File_Open(File *pFile, const Char *szPath){
 #endif
 }
 
-static inline B File_OpenForRead(File *pFile, const Char *szPath){
+static inline B File_OpenForRead(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_RDONLY);
   return pFile->fd != -1;
@@ -78,7 +78,7 @@ static inline B File_OpenForRead(File *pFile, const Char *szPath){
 #endif
 }
 
-static inline B File_CreateForWrite(File *pFile, const Char *szPath){
+static inline B File_CreateForWrite(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_WRONLY, 0644);
   return pFile->fd != -1;
@@ -86,7 +86,7 @@ static inline B File_CreateForWrite(File *pFile, const Char *szPath){
 #endif
 }
 
-static inline B File_OpenForWrite(File *pFile, const Char *szPath){
+static inline B File_OpenForWrite(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_WRONLY);
   return pFile->fd != -1;
@@ -94,7 +94,7 @@ static inline B File_OpenForWrite(File *pFile, const Char *szPath){
 #endif
 }
 
-static inline B File_PrepareForWrite(File *pFile, const Char *szPath){
+static inline B File_PrepareForWrite(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_WRONLY);
   if(pFile->fd == -1){
@@ -111,7 +111,7 @@ static inline B File_PrepareForWrite(File *pFile, const Char *szPath){
 #endif
 }
 
-static inline B File_OpenForAppending(File *pFile, const Char *szPath){
+static inline B File_OpenForAppending(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_APPEND);
   return pFile->fd != -1;
@@ -119,7 +119,7 @@ static inline B File_OpenForAppending(File *pFile, const Char *szPath){
 #endif
 }
 
-static inline B File_PrepareForAppending(File *pFile, const Char *szPath){
+static inline B File_PrepareForAppending(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_APPEND);
   if(pFile->fd == -1){
@@ -136,7 +136,7 @@ static inline B File_PrepareForAppending(File *pFile, const Char *szPath){
 #endif
 }
 
-static inline B File_Prepare(File *pFile, const Char *szPath){
+static inline B File_Prepare(File *pFile, const C *szPath){
 #ifdef __linux__
   pFile->fd = open((const char*)szPath, O_RDWR);
   if(pFile->fd != -1)

@@ -7,11 +7,11 @@
 
 #include "Type.h"
 
-static inline B Char_InRange(Char cValue, Char cMin, U8 uSize){
+static inline B Char_InRange(C cValue, C cMin, U8 uSize){
   return (U8)(cValue - cMin) < uSize;
 }
 
-static inline B Char_NotInRange(Char cValue, Char cMin, U8 uMax){
+static inline B Char_NotInRange(C cValue, C cMin, U8 uMax){
   return (U8)(cValue - cMin) > uMax;
 }
 
@@ -43,15 +43,15 @@ static inline B Char_NotInRange(Char cValue, Char cMin, U8 uMax){
 #define CASE_CHAR_DIGIT \
     '0': case CASE_CHAR_NONZERODIGIT
 
-static inline B Char_IsUpper(Char c){
-  return Char_InRange(c, (Char)'A', 26);
+static inline B Char_IsUpper(C c){
+  return Char_InRange(c, (C)'A', 26);
 }
 
-static inline B Char_IsLower(Char c){
-    return Char_InRange(c, (Char)'a', 26);
+static inline B Char_IsLower(C c){
+    return Char_InRange(c, (C)'a', 26);
 }
 
-static inline B Char_IsAlpha(Char c){
+static inline B Char_IsAlpha(C c){
     switch(c){
     case CASE_CHAR_UPPER: case CASE_CHAR_LOWER:
         return true;
@@ -59,16 +59,16 @@ static inline B Char_IsAlpha(Char c){
     return false;
 }
 
-static inline B Char_IsDigit(Char c){
-    return Char_InRange(c, (Char)'0', 10);
+static inline B Char_IsDigit(C c){
+    return Char_InRange(c, (C)'0', 10);
 }
 
-static inline B Char_IsNotDigit(Char c){
-  U8 uRange = c - (Char)'0';
+static inline B Char_IsNotDigit(C c){
+  U8 uRange = c - (C)'0';
   return uRange > 9;
 }
 
-static inline B Char_IsHexLetterUpper(Char c){
+static inline B Char_IsHexLetterUpper(C c){
     switch(c){
     case CASE_CHAR_HEX_LETTER_UPPER:
         return true;
@@ -76,7 +76,7 @@ static inline B Char_IsHexLetterUpper(Char c){
     return false;
 }
 
-static inline B Char_IsHexUpper(Char c){
+static inline B Char_IsHexUpper(C c){
     switch(c){
     case CASE_CHAR_DIGIT: case CASE_CHAR_HEX_LETTER_UPPER:
         return true;
@@ -84,7 +84,7 @@ static inline B Char_IsHexUpper(Char c){
     return false;
 }
 
-static inline B Char_IsHexLetterLower(Char c){
+static inline B Char_IsHexLetterLower(C c){
     switch(c){
     case CASE_CHAR_HEX_LETTER_LOWER:
         return true;
@@ -92,7 +92,7 @@ static inline B Char_IsHexLetterLower(Char c){
     return false;
 }
 
-static inline B Char_IsHexLower(Char c){
+static inline B Char_IsHexLower(C c){
     switch(c){
     case CASE_CHAR_DIGIT: case CASE_CHAR_HEX_LETTER_LOWER:
         return true;
@@ -100,7 +100,7 @@ static inline B Char_IsHexLower(Char c){
     return false;
 }
 
-static inline B Char_IsHex(Char c){
+static inline B Char_IsHex(C c){
     switch(c){
     case CASE_CHAR_DIGIT: case CASE_CHAR_HEX_LETTER:
         return true;
@@ -108,7 +108,7 @@ static inline B Char_IsHex(Char c){
     return false;
 }
 
-static inline U8 Char_HexValue(Char c){
+static inline U8 Char_HexValue(C c){
     switch(c){
     case CASE_CHAR_DIGIT:
         return c - '0';

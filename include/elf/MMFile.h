@@ -9,7 +9,7 @@ typedef struct{
   Byte *pBegin;
 }MMFile;
 
-static inline Byte *MMFile_Open(MMFile *pFile, const Char *szPath){
+static inline Byte *MMFile_Open(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
   if(!File_Open(pfFile, szPath))
     return null;
@@ -27,7 +27,7 @@ static inline Byte *MMFile_Open(MMFile *pFile, const Char *szPath){
   return pFile->pBegin = pBegin;
 }
 
-static inline Byte *MMFile_Prepare(MMFile *pFile, const Char *szPath){
+static inline Byte *MMFile_Prepare(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
   if(!File_Prepare(pfFile, szPath))
     return null;
@@ -45,7 +45,7 @@ static inline Byte *MMFile_Prepare(MMFile *pFile, const Char *szPath){
   return pFile->pBegin = pBegin;
 }
 
-static inline const Byte *MMFile_OpenForRead(MMFile *pFile, const Char *szPath){
+static inline const Byte *MMFile_OpenForRead(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
   if(!File_OpenForRead(pfFile, szPath))
     return null;

@@ -36,8 +36,8 @@ enum ResultOfHttpParsing{
 
 typedef struct HttpClient HttpClient;
 typedef int (*EventHandler)(HttpClient *pClient);
-typedef int (*DataHandler)(HttpClient *pClient, const Char *pBegin, const Char *pEnd);
-typedef int (*FieldHandler)(HttpClient *pClient, const Char *pName, const Char *pNameEnd, const Char *pValue, const Char *pValueEnd);
+typedef int (*DataHandler)(HttpClient *pClient, const C *pBegin, const C *pEnd);
+typedef int (*FieldHandler)(HttpClient *pClient, const C *pName, const C *pNameEnd, const C *pValue, const C *pValueEnd);
 //Api
 static inline void HttpClient_Initialize(HttpClient *pClient, DataHandler onVersion,
                                          DataHandler onStatusCode,
@@ -47,9 +47,9 @@ static inline void HttpClient_Initialize(HttpClient *pClient, DataHandler onVers
                                          DataHandler onBody,
                                          EventHandler onComplete);
 
-static inline ResultOfHttpParsing HttpClient_Parse(HttpClient *pClient, const Char *pBegin, Char *pEnd);
+static inline ResultOfHttpParsing HttpClient_Parse(HttpClient *pClient, const C *pBegin, C *pEnd);
 
-typedef ResultOfHttpParsing (*ParseFunction)(HttpClient *pClient, const Char *pBegin, Char *pEnd);
+typedef ResultOfHttpParsing (*ParseFunction)(HttpClient *pClient, const C *pBegin, C *pEnd);
 
 struct HttpClient{
     HTTPCLIENT_BASE base;
@@ -79,14 +79,14 @@ struct HttpClient{
 };
 
 //Internal
-static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, const Char *pBegin, Char *pEnd);
-static inline ResultOfHttpParsing HttpClient_ParseStatusCode(HttpClient *pClient, const Char *pBegin, Char *pEnd);
-static inline ResultOfHttpParsing HttpClient_ParseReasonPhrase(HttpClient *pClient, const Char *pBegin, Char *pEnd);
-static inline ResultOfHttpParsing HttpClient_ParseFieldLine(HttpClient *pClient, const Char *pBegin, Char *pEnd);
-static ResultOfHttpParsing HttpClient_ParseMessageBody(HttpClient *pClient, const Char *pBegin, Char *pEnd);
-static ResultOfHttpParsing HttpClient_ParseChunk(HttpClient *pClient, const Char *pBegin, Char *pEnd);
-static ResultOfHttpParsing HttpClient_ParseChunkedData(HttpClient *pClient, const Char *pBegin, Char *pEnd);
-static inline B ParseFieldContent(HttpClient *pClient, const Char *pName, const Char *pNameEnd, const Char *pValue, const Char *pValueEnd);
+static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, const C *pBegin, C *pEnd);
+static inline ResultOfHttpParsing HttpClient_ParseStatusCode(HttpClient *pClient, const C *pBegin, C *pEnd);
+static inline ResultOfHttpParsing HttpClient_ParseReasonPhrase(HttpClient *pClient, const C *pBegin, C *pEnd);
+static inline ResultOfHttpParsing HttpClient_ParseFieldLine(HttpClient *pClient, const C *pBegin, C *pEnd);
+static ResultOfHttpParsing HttpClient_ParseMessageBody(HttpClient *pClient, const C *pBegin, C *pEnd);
+static ResultOfHttpParsing HttpClient_ParseChunk(HttpClient *pClient, const C *pBegin, C *pEnd);
+static ResultOfHttpParsing HttpClient_ParseChunkedData(HttpClient *pClient, const C *pBegin, C *pEnd);
+static inline B ParseFieldContent(HttpClient *pClient, const C *pName, const C *pNameEnd, const C *pValue, const C *pValueEnd);
 
 static inline void HttpClient_Initialize(HttpClient *pClient, DataHandler onVersion,
                                          DataHandler onStatusCode,
@@ -110,16 +110,16 @@ static inline void HttpClient_Initialize(HttpClient *pClient, DataHandler onVers
     pClient->file.fd = -1;
 }
 
-static inline ResultOfHttpParsing HttpClient_Parse(HttpClient *pClient, const Char *pBegin, Char *pEnd){
+static inline ResultOfHttpParsing HttpClient_Parse(HttpClient *pClient, const C *pBegin, C *pEnd){
     *pEnd = '\n';
     return pClient->Parse(pClient, pBegin, pEnd);
 }
 
-static inline Char *HttpClient_ReadLine(const Char *pBegin, Char *pEnd){
-    return (Char*)String_SkipUntil(pBegin, '\n');
+static inline C *HttpClient_ReadLine(const C *pBegin, C *pEnd){
+    return (C*)String_SkipUntil(pBegin, '\n');
 }
 
-static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, const Char *pBegin, Char *pEnd){
+static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, const C *pBegin, C *pEnd){
     U32 nSize = pEnd - pBegin;
     if(nSize < 4){
         if(nSize && *pBegin != 'H')
@@ -127,10 +127,10 @@ static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, cons
         return rohpNeedMoreData;
     }
 
-    if(!String_Equal4(pBegin, (const Char*)"HTTP"))
+    if(!String_Equal4(pBegin, (const C*)"HTTP"))
         return rohpBadFormat;
 
-    const Char *p = pBegin + 4;
+    const C *p = pBegin + 4;
     if(*p != '/'){
         if(p != pEnd)
             return rohpBadFormat;
@@ -141,7 +141,7 @@ static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, cons
 
     //Parse major version
     U32 nInteger = 0;
-    const Char *pString = p;
+    const C *pString = p;
     p = String_ParseU32(p, &nInteger);
     if(p == pEnd)
         return rohpNeedMoreData;
@@ -176,9 +176,9 @@ static ResultOfHttpParsing HttpClient_ParseHttpVersion(HttpClient *pClient, cons
     return HttpClient_ParseStatusCode(pClient, p, pEnd);
 }
 
-static inline ResultOfHttpParsing HttpClient_ParseStatusCode(HttpClient *pClient, const Char *pBegin, Char *pEnd){
+static inline ResultOfHttpParsing HttpClient_ParseStatusCode(HttpClient *pClient, const C *pBegin, C *pEnd){
     U32 nInteger = 0;
-    const Char *p = String_ParseU32(pBegin, &nInteger);
+    const C *p = String_ParseU32(pBegin, &nInteger);
     if(p == pEnd){
         U32 nSize = p - pBegin;
         memmove(pClient->szBuffer, pBegin, nSize);
@@ -201,8 +201,8 @@ static inline ResultOfHttpParsing HttpClient_ParseStatusCode(HttpClient *pClient
     return HttpClient_ParseReasonPhrase(pClient, p, pEnd);
 }
 
-static inline ResultOfHttpParsing HttpClient_ParseReasonPhrase(HttpClient *pClient, const Char *pBegin, Char *pEnd){
-    const Char *p = HttpClient_ReadLine(pBegin, pEnd);
+static inline ResultOfHttpParsing HttpClient_ParseReasonPhrase(HttpClient *pClient, const C *pBegin, C *pEnd){
+    const C *p = HttpClient_ReadLine(pBegin, pEnd);
     U32 nSize = p - pBegin;
     if(p == pEnd){
         if(nSize > (HTTP_MAX_REASON_PHRASE_SIZE + 1))
@@ -223,8 +223,8 @@ static inline ResultOfHttpParsing HttpClient_ParseReasonPhrase(HttpClient *pClie
     return HttpClient_ParseFieldLine(pClient, p, pEnd);
 }
 
-static inline ResultOfHttpParsing HttpClient_ParseFieldLine(HttpClient *pClient, const Char *pBegin, Char *pEnd){
-    Char *pLineEnd = HttpClient_ReadLine(pBegin, pEnd);
+static inline ResultOfHttpParsing HttpClient_ParseFieldLine(HttpClient *pClient, const C *pBegin, C *pEnd){
+    C *pLineEnd = HttpClient_ReadLine(pBegin, pEnd);
     U32 nSize = pLineEnd - pBegin;
     if(pLineEnd == pEnd){
         if(nSize > (HTTP_MAX_FIELD_LINE_SIZE + 1))
@@ -236,7 +236,7 @@ static inline ResultOfHttpParsing HttpClient_ParseFieldLine(HttpClient *pClient,
     }
 
     *pLineEnd = ':';
-    const Char *p = String_SkipUntil(pBegin, ':');
+    const C *p = String_SkipUntil(pBegin, ':');
     if(p == pLineEnd){
         if(nSize != 1 || *pBegin != 0x0D)
             return rohpColonExpected;
@@ -253,17 +253,17 @@ static inline ResultOfHttpParsing HttpClient_ParseFieldLine(HttpClient *pClient,
 
         return pClient->Parse(pClient, pLineEnd + 1, pEnd);
     }
-    const Char *pNameEnd = p;
+    const C *pNameEnd = p;
     ++p;
 
     if(*p == 0x20)
         ++p;
 
-    const Char *pValue = p;
+    const C *pValue = p;
     p = pLineEnd - 1;
     if(*p != 0x0D)
         return rohpCarriageReturnExpected;
-    const Char *pValueEnd = p;
+    const C *pValueEnd = p;
 
     //Parse field content
     ParseFieldContent(pClient, pBegin, pNameEnd, pValue, pValueEnd);
@@ -272,8 +272,8 @@ static inline ResultOfHttpParsing HttpClient_ParseFieldLine(HttpClient *pClient,
     return HttpClient_ParseFieldLine(pClient, pLineEnd + 1, pEnd);
 }
 
-static ResultOfHttpParsing HttpClient_ParseChunk(HttpClient *pClient, const Char *pBegin, Char *pEnd){
-    Char *pLineEnd = HttpClient_ReadLine(pBegin, pEnd);
+static ResultOfHttpParsing HttpClient_ParseChunk(HttpClient *pClient, const C *pBegin, C *pEnd){
+    C *pLineEnd = HttpClient_ReadLine(pBegin, pEnd);
     U32 nSize = pLineEnd - pBegin;
     if(pLineEnd == pEnd){
         if(nSize > HTTP_MAX_CHUNK_SIZE_LENGTH)
@@ -284,7 +284,7 @@ static ResultOfHttpParsing HttpClient_ParseChunk(HttpClient *pClient, const Char
         return rohpNeedMoreData;
     }
 
-    const Char *p = String_ParseHexU32(pBegin, &pClient->nChunkSize);
+    const C *p = String_ParseHexU32(pBegin, &pClient->nChunkSize);
     if(p == pEnd){
         return rohpBadFormat;
     }
@@ -300,7 +300,7 @@ static ResultOfHttpParsing HttpClient_ParseChunk(HttpClient *pClient, const Char
     return HttpClient_ParseChunkedData(pClient, pLineEnd + 1, pEnd);
 }
 
-static ResultOfHttpParsing HttpClient_ParseMessageBody(HttpClient *pClient, const Char *pBegin, Char *pEnd){
+static ResultOfHttpParsing HttpClient_ParseMessageBody(HttpClient *pClient, const C *pBegin, C *pEnd){
     U32 nSize = pEnd - pBegin;
 
     if(nSize > pClient->nContentLength)
@@ -323,7 +323,7 @@ static ResultOfHttpParsing HttpClient_ParseMessageBody(HttpClient *pClient, cons
     return rohpOk;
 }
 
-static ResultOfHttpParsing HttpClient_ParseChunkedData(HttpClient *pClient, const Char *pBegin, Char *pEnd){
+static ResultOfHttpParsing HttpClient_ParseChunkedData(HttpClient *pClient, const C *pBegin, C *pEnd){
     if(pBegin == pEnd){
         pClient->pDataEnd = pClient->szBuffer;
         return rohpOk;
@@ -333,13 +333,13 @@ static ResultOfHttpParsing HttpClient_ParseChunkedData(HttpClient *pClient, cons
     if(nSize > pClient->nChunkSize)
         nSize = pClient->nChunkSize;
 
-    const Char *pDataEnd = pBegin + nSize;
+    const C *pDataEnd = pBegin + nSize;
     pClient->nReceived += nSize;
     pClient->nContentLength = pClient->nReceived;
     pClient->onBody(pClient, pBegin, pDataEnd);
     pClient->nChunkSize -= nSize;
     if(pClient->nChunkSize == 0){
-        Char *pLineEnd = HttpClient_ReadLine(pDataEnd, pEnd);
+        C *pLineEnd = HttpClient_ReadLine(pDataEnd, pEnd);
         if(pLineEnd == pEnd){
             pClient->pDataEnd = pClient->szBuffer;
             return rohpOk;
@@ -357,13 +357,13 @@ static ResultOfHttpParsing HttpClient_ParseChunkedData(HttpClient *pClient, cons
     return rohpOk;
 }
 
-static inline B ParseFieldContent(HttpClient *pClient, const Char *pName, const Char *pNameEnd, const Char *pValue, const Char *pValueEnd){
+static inline B ParseFieldContent(HttpClient *pClient, const C *pName, const C *pNameEnd, const C *pValue, const C *pValueEnd){
     U32 nNameSize = pNameEnd - pName;
     switch(nNameSize){
     case 13:
-        if(String_Equal8(pName, (const Char *)"Content-") && String_Equal4(&pName[8], (const Char *)"Rang") && pName[12] == 'e'){
-            if(String_Equal6(pValue, (const Char *)"byte", (const Char *)"s ")){
-                const Char *p = pValue + 6;
+        if(String_Equal8(pName, (const C *)"Content-") && String_Equal4(&pName[8], (const C *)"Rang") && pName[12] == 'e'){
+            if(String_Equal6(pValue, (const C *)"byte", (const C *)"s ")){
+                const C *p = pValue + 6;
                 U64 nBeginOffset = 0;
                 p = String_ParseU64(p, &nBeginOffset);
                 if(*p == '-'){
@@ -380,16 +380,16 @@ static inline B ParseFieldContent(HttpClient *pClient, const Char *pName, const 
         }
         break;
     case 14:
-        if(String_Equal8(pName, (const Char *)"Content-") && String_Equal6(&pName[8], (const Char *)"Leng", (const Char *)"th")){
-            const Char *p = String_ParseU64(pValue, &pClient->nContentLength);
+        if(String_Equal8(pName, (const C *)"Content-") && String_Equal6(&pName[8], (const C *)"Leng", (const C *)"th")){
+            const C *p = String_ParseU64(pValue, &pClient->nContentLength);
             if(p == pValue)
                 return rohpNumberExpected;
             pClient->bContentLength = 1;
         }
         break;
     case 17:
-        if(String_Equal8(pName, (const Char *)"Transfer") && String_Equal8(&pName[8], (const Char *)"-Encodin") && pName[16] == 'g'){
-            if(String_Equal8(pValue, (const Char *)"chunked\r")){
+        if(String_Equal8(pName, (const C *)"Transfer") && String_Equal8(&pName[8], (const C *)"-Encodin") && pName[16] == 'g'){
+            if(String_Equal8(pValue, (const C *)"chunked\r")){
                 pClient->bChunkedBody = 1;
             }
         }
