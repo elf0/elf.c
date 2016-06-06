@@ -48,13 +48,22 @@ typedef U8 Bool;
 #define false 0
 #define true  1
 
-//Error code
-typedef U8 E8;
-
 typedef Byte* P;
 #define null  0
 
-typedef signed long Result;
+//Error code
+typedef U8 E8;
+typedef U16 E16;
+typedef U32 E32;
+typedef U64 E64;
+typedef U E;
+
+//Result code
+typedef I8 R8;
+typedef I16 R16;
+typedef I32 R32;
+typedef I64 R64;
+typedef I R;
 
 #define ContainerOf(pointer, Member, Container) \
     ((Container*)((P)(pointer) - (P)&((Container*)nullptr)->Member))
