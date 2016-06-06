@@ -21,6 +21,16 @@ typedef signed long long  I64;
 typedef float              F32;
 typedef double             F64;
 
+#if defined(__x86_64__) || defined(_WIN64)
+typedef U64 U;
+typedef I64 I;
+typedef F64 F;
+#else
+typedef U32 U;
+typedef I32 I;
+typedef F32 F;
+#endif
+
 typedef U8 Bool;
 #define false 0
 #define true  1
