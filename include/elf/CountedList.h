@@ -9,7 +9,7 @@
 
 typedef struct{
     List list;
-    U32 nCount;
+    U nCount;
 }CountedList;
 
 static inline void CountedList_Reset(CountedList *pList){
@@ -29,7 +29,7 @@ static inline Bool CountedList_NotEmpty(const CountedList *pList){
     return List_NotEmpty((List*)pList);
 }
 
-static inline U32 CountedList_GetCount(const CountedList *pList){
+static inline U CountedList_GetCount(const CountedList *pList){
     return pList->nCount;
 }
 
@@ -101,7 +101,7 @@ static inline void CountedList_MoveToFront(CountedList *pList, CountedList *pTar
 
 static inline void CountedList_Swap(CountedList *pList, CountedList *pTargetList){
     List_Swap ((List*)pList, (List*)pTargetList);
-    U32 nTmp = pList->nCount;
+    U nTmp = pList->nCount;
     pList->nCount = pTargetList->nCount;
     pTargetList->nCount = nTmp;
 }
