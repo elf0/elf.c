@@ -5,6 +5,19 @@
 //Author: elf
 //EMail: elf@elf0.org
 
+#if defined(__GNUC__) \
+    && defined(__BYTE_ORDER__)
+
+#if defined(__ORDER_BIG_ENDIAN__) \
+    && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define ELF_BIG_ENDIAN
+#elif defined(__ORDER_LITTLE_ENDIAN__) \
+    && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define ELF_LITTLE_ENDIAN
+#endif
+
+#endif
+
 typedef unsigned char      Byte;
 typedef unsigned char      Char;
 
@@ -38,7 +51,7 @@ typedef U8 Bool;
 //Error code
 typedef U8 E8;
 
-typedef Byte* Pointer;
+typedef Byte* P;
 #define null  0
 
 typedef signed long Result;
