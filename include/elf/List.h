@@ -71,6 +71,10 @@ static inline DoubleNode *List_Pop(List *pList){
     return pNode;
 }
 
+static inline void List_PopTo(List *pList, List *pTarget){
+    List_Push(pTarget, List_Pop(pList));
+}
+
 static inline void List_PushFront(List *pList, DoubleNode *pNode){
     DoubleNode_Link(pNode, (DoubleNode*)pList, ((DoubleNode*)pList)->pNext);
 }
