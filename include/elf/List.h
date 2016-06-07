@@ -11,7 +11,7 @@ typedef struct{
     DoubleNode entry;
 }List;
 
-static inline void List_Reset(List *pList){
+static inline void List_Clear(List *pList){
     DoubleNode_Reset((DoubleNode*)pList);
 }
 

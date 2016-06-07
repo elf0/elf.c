@@ -12,8 +12,8 @@ typedef struct{
     U nCount;
 }CountedList;
 
-static inline void CountedList_Reset(CountedList *pList){
-    List_Reset((List*)pList);
+static inline void CountedList_Clear(CountedList *pList){
+    List_Clear((List*)pList);
     pList->nCount = 0;
 }
 
