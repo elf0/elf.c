@@ -18,7 +18,7 @@ static inline void CountedList_Clear(CountedList *pList){
 }
 
 static inline void CountedList_Initialize(CountedList *pList){
-    CountedList_Reset(pList);
+    CountedList_Clear(pList);
 }
 
 static inline B CountedList_Empty(const CountedList *pList){

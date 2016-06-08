@@ -71,6 +71,6 @@ typedef I64 R64;
 typedef I R;
 
 #define ContainerOf(pointer, Member, Container) \
-    ((Container*)((P)(pointer) - (P)&((Container*)nullptr)->Member))
+    ((Container*)((P)(pointer) - (P)&((Container*)0)->Member))
 
 #endif //TYPE_H

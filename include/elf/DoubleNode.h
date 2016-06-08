@@ -5,6 +5,8 @@
 //Author: elf
 //EMail: elf@elf0.org
 
+#include "Type.h"
+
 typedef struct struct_DoubleNode DoubleNode;
 struct struct_DoubleNode{
     DoubleNode *pNext;

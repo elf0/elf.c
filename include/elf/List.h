@@ -16,7 +16,7 @@ static inline void List_Clear(List *pList){
 }
 
 static inline void List_Initialize(List *pList){
-    List_Reset(pList);
+    List_Clear(pList);
 }
 
 static inline B List_Empty(const List *pList){
