@@ -79,6 +79,10 @@ static inline void List_PushFront(List *pList, DoubleNode *pNode){
     DoubleNode_Link(pNode, (DoubleNode*)pList, ((DoubleNode*)pList)->pNext);
 }
 
+static inline void List_PopToFront(List *pList, List *pTarget){
+    List_PushFront(pTarget, List_Pop(pList));
+}
+
 static inline DoubleNode *List_PopBack (List *pList){
     DoubleNode *pNode = ((DoubleNode*)pList)->pPrev;
     DoubleNode_Unlink(pNode);
@@ -109,3 +113,4 @@ static inline void List_Swap(List *pList, List *pTargetList){
 }
 
 #endif //LIST_H
+

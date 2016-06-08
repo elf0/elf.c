@@ -72,9 +72,17 @@ static inline DoubleNode *CountedList_Pop(CountedList *pList){
     return pNode;
 }
 
+static inline void CountedList_PopTo(CountedList *pList, CountedList *pTarget){
+    CountedList_Push(pTarget, CountedList_Pop(pList));
+}
+
 static inline void CountedList_PushFront(CountedList *pList, DoubleNode *pNode){
     List_PushFront((List*)pList, pNode);
     ++pList->nCount;
+}
+
+static inline void CountedList_PopToFront(CountedList *pList, CountedList *pTarget){
+    CountedList_PushFront(pTarget, CountedList_Pop(pList));
 }
 
 static inline DoubleNode *CountedList_PopBack(CountedList *pList){
