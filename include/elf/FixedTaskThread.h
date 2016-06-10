@@ -101,7 +101,7 @@ static inline void FixedTaskThread_RunTasks(FixedTaskThread *pThread){
     Task **ppEnd = pThread->ppRunningsEnd;
     while(ppTask != ppEnd){
         Task *pTask = *ppTask;
-        if(pTask->Perform(pTask)){
+        if(pTask->bCancel || pTask->Perform(pTask)){
             pTask->Finalize(pTask);
             *ppTask = *--ppEnd;
             pThread->ppRunningsEnd= ppEnd;

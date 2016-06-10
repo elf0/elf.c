@@ -77,7 +77,7 @@ static inline void TaskThread_RunTasks(TaskThread *pThread){
     Task *pTask;
     while(pNode != pEntry){
         pTask = (Task*)pNode;
-        if(pTask->Perform(pTask)){
+        if(pTask->bCancel || pTask->Perform(pTask)){
             List_Remove(pNode);
             pNode = pNode->pNext;
             pTask->Finalize(pTask);
