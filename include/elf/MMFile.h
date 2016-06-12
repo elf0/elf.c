@@ -1,6 +1,10 @@
 #ifndef MAPPEDFILE_H
 #define MAPPEDFILE_H
 
+//License: Public Domain
+//Author: elf
+//EMail: elf@elf0.org
+
 #include "File.h"
 #include <sys/mman.h>
 

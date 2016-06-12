@@ -20,7 +20,19 @@ static inline void Thread_Initialize(Thread *pThread, ThreadEntry Entry){
 }
 
 static inline B Thread_Run(Thread *pThread){
+#ifdef __linux__
  return pthread_create(&pThread->thread, NULL, (void*(*)(void*))pThread->Entry, pThread) == 0;
+#else
+#endif
+}
+
+static inline void *Thread_Join(Thread *pThread){
+#ifdef __linux__
+  void *pResult;
+  pthread_join(&pThread->thread, &pResult);
+  return pResult;
+#else
+#endif
 }
 
 #endif //THREAD_H
