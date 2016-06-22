@@ -8,9 +8,9 @@
 //Buffer must ends with ":\n"
 //Line: "Key:Value\n"
 
-typedef void (*ConfigReader_Handler)(const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
+typedef E8 (*ConfigReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 
-static inline E8 ConfigReader_Parse(const C *pBegin, const C *pEnd, ConfigReader_Handler onKV){
+static inline E8 ConfigReader_Parse(void *pContext, const C *pBegin, const C *pEnd, ConfigReader_Handler onKV){
   size_t nSize = pEnd - pBegin;
   if(nSize < 2)
     return 1;
@@ -20,6 +20,7 @@ static inline E8 ConfigReader_Parse(const C *pBegin, const C *pEnd, ConfigReader
   if(*pEnd0 != 0x3A || *pEnd1 != 0x0A)
     return 1;
 
+  E8 err;
   const C *pKey, *pKeyEnd;
   const C *pValue;
   const C *p = pBegin;
@@ -27,9 +28,11 @@ static inline E8 ConfigReader_Parse(const C *pBegin, const C *pEnd, ConfigReader
     pKeyEnd = String_SkipUntil(pKey = p, 0x3A);
     p = String_SkipUntil(pValue = pKeyEnd + 1, 0x0A);
     if(p == pEnd1)
-      return 0;
+      break;
 
-    onKV(pKey, pKeyEnd, pValue, p++);
+    err = onKV(pContext, pKey, pKeyEnd, pValue, p++);
+    if(err)
+      return err;
   }
 
   return 0;
