@@ -24,16 +24,10 @@ static inline E8 ConfigReader_Parse(const C *pBegin, const C *pEnd, ConfigReader
   const C *pValue;
   const C *p = pBegin;
   while(true){
-    pKey = p;
-    p = String_SkipUntil(p, 0x3A);
-    if(p == pEnd0)
-      return p == pKey? 0 : 1;
-    pKeyEnd = p++;
-
-    pValue = p;
-    p = String_SkipUntil(p, 0x0A);
+    pKeyEnd = String_SkipUntil(pKey = p, 0x3A);
+    p = String_SkipUntil(pValue = pKeyEnd + 1, 0x0A);
     if(p == pEnd1)
-      return 1;
+      return 0;
 
     onKV(pKey, pKeyEnd, pValue, p++);
   }

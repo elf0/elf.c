@@ -5,13 +5,19 @@
 //Author: elf
 //EMail: elf@elf0.org
 
+#ifdef __linux__
 #include <pthread.h>
+#else
+#endif
 
 typedef struct structThread Thread;
 typedef void *(*ThreadEntry)(Thread *pThread);
 
 struct structThread{
+#ifdef __linux__
  pthread_t thread;
+#else
+#endif
  ThreadEntry Entry;
 };
 

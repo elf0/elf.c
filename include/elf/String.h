@@ -5,7 +5,7 @@
 //Author: elf
 //EMail: elf@elf0.org
 
-#include "C.h"
+#include "Char.h"
 
 typedef void (*String_EventHandler)(void *pContext, const C *pBegin, const C *pEnd);
 
