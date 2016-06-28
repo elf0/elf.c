@@ -8,6 +8,8 @@
 //Buffer must ends with ":\n"
 //Line: "Key:Value\n"
 
+#include "String.h"
+
 typedef E8 (*ConfigReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 
 static inline E8 ConfigReader_Parse(void *pContext, const C *pBegin, const C *pEnd, ConfigReader_Handler onKV){

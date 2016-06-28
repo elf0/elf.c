@@ -56,11 +56,8 @@ static inline E8 MMFile_Prepare(MMFile *pFile, const C *szPath, U32 uMinSize){
   }
 
   U64 uSize = File_GetSize(pfFile);
-  if(!uSize){
-   if(!uMinSize)
-    uMinSize = 4096;
-
-   E8 e = MMFile_Adjust(pFile, uMinSize);
+  if(uSize < uMinSize){
+   E8 e = MMFile_Adjust(pFile, uMinSize - uSize);
    if(e){
     File_Close(pfFile);
     return e;
