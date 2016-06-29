@@ -24,10 +24,36 @@ typedef struct{
 
 static inline E8 MMFile_Adjust(MMFile *pFile, I32 iSize);
 
+static inline E8 MMFile_Create(MMFile *pFile, const C *szPath, U32 uSize){
+  File *pfFile = &pFile->file;
+  if(!File_Create(pfFile, szPath))
+    return 1;
+  pFile->pBegin = null;
+
+  if(!File_SetSize(pfFile, uSize)){
+    File_Close(pfFile);
+    return 2;
+  }
+
+  if(!File_ReadMeta(pfFile)){
+    File_Close(pfFile);
+    return 3;
+  }
+
+  Byte *pBegin = (Byte*)mmap(null, uSize, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
+  if(pBegin == MAP_FAILED){
+    File_Close(pfFile);
+    return 4;
+  }
+  pFile->pBegin = pBegin;
+  return 0;
+}
+
 static inline E8 MMFile_Open(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
   if(!File_Open(pfFile, szPath))
     return 1;
+  pFile->pBegin = null;
 
   if(!File_ReadMeta(pfFile)){
     File_Close(pfFile);
@@ -37,7 +63,6 @@ static inline E8 MMFile_Open(MMFile *pFile, const C *szPath){
   Byte *pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
   if(pBegin == MAP_FAILED){
     File_Close(pfFile);
-    pFile->pBegin = null;
     return 3;
   }
 
@@ -49,6 +74,7 @@ static inline E8 MMFile_Prepare(MMFile *pFile, const C *szPath, U32 uMinSize){
   File *pfFile = &pFile->file;
   if(!File_Prepare(pfFile, szPath))
     return 1;
+  pFile->pBegin = null;
 
   if(!File_ReadMeta(pfFile)){
     File_Close(pfFile);
@@ -67,7 +93,6 @@ static inline E8 MMFile_Prepare(MMFile *pFile, const C *szPath, U32 uMinSize){
   Byte *pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
   if(pBegin == MAP_FAILED){
     File_Close(pfFile);
-    pFile->pBegin = null;
     return 3;
   }
   pFile->pBegin = pBegin;
@@ -78,6 +103,7 @@ static inline const E8 MMFile_OpenForRead(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
   if(!File_OpenForRead(pfFile, szPath))
     return 1;
+  pFile->pBegin = null;
 
   if(!File_ReadMeta(pfFile)){
     File_Close(pfFile);
@@ -87,7 +113,6 @@ static inline const E8 MMFile_OpenForRead(MMFile *pFile, const C *szPath){
   Byte *pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ, MAP_SHARED, pfFile->fd, 0);
   if(pBegin == MAP_FAILED){
     File_Close(pfFile);
-    pFile->pBegin = null;
     return 3;
   }
   pFile->pBegin = pBegin;
