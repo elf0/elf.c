@@ -36,6 +36,12 @@ static inline B VU30_Invalid(U32 u32){
   return u32 > 0x3FFFFFFF;
 }
 
+static inline Byte *VU30_FromU6(Byte *pVU30, U8 u6){
+  U8 *p = pVU30;
+  *p++ = u6;
+  return p;
+}
+
 static inline Byte *VU30_FromU8(Byte *pVU30, U8 u8){
   U8 *p = pVU30;
 

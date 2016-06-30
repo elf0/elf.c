@@ -36,6 +36,12 @@ static inline B VU61_Invalid(U64 u64){
   return u64 > 0x1FFFFFFFFFFFFFFF;
 }
 
+static inline Byte *VU61_FromU5(Byte *pVU61, U8 u5){
+  U8 *p = pVU61;
+  *p++ = u5;
+  return p;
+}
+
 static inline Byte *VU61_FromU8(Byte *pVU61, U8 u8){
   U8 *p = pVU61;
 
