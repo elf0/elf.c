@@ -83,7 +83,7 @@ static inline void Buffer_SetData(Buffer *pbBuffer, Byte *pData){
     pbBuffer->pData = pData;
 }
 
-static inline void Buffer_ForwardData(Buffer *pbBuffer){
+static inline void Buffer_MoveData(Buffer *pbBuffer){
     U32 nData = Buffer_DataSize(pbBuffer);
     memmove(pbBuffer->pBegin, pbBuffer->pData, nData);
     pbBuffer->pData = pbBuffer->pBegin;

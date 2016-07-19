@@ -194,9 +194,6 @@ static inline B String_ParseU64(const C **ppszNumber, U64 *puValue){
     return false;
 }
 
-#define I32_MIN 0x80000000
-#define I64_MIN 0x8000000000000000LL
-
 static inline B String_ParseBinaryU32(const C **ppszNumber, U32 *puValue){
     const C *p = *ppszNumber;
     U32 uValue = *puValue;

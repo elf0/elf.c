@@ -56,13 +56,6 @@ typedef U8 Byte;
 typedef Byte* P;
 #define null  0
 
-//Error code
-typedef U8 E8;
-typedef U16 E16;
-typedef U32 E32;
-typedef U64 E64;
-typedef U E;
-
 //Result code
 typedef I8 R8;
 typedef I16 R16;

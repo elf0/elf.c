@@ -102,8 +102,6 @@ static inline B File_PrepareForWrite(File *pFile, const C *szPath){
       return false;
 
     pFile->fd = open((const char*)szPath, O_CREAT | O_WRONLY, 0644);
-    if(pFile->fd == -1)
-      return false;
   }
 
   return pFile->fd != -1;
@@ -127,8 +125,6 @@ static inline B File_PrepareForAppending(File *pFile, const C *szPath){
       return false;
 
     pFile->fd = open((const char*)szPath, O_CREAT | O_APPEND, 0644);
-    if(pFile->fd == -1)
-      return false;
   }
 
   return pFile->fd != -1;

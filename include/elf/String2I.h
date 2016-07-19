@@ -7,6 +7,9 @@
 
 //String to integer
 
+#define I32_MIN 0x80000000
+#define I64_MIN 0x8000000000000000LL
+
 //Parse '+' youself.
 static inline B String_ParseI32_Positive(const C **ppszNumber, I32 *piValue);
 static inline B String_ParseI64_Positive(const C **ppszNumber, I64 *piValue);
