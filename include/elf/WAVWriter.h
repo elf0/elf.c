@@ -123,7 +123,7 @@ static inline void WAVWriter_AdjustHeader(WAVWriter *pWriter){
     WAVHeader *pHeader = &pWriter->header;
     RIFF_Chunk *pChunk = &pHeader->rcSampleChunk;
     if(pWriter->uOffset != WAVHEADER_SIZE + pChunk->uContent){
-        pHeader->rcChunk .uContent = pWriter->uOffset;
+        pHeader->rcChunk .uContent = pWriter->uOffset - sizeof(RIFF_Chunk);
         pChunk->uContent = pWriter->uOffset - WAVHEADER_SIZE;
     }
 }
