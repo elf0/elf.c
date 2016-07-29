@@ -19,13 +19,16 @@ typedef struct{
     U16 uBitsPerSample;
 }WAVMeta;
 
+static inline U32 WAVMeta_BytesPerSample(WAVMeta *pMeta){
+     return pMeta->uChannels * (pMeta->uBitsPerSample >> 3);
+}
+
 typedef struct{
     RIFF_Chunk rcChunk;
     U32 uFormat;
     RIFF_Chunk rcMetaChunk;
     WAVMeta wmMeta;
     RIFF_Chunk rcSampleChunk;
-    Byte szSamples[4];
 }WAVHeader;
 
 #define WAVHEADER_SIZE sizeof(WAVHeader)

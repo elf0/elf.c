@@ -136,7 +136,8 @@ static inline E8 WAVWriter_WriteHeader(WAVWriter *pWriter){
 static inline E8 WAVWriter_Append(WAVWriter *pWriter, Byte *pSamples, U32 uSamples){
     WAVHeader *pHeader = &pWriter->header;
     WAVMeta *pMeta = &pHeader->wmMeta;
-    U32 uBytes = uSamples * pMeta->uChannels * (pMeta->uBitsPerSample >> 3);
+    U32 uBytesPerSample = WAVMeta_BytesPerSample(pMeta);
+    U32 uBytes = uSamples * uBytesPerSample;
     if(File_WriteTo((File*)pWriter, pWriter->uOffset, pSamples, uBytes) != uBytes)
         return  1;
     pWriter->uOffset += uBytes;
@@ -146,7 +147,7 @@ static inline E8 WAVWriter_Append(WAVWriter *pWriter, Byte *pSamples, U32 uSampl
 static inline E8 WAVWriter_Modify(WAVWriter *pWriter, U32 uIndex, Byte *pSamples, U32 uSamples){
     WAVHeader *pHeader = &pWriter->header;
     WAVMeta *pMeta = &pHeader->wmMeta;
-    U32 uBytesPerSample = pMeta->uChannels * (pMeta->uBitsPerSample >> 3);
+    U32 uBytesPerSample = WAVMeta_BytesPerSample(pMeta);
     U64 uOffset = WAVHEADER_SIZE + uIndex * uBytesPerSample;
     U32 uBytes = uSamples * uBytesPerSample;
     if(uOffset + uBytes > pWriter->uOffset)
