@@ -19,7 +19,7 @@ static inline E8 KVLineReader_Parse(void *pContext, const C *pBegin, const C *pE
 
   const C *pEnd0 = &pEnd[-2];
   const C *pEnd1 = &pEnd[-1];
-  if(*pEnd0 != 0x3A || *pEnd1 != 0x0A)
+  if(*(U16*)pEnd0 != *(U16*)":\n")
     return 1;
 
   E8 err;
