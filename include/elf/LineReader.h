@@ -14,25 +14,18 @@ typedef E8 (*LineReader_Handler)(void *pContext, const C *pLine, const C *pLineE
 
 static inline E8 LineReader_Parse(void *pContext, const C *pBegin, const C *pEnd, LineReader_Handler onLine){
   size_t nSize = pEnd - pBegin;
-  if(nSize < 1)
-    return 1;
-
-  --pEnd;
-  if(*pEnd != 0x0A)
+  if(nSize < 1 || pEnd[-1] != 0x0A)
     return 1;
 
   E8 err;
   const C *pLine;
   const C *p = pBegin;
-  while(true){
+  do{
     p = String_SkipUntil(pLine = p, 0x0A);
-    if(p == pEnd)
-      break;
-
     err = onLine(pContext, pLine, p++);
     if(err)
       return err;
-  }
+  }while(p != pEnd);
 
   return 0;
 }
