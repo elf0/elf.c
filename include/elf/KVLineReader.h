@@ -1,5 +1,5 @@
-#ifndef CONFIGREADER_H
-#define CONFIGREADER_H
+#ifndef KVLINEREADER_H
+#define KVLINEREADER_H
 
 //License: Public Domain
 //Author: elf
@@ -10,9 +10,9 @@
 
 #include "String.h"
 
-typedef E8 (*ConfigReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
+typedef E8 (*KVLineReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 
-static inline E8 ConfigReader_Parse(void *pContext, const C *pBegin, const C *pEnd, ConfigReader_Handler onKV){
+static inline E8 KVLineReader_Parse(void *pContext, const C *pBegin, const C *pEnd, KVLineReader_Handler onKV){
   size_t nSize = pEnd - pBegin;
   if(nSize < 2)
     return 1;
@@ -40,4 +40,4 @@ static inline E8 ConfigReader_Parse(void *pContext, const C *pBegin, const C *pE
   return 0;
 }
 
-#endif // CONFIGREADER_H
+#endif // KVLINEREADER_H
