@@ -10,13 +10,14 @@
 
 #include "String.h"
 
-typedef E8 (*KVReader_Handler)(void *pContext, const C *pBegin, const C *pEnd);
+typedef struct KVReader KVReader;
+typedef E8 (*KVReader_Handler)(KVReader *pReader, const C *pBegin, const C *pEnd);
 
-typedef struct{
+struct KVReader{
   void *pContext;
   KVReader_Handler onKey;
   KVReader_Handler onValue;
-}KVReader;
+};
 
 static inline void KVReader_Initialize(KVReader *pReader
                                        , void *pContext
@@ -40,12 +41,12 @@ static inline E8 KVReader_Parse(KVReader *pReader, const C *pBegin, const C *pEn
   const C *p = pBegin;
   while(1){
     p = String_SkipUntil(pData = p, (C)':');
-    if(err = pReader->onKey(pReader->pContext, pData, p++))
+    if(err = pReader->onKey(pReader, pData, p++))
       return err;
 
     while(1){
       p = String_SkipUntil(pData = p, (C)'\n');
-      if(err = pReader->onValue(pReader->pContext, pData, p++))
+      if(err = pReader->onValue(pReader, pData, p++))
         return err;
 
       if(p == pEnd)
