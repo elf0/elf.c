@@ -48,18 +48,18 @@ static inline E8 KVSReader_Parse(KVSReader *pReader, const C *pBegin, const C *p
   if(*(U16*)(pEnd - 2) != *(U16*)":\n")
     return 1;
 
-  E8 err;
+  E8 e;
   const C *pData;
   const C *p = pBegin;
   while(1){
     p = String_SkipUntil(pData = p, (C)KVSReader_KEY_END_CHAR);
-    if(err = pReader->onKey(pReader, pData, p++))
-      return err;
+    if(e = pReader->onKey(pReader, pData, p++))
+      return e;
 
     while(1){
       p = String_SkipUntil(pData = p, (C)KVSReader_VALUE_END_CHAR);
-      if(err = pReader->onValue(pReader, pData, p++))
-        return err;
+      if(e = pReader->onValue(pReader, pData, p++))
+        return e;
 
       if(p == pEnd)
         return 0;
