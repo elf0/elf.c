@@ -96,23 +96,22 @@ static E8 RBTree_InsertRoot(RBTree *pTree, RBTree_Node *pNew){
 
 static E8 RBTree_InsertChild(RBTree *pTree, RBTree_Node *pNew){
   RBTree_Node *pNode = RBTREE_ROOT(pTree);
-  RBTree_Node *pParent;
   I8 iCompare;
   while(1){
     iCompare = pTree->fCompare(&pNew->key, &pNode->key);
     if(iCompare < 0){
-      pParent = pNode;
-      pNode = pNode->pLeft;
-      if(!pNode){
-        pParent->pLeft = pNew;
+      if(pNode->pLeft)
+        pNode = pNode->pLeft;
+      else{
+        pNode->pLeft = pNew;
         break;
       }
     }
     else if(iCompare > 0){
-      pParent = pNode;
-      pNode = pNode->pRight;
-      if(!pNode){
-        pParent->pRight = pNew;
+      if(pNode->pRight)
+        pNode = pNode->pRight;
+      else{
+        pNode->pRight = pNew;
         break;
       }
     }
@@ -120,7 +119,7 @@ static E8 RBTree_InsertChild(RBTree *pTree, RBTree_Node *pNew){
       return 1;
   }
 
-  RBTREE_NODE_SET_PARENT(pNew, pParent);
+  RBTREE_NODE_SET_PARENT(pNew, pNode);
   pNew->pLeft = 0;
   pNew->pRight = 0;
   pNew->bRed = 1;
