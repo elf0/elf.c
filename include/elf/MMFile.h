@@ -99,7 +99,7 @@ static inline E8 MMFile_Prepare(MMFile *pFile, const C *szPath, U32 uMinSize){
   return 0;
 }
 
-static inline const E8 MMFile_OpenForRead(MMFile *pFile, const C *szPath){
+static inline E8 MMFile_OpenForRead(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
   if(!File_OpenForRead(pfFile, szPath))
     return 1;
