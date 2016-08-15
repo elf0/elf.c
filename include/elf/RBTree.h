@@ -17,7 +17,6 @@ static inline B RBTree_Insert(RBTree *pTree, RBTree_Node *pNew);
 
 //Internal
 struct RBTree_Node{
-  //pParent must be first
   RBTree_Node *pParent;
   RBTree_Node *pLeft;
   RBTree_Node *pRight;
@@ -35,11 +34,8 @@ typedef E8 (*RBTree_Insert_Function) (RBTree *pTree, RBTree_Node *pNode);
 static inline E8 RBTree_InsertRoot(RBTree *pTree, RBTree_Node *pNew);
 static inline E8 RBTree_InsertChild(RBTree *pTree, RBTree_Node *pNew);
 static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode);
-static inline void RBTree_LeftRotate(RBTree *pTree, RBTree_Node *pNode);
-static inline void RBTree_RightRotate(RBTree *pTree, RBTree_Node *pNode);
 
 struct RBTree{
-  //pRoot must be first
   RBTree_Node     *pRoot;
   RBTree_Insert_Function   fInsert;
   RBTree_Compare_Function fCompare;
@@ -144,17 +140,18 @@ static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode){
         pNode = pGrandparent;
       }
       else{
-        if(pNode == pParent->pRight){
-          //Set pGreatGrandparent
-          pGreatGrandparent = pGrandparent->pParent;
-          if(pGrandparent == RBTREE_ROOT(pTree))
-            RBTREE_SET_ROOT(pTree, pNode);
-          else if(pGrandparent == pGreatGrandparent->pLeft)
-            pGreatGrandparent->pLeft = pNode;
+        pGreatGrandparent = pGrandparent->pParent;
+        RBTree_Node  *pParentRight = pParent->pRight;
+        if(pNode == pParentRight){
+          if(pGreatGrandparent){
+            if(pGrandparent == pGreatGrandparent->pLeft)
+              pGreatGrandparent->pLeft = pNode;
+            else
+              pGreatGrandparent->pRight = pNode;
+          }
           else
-            pGreatGrandparent->pRight = pNode;
+            RBTREE_SET_ROOT(pTree, pNode);
 
-          //Set pGrandparent
           pGrandparent->bRed = 1;
           RBTREE_NODE_SET_PARENT(pGrandparent, pNode);
           pRight = pNode->pRight;
@@ -162,14 +159,12 @@ static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode){
           if(pRight)
             RBTREE_NODE_SET_PARENT(pRight, pGrandparent);
 
-          //Set pParent
           RBTREE_NODE_SET_PARENT(pParent, pNode);
           pLeft = pNode->pLeft;
           pParent->pRight = pLeft;
           if(pLeft)
             RBTREE_NODE_SET_PARENT(pLeft, pParent);
 
-          //Set pNode
           pNode->bRed = 0;
           RBTREE_NODE_SET_PARENT(pNode, pGreatGrandparent);
           pNode->pLeft = pParent;
@@ -177,7 +172,24 @@ static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode){
 
           break;
         }
-        RBTree_RightRotate(pTree, pGrandparent);
+
+        RBTREE_NODE_SET_PARENT(pGrandparent, pParent);
+        pGrandparent->pLeft = pParentRight;
+
+        if(pParentRight)
+          RBTREE_NODE_SET_PARENT(pParentRight, pGrandparent);
+
+        RBTREE_NODE_SET_PARENT(pParent, pGreatGrandparent);
+        pParent->pRight = pGrandparent;
+
+        if(pGreatGrandparent){
+          if(pGrandparent == pGreatGrandparent->pLeft)
+            pGreatGrandparent->pLeft = pParent;
+          else
+            pGreatGrandparent->pRight = pParent;
+        }
+        else
+          RBTREE_SET_ROOT(pTree, pParent);
       }
     }
     else{
@@ -191,17 +203,18 @@ static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode){
         pNode = pGrandparent;
       }
       else{
-        if(pNode == pParent->pLeft){
-          //Set pGreatGrandparent
-          pGreatGrandparent = pGrandparent->pParent;
-          if(pGrandparent == RBTREE_ROOT(pTree))
-            RBTREE_SET_ROOT(pTree, pNode);
-          else if(pGrandparent == pGreatGrandparent->pLeft)
-            pGreatGrandparent->pLeft = pNode;
+        pGreatGrandparent = pGrandparent->pParent;
+        RBTree_Node  *pParentLeft = pParent->pLeft;
+        if(pNode == pParentLeft){
+          if(pGreatGrandparent){
+            if(pGrandparent == pGreatGrandparent->pLeft)
+              pGreatGrandparent->pLeft = pNode;
+            else
+              pGreatGrandparent->pRight = pNode;
+          }
           else
-            pGreatGrandparent->pRight = pNode;
+            RBTREE_SET_ROOT(pTree, pNode);
 
-          //Set pGrandparent
           pGrandparent->bRed = 1;
           RBTREE_NODE_SET_PARENT(pGrandparent, pNode);
           pLeft = pNode->pLeft;
@@ -209,14 +222,12 @@ static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode){
           if(pLeft)
             RBTREE_NODE_SET_PARENT(pLeft, pGrandparent);
 
-          //Set pParent
           RBTREE_NODE_SET_PARENT(pParent, pNode);
           pRight = pNode->pRight;
           pParent->pLeft = pRight;
           if(pRight)
             RBTREE_NODE_SET_PARENT(pRight, pParent);
 
-          //Set pNode
           pNode->bRed = 0;
           RBTREE_NODE_SET_PARENT(pNode, pGreatGrandparent);
           pNode->pLeft = pGrandparent;
@@ -224,7 +235,24 @@ static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode){
 
           break;
         }
-        RBTree_LeftRotate(pTree, pGrandparent);
+
+        RBTREE_NODE_SET_PARENT(pGrandparent, pParent);
+        pGrandparent->pRight = pParentLeft;
+
+        if(pParentLeft)
+          RBTREE_NODE_SET_PARENT(pParentLeft, pGrandparent);
+
+        RBTREE_NODE_SET_PARENT(pParent, pGreatGrandparent);
+        pParent->pLeft = pGrandparent;
+
+        if(pGreatGrandparent){
+          if(pGrandparent == pGreatGrandparent->pRight)
+            pGreatGrandparent->pRight = pParent;
+          else
+            pGreatGrandparent->pLeft = pParent;
+        }
+        else
+          RBTREE_SET_ROOT(pTree, pParent);
       }
     }
     pParent->bRed = 0;
@@ -232,48 +260,5 @@ static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode){
   }
 }
 
-static inline void RBTree_LeftRotate(RBTree *pTree, RBTree_Node *pNode){
-  RBTree_Node  *pParent = RBTREE_NODE_PARENT(pNode);
-  RBTree_Node  *pRight = pNode->pRight;
-  RBTree_Node  *pRightLeft = pRight->pLeft;
-
-  RBTREE_NODE_SET_PARENT(pNode, pRight);
-  pNode->pRight = pRightLeft;
-
-  RBTREE_NODE_SET_PARENT(pRight, pParent);
-  pRight->pLeft = pNode;
-
-  if(pRightLeft)
-    RBTREE_NODE_SET_PARENT(pRightLeft, pNode);
-
-  if(pNode == RBTREE_ROOT(pTree))
-    RBTREE_SET_ROOT(pTree, pRight);
-  else if(pNode == pParent->pLeft)
-    pParent->pLeft = pRight;
-  else
-    pParent->pRight = pRight;
-}
-
-static inline void RBTree_RightRotate(RBTree *pTree, RBTree_Node *pNode){
-  RBTree_Node  *pParent = RBTREE_NODE_PARENT(pNode);
-  RBTree_Node  *pLeft= pNode->pLeft;
-  RBTree_Node  *pLeftRight = pLeft->pRight;
-
-  RBTREE_NODE_SET_PARENT(pNode, pLeft);
-  pNode->pLeft = pLeftRight;
-
-  RBTREE_NODE_SET_PARENT(pLeft, pParent);
-  pLeft->pRight = pNode;
-
-  if(pLeftRight)
-    RBTREE_NODE_SET_PARENT(pLeftRight, pNode);
-
-  if(pNode == RBTREE_ROOT(pTree))
-    RBTREE_SET_ROOT(pTree, pLeft);
-  else if(pNode == pParent->pRight)
-    pParent->pRight = pLeft;
-  else
-    pParent->pLeft = pLeft;
-}
 #endif // RBTREE_H
 
