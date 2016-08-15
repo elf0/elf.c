@@ -25,7 +25,13 @@ struct HashSet_Node{
   Byte szData[4];
 };
 
+//SET_HASH_WIDTH must be 2, 4, 8, 16 , 32, ..
+#ifndef SET_HASH_WIDTH
 #define SET_HASH_WIDTH 16
+#endif
+
+#define SET_HASH_INDEX(uData) (uData & (SET_HASH_WIDTH - 1))
+
 struct HashSet{
   RBTree trees[SET_HASH_WIDTH];
   U32 uCount;
@@ -41,11 +47,11 @@ static inline void HashSet_Initialize(HashSet *pSet){
 }
 
 static inline HashSet_Node *HashSet_Find(HashSet *pSet, Byte *pKey, U32 uKey, HashSet_FindCompare_f fCompare){
-  return (HashSet_Node*)RBTree_Find(&pSet->trees[uKey & 0xF], pKey, uKey, (RBTree_FindCompare_f)fCompare);
+  return (HashSet_Node*)RBTree_Find(&pSet->trees[SET_HASH_INDEX(uKey)], pKey, uKey, (RBTree_FindCompare_f)fCompare);
 }
 
 static inline E8 HashSet_Insert(HashSet *pSet, HashSet_Node *pNew, HashSet_InsertCompare_f fCompare){
-  RBTree *pTree = &pSet->trees[pNew->uData & 0xF];
+  RBTree *pTree = &pSet->trees[SET_HASH_INDEX(pNew->uData)];
   E8 e = pTree->fAdd(pTree, (RBTree_Node*)pNew, (RBTree_AddCompare_f)fCompare);
   if(e)
     return e;
@@ -56,7 +62,7 @@ static inline E8 HashSet_Insert(HashSet *pSet, HashSet_Node *pNew, HashSet_Inser
 
 //RBTree_Remove not implement yet
 static inline void HashSet_Remove(HashSet *pSet, HashSet_Node *pNode){
-  RBTree *pTree = &pSet->trees[pNode->uData & 0xF];
+  RBTree *pTree = &pSet->trees[SET_HASH_INDEX(pNode->uData)];
   RBTree_Remove(pTree, (RBTree_Node*)pNode);
   --pSet->uCount;
 }
