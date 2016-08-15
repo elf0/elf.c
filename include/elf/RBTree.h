@@ -30,7 +30,7 @@ struct RBTree_Node{
 #define RBTREE_NODE_PARENT(pNode) (*(RBTree_Node**)pNode)
 #define RBTREE_NODE_SET_PARENT(pNode, pParent) (RBTREE_NODE_PARENT(pNode) = pParent)
 
-typedef E8 (*RBTree_Add_F) (RBTree *pTree, RBTree_Node *pNode, RBTree_AddCompare_f fCompare);
+typedef E8 (*RBTree_Add_f) (RBTree *pTree, RBTree_Node *pNode, RBTree_AddCompare_f fCompare);
 
 static inline E8 RBTree_AddRoot(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCompare_f fCompare);
 static inline E8 RBTree_AddChild(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCompare_f fCompare);
@@ -38,7 +38,7 @@ static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode);
 
 struct RBTree{
   RBTree_Node     *pRoot;
-  RBTree_Add_F   fAdd;
+  RBTree_Add_f   fAdd;
 };
 
 static inline void RBTree_Initialize(RBTree *pTree){
