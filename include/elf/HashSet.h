@@ -11,18 +11,19 @@
 typedef struct HashSet  HashSet;
 typedef struct HashSet_Node HashSet_Node;
 
-typedef I8 (*HashSet_FindCompare_f)(Byte *pKey, U32 uKey, HashSet_Node *pNode);
-typedef I8 (*HashSet_AddCompare_f)(HashSet_Node *pNew, HashSet_Node *pNode);
+//User must implement these
+static inline HashSet_Node *HashSet_Allocate(void *pContext, const Byte *pKey, U32 uKey);
+static inline I8 HashSet_Compare(const Byte *pLeft, U32 uLeft, const HashSet_Node *pNode);
 
 static inline void HashSet_Initialize(HashSet *pSet);
-static inline HashSet_Node *HashSet_Find(HashSet *pSet, Byte *pKey, U32 uKey, HashSet_FindCompare_f fCompare);
-static inline B HashSet_Add(HashSet *pSet, HashSet_Node *pNew, HashSet_AddCompare_f fCompare);
+static inline HashSet_Node *HashSet_Find(HashSet *pSet, const Byte *pKey, U32 uKey);
+static inline E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
+                             , void *pContext, HashSet_Node **ppNode);
 
 //Internal
+
 struct HashSet_Node{
   RBTree_Node node;
-  U32 uData;
-  Byte szData[4];
 };
 
 //SET_HASH_WIDTH must be 2, 4, 8, 16 , 32, ..
@@ -46,13 +47,15 @@ static inline void HashSet_Initialize(HashSet *pSet){
   pSet->uCount = 0;
 }
 
-static inline HashSet_Node *HashSet_Find(HashSet *pSet, Byte *pKey, U32 uKey, HashSet_FindCompare_f fCompare){
-  return (HashSet_Node*)RBTree_Find(&pSet->trees[SET_HASH_INDEX(uKey)], pKey, uKey, (RBTree_FindCompare_f)fCompare);
+static inline HashSet_Node *HashSet_Find(HashSet *pSet, const Byte *pKey, U32 uKey){
+  return (HashSet_Node*)RBTree_Find(&pSet->trees[SET_HASH_INDEX(uKey)], pKey, uKey);
 }
 
-static inline E8 HashSet_Add(HashSet *pSet, HashSet_Node *pNew, HashSet_AddCompare_f fCompare){
-  RBTree *pTree = &pSet->trees[SET_HASH_INDEX(pNew->uData)];
-  E8 e = pTree->fAdd(pTree, (RBTree_Node*)pNew, (RBTree_AddCompare_f)fCompare);
+static inline E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
+                             , void *pContext, HashSet_Node **ppNode){
+  RBTree *pTree = &pSet->trees[SET_HASH_INDEX(uKey)];
+  E8 e = pTree->fAdd(pTree, pKey, uKey
+                     , pContext, (RBTree_Node**)ppNode);
   if(e)
     return e;
 
@@ -61,11 +64,18 @@ static inline E8 HashSet_Add(HashSet *pSet, HashSet_Node *pNew, HashSet_AddCompa
 }
 
 //RBTree_Remove not implement yet
-static inline void HashSet_Remove(HashSet *pSet, HashSet_Node *pNode){
-  RBTree *pTree = &pSet->trees[SET_HASH_INDEX(pNode->uData)];
+static inline void HashSet_Remove(HashSet *pSet, U32 uKey, HashSet_Node *pNode){
+  RBTree *pTree = &pSet->trees[SET_HASH_INDEX(uKey)];
   RBTree_Remove(pTree, (RBTree_Node*)pNode);
   --pSet->uCount;
 }
 
+static inline RBTree_Node *RBTree_Allocate(void *pContext, const Byte *pKey, U32 uKey){
+  return (RBTree_Node*)HashSet_Allocate(pContext, pKey, uKey);
+}
+
+static inline I8 RBTree_Compare(const Byte *pKey, U32 uKey, const RBTree_Node *pNode){
+  return HashSet_Compare(pKey, uKey, (HashSet_Node*)pNode);
+}
 
 #endif // HASHSET_H

@@ -5,16 +5,19 @@
 //Author: elf
 //EMail: elf@elf0.org
 
+#include "Type.h"
+
 //API
 typedef struct RBTree  RBTree;
 typedef struct RBTree_Node RBTree_Node;
 
-typedef I8 (*RBTree_FindCompare_f)(Byte *pKey, U32 uKey, RBTree_Node *pNode);
-typedef I8 (*RBTree_AddCompare_f)(RBTree_Node *pNew, RBTree_Node *pNode);
+//User must implement these
+static inline RBTree_Node *RBTree_Allocate(void *pContext, const Byte *pKey, U32 uKey);
+static inline I8 RBTree_Compare(const Byte *pLeft, U32 uLeft, const RBTree_Node *pNode);
 
 static inline void RBTree_Initialize(RBTree *pTree);
-static inline RBTree_Node *RBTree_Find(RBTree *pTree, Byte *pKey, U32 uKey, RBTree_FindCompare_f fCompare);
-static inline B RBTree_Add(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCompare_f fCompare);
+static inline RBTree_Node *RBTree_Find(RBTree *pTree, const Byte *pKey, U32 uKey);
+static inline B RBTree_Add(RBTree *pTree, const Byte *pKey, U32 uKey, void *pContext, RBTree_Node **ppNode);
 
 //Internal
 struct RBTree_Node{
@@ -30,10 +33,10 @@ struct RBTree_Node{
 #define RBTREE_NODE_PARENT(pNode) (*(RBTree_Node**)pNode)
 #define RBTREE_NODE_SET_PARENT(pNode, pParent) (RBTREE_NODE_PARENT(pNode) = pParent)
 
-typedef E8 (*RBTree_Add_f) (RBTree *pTree, RBTree_Node *pNode, RBTree_AddCompare_f fCompare);
+typedef E8 (*RBTree_Add_f) (RBTree *pTree, const Byte *pKey, U32 uKey, void *pContext, RBTree_Node **ppNode);
 
-static inline E8 RBTree_AddRoot(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCompare_f fCompare);
-static inline E8 RBTree_AddChild(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCompare_f fCompare);
+static inline E8 RBTree_AddRoot(RBTree *pTree, const Byte *pKey, U32 uKey, void *pContext, RBTree_Node **ppNode);
+static inline E8 RBTree_AddChild(RBTree *pTree, const Byte *pKey, U32 uKey, void *pContext, RBTree_Node **ppNode);
 static inline void RBTree_Balance(RBTree *pTree, RBTree_Node *pNode);
 
 struct RBTree{
@@ -46,11 +49,11 @@ static inline void RBTree_Initialize(RBTree *pTree){
   pTree->fAdd = RBTree_AddRoot;
 }
 
-static inline RBTree_Node *RBTree_Find(RBTree *pTree, Byte *pKey, U32 uKey, RBTree_FindCompare_f fCompare){
+static inline RBTree_Node *RBTree_Find(RBTree *pTree, const Byte *pKey, U32 uKey){
   RBTree_Node *pNode = RBTREE_ROOT(pTree);
   I8 iCompare;
   while(pNode){
-    iCompare = fCompare(pKey, uKey, pNode);
+    iCompare = RBTree_Compare(pKey, uKey, pNode);
     if(iCompare < 0)
       pNode = pNode->pLeft;
     else if(iCompare > 0)
@@ -62,11 +65,14 @@ static inline RBTree_Node *RBTree_Find(RBTree *pTree, Byte *pKey, U32 uKey, RBTr
   return 0;
 }
 
-static inline E8 RBTree_Add(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCompare_f fCompare){
-  return pTree->fAdd(pTree, pNew, fCompare);
+static inline E8 RBTree_Add(RBTree *pTree, const Byte *pKey, U32 uKey
+                            , void *pContext, RBTree_Node **ppNode){
+  return pTree->fAdd(pTree, pKey, uKey, pContext, ppNode);
 }
 
-static inline E8 RBTree_AddRoot(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCompare_f fCompare){
+static inline E8 RBTree_AddRoot(RBTree *pTree, const Byte *pKey, U32 uKey
+                                , void *pContext, RBTree_Node **ppNode){
+  RBTree_Node *pNew = RBTree_Allocate(pContext, pKey, uKey);
   pNew->pLeft = 0;
   pNew->pRight = 0;
   RBTREE_NODE_SET_PARENT(pNew, 0);
@@ -74,19 +80,23 @@ static inline E8 RBTree_AddRoot(RBTree *pTree, RBTree_Node *pNew, RBTree_AddComp
 
   RBTREE_SET_ROOT(pTree, pNew);
   pTree->fAdd = RBTree_AddChild;
+
+  *ppNode = pNew;
   return 0;
 }
 
-static inline E8 RBTree_AddChild(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCompare_f fCompare){
+static inline E8 RBTree_AddChild(RBTree *pTree, const Byte *pKey, U32 uKey
+                                 , void *pContext, RBTree_Node **ppNode){
+  RBTree_Node *pNew;
   RBTree_Node *pNode = RBTREE_ROOT(pTree);
   I8 iCompare;
   while(1){
-    iCompare = fCompare(pNew, pNode);
+    iCompare = RBTree_Compare(pKey, uKey, pNode);
     if(iCompare < 0){
       if(pNode->pLeft)
         pNode = pNode->pLeft;
       else{
-        pNode->pLeft = pNew;
+        pNode->pLeft = pNew = RBTree_Allocate(pContext, pKey, uKey);
         break;
       }
     }
@@ -94,7 +104,7 @@ static inline E8 RBTree_AddChild(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCom
       if(pNode->pRight)
         pNode = pNode->pRight;
       else{
-        pNode->pRight = pNew;
+        pNode->pRight = pNew = RBTree_Allocate(pContext, pKey, uKey);
         break;
       }
     }
@@ -108,6 +118,7 @@ static inline E8 RBTree_AddChild(RBTree *pTree, RBTree_Node *pNew, RBTree_AddCom
   pNew->bRed = 1;
 
   RBTree_Balance(pTree, pNew);
+  *ppNode = pNew;
   return 0;
 }
 
