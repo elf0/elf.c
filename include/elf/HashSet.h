@@ -6,12 +6,11 @@
 //EMail: elf@elf0.org
 
 #include "RBTree.h"
-
+#include "HashSet_Node.h"
 //API
 typedef struct HashSet  HashSet;
-typedef struct HashSet_Node HashSet_Node;
 
-//User must implement these
+//User must implement "HashSet_Allocate()" and "HashSet_Compare()"
 static inline HashSet_Node *HashSet_Allocate(void *pContext, const Byte *pKey, U32 uKey);
 static inline I8 HashSet_Compare(const Byte *pLeft, U32 uLeft, const HashSet_Node *pNode);
 
@@ -21,10 +20,6 @@ static inline E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
                              , void *pContext, HashSet_Node **ppNode);
 
 //Internal
-
-struct HashSet_Node{
-  RBTree_Node node;
-};
 
 //SET_HASH_WIDTH must be 2, 4, 8, 16 , 32, ..
 #ifndef SET_HASH_WIDTH

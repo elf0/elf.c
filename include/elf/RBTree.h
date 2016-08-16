@@ -5,13 +5,12 @@
 //Author: elf
 //EMail: elf@elf0.org
 
-#include "Type.h"
+#include "RBTree_Node.h"
 
 //API
 typedef struct RBTree  RBTree;
-typedef struct RBTree_Node RBTree_Node;
 
-//User must implement these
+//User must implement "RBTree_Allocate()" and "RBTree_Compare()"
 static inline RBTree_Node *RBTree_Allocate(void *pContext, const Byte *pKey, U32 uKey);
 static inline I8 RBTree_Compare(const Byte *pLeft, U32 uLeft, const RBTree_Node *pNode);
 
@@ -20,12 +19,7 @@ static inline RBTree_Node *RBTree_Find(RBTree *pTree, const Byte *pKey, U32 uKey
 static inline B RBTree_Add(RBTree *pTree, const Byte *pKey, U32 uKey, void *pContext, RBTree_Node **ppNode);
 
 //Internal
-struct RBTree_Node{
-  RBTree_Node *pParent;
-  RBTree_Node *pLeft;
-  RBTree_Node *pRight;
-  B bRed;
-};
+
 
 #define RBTREE_ROOT(pTree) (*(RBTree_Node**)pTree)
 #define RBTREE_SET_ROOT(pTree, pNode) (RBTREE_ROOT(pTree) = pNode)
