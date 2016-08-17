@@ -15,6 +15,7 @@ static inline HashSet_Node *HashSet_Allocate(void *pContext, const Byte *pKey, U
 static inline I8 HashSet_Compare(const Byte *pLeft, U32 uLeft, const HashSet_Node *pNode);
 
 static inline void HashSet_Initialize(HashSet *pSet);
+static inline void HashSet_Finalize(HashSet *pSet);
 static inline HashSet_Node *HashSet_Find(HashSet *pSet, const Byte *pKey, U32 uKey);
 static inline E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
                              , void *pContext, HashSet_Node **ppNode);
@@ -38,6 +39,15 @@ static inline void HashSet_Initialize(HashSet *pSet){
   RBTree *ptEnd = pTree + SET_HASH_WIDTH;
   while(pTree != ptEnd)
     RBTree_Initialize(pTree++);
+
+  pSet->uCount = 0;
+}
+
+static inline void HashSet_Finalize(HashSet *pSet){
+  RBTree *pTree = pSet->trees;
+  RBTree *ptEnd = pTree + SET_HASH_WIDTH;
+  while(pTree != ptEnd)
+    RBTree_Finalize(pTree++);
 
   pSet->uCount = 0;
 }
