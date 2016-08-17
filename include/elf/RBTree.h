@@ -57,8 +57,10 @@ static inline void RBTree_Free(RBTree_Node *pNode){
 
 static inline void RBTree_Finalize(RBTree *pTree){
   RBTree_Node *pNode = RBTREE_ROOT(pTree);
-  if(pNode)
+  if(pNode){
     RBTree_Free(pNode);
+    RBTREE_SET_ROOT(pTree, 0);
+  }
 }
 
 static inline RBTree_Node *RBTree_Find(RBTree *pTree, const Byte *pKey, U32 uKey){
