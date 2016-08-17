@@ -10,9 +10,10 @@
 //API
 typedef struct RBTree  RBTree;
 
-//User must implement "RBTree_Allocate()" and "RBTree_Compare()"
+//User must implement "RBTree_Allocate()", "RBTree_Compare()" and "RBTree_Node_Free()"
 static inline RBTree_Node *RBTree_Allocate(void *pContext, const Byte *pKey, U32 uKey);
 static inline I8 RBTree_Compare(const Byte *pLeft, U32 uLeft, const RBTree_Node *pNode);
+static inline void RBTree_Node_Free(RBTree_Node *pNode);
 
 static inline void RBTree_Initialize(RBTree *pTree);
 static inline RBTree_Node *RBTree_Find(RBTree *pTree, const Byte *pKey, U32 uKey);
@@ -41,6 +42,22 @@ struct RBTree{
 static inline void RBTree_Initialize(RBTree *pTree){
   pTree->pRoot = 0;
   pTree->fAdd = RBTree_AddRoot;
+}
+
+static inline void RBTree_Free(RBTree_Node *pNode){
+  if(pNode->pLeft)
+    RBTree_Free(pNode->pLeft);
+
+  if(pNode->pRight)
+    RBTree_Free(pNode->pRight);
+
+  RBTree_Node_Free(pNode);
+}
+
+static inline void RBTree_Finalize(RBTree *pTree){
+  RBTree_Node *pNode = RBTREE_ROOT(pTree);
+  if(pNode)
+    RBTree_Free(pNode);
 }
 
 static inline RBTree_Node *RBTree_Find(RBTree *pTree, const Byte *pKey, U32 uKey){
