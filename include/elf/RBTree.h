@@ -16,6 +16,7 @@ static inline I8 RBTree_Compare(const Byte *pLeft, U32 uLeft, const RBTree_Node 
 static inline void RBTree_Node_Free(RBTree_Node *pNode);
 
 static inline void RBTree_Initialize(RBTree *pTree);
+static inline void RBTree_Finalize(RBTree *pTree);
 static inline RBTree_Node *RBTree_Find(RBTree *pTree, const Byte *pKey, U32 uKey);
 static inline B RBTree_Add(RBTree *pTree, const Byte *pKey, U32 uKey, void *pContext, RBTree_Node **ppNode);
 
