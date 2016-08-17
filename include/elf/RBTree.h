@@ -10,10 +10,10 @@
 //API
 typedef struct RBTree  RBTree;
 
-//User must implement "RBTree_Allocate()", "RBTree_Compare()" and "RBTree_Node_Free()"
-static inline RBTree_Node *RBTree_Allocate(void *pContext, const Byte *pKey, U32 uKey);
-static inline I8 RBTree_Compare(const Byte *pLeft, U32 uLeft, const RBTree_Node *pNode);
+//User must implement "RBTree_Node_Allocate()", "RBTree_Node_Compare()" and "RBTree_Node_Free()"
+static inline RBTree_Node *RBTree_Node_Allocate(void *pContext, const Byte *pKey, U32 uKey);
 static inline void RBTree_Node_Free(RBTree_Node *pNode);
+static inline I8 RBTree_Node_Compare(const Byte *pLeft, U32 uLeft, const RBTree_Node *pNode);
 
 static inline void RBTree_Initialize(RBTree *pTree);
 static inline void RBTree_Finalize(RBTree *pTree);
@@ -67,7 +67,7 @@ static inline RBTree_Node *RBTree_Find(RBTree *pTree, const Byte *pKey, U32 uKey
   RBTree_Node *pNode = RBTREE_ROOT(pTree);
   I8 iCompare;
   while(pNode){
-    iCompare = RBTree_Compare(pKey, uKey, pNode);
+    iCompare = RBTree_Node_Compare(pKey, uKey, pNode);
     if(iCompare < 0)
       pNode = pNode->pLeft;
     else if(iCompare > 0)
@@ -86,7 +86,7 @@ static inline E8 RBTree_Add(RBTree *pTree, const Byte *pKey, U32 uKey
 
 static inline E8 RBTree_AddRoot(RBTree *pTree, const Byte *pKey, U32 uKey
                                 , void *pContext, RBTree_Node **ppNode){
-  RBTree_Node *pNew = RBTree_Allocate(pContext, pKey, uKey);
+  RBTree_Node *pNew = RBTree_Node_Allocate(pContext, pKey, uKey);
   pNew->pLeft = 0;
   pNew->pRight = 0;
   RBTREE_NODE_SET_PARENT(pNew, 0);
@@ -105,12 +105,12 @@ static inline E8 RBTree_AddChild(RBTree *pTree, const Byte *pKey, U32 uKey
   RBTree_Node *pNode = RBTREE_ROOT(pTree);
   I8 iCompare;
   while(1){
-    iCompare = RBTree_Compare(pKey, uKey, pNode);
+    iCompare = RBTree_Node_Compare(pKey, uKey, pNode);
     if(iCompare < 0){
       if(pNode->pLeft)
         pNode = pNode->pLeft;
       else{
-        pNode->pLeft = pNew = RBTree_Allocate(pContext, pKey, uKey);
+        pNode->pLeft = pNew = RBTree_Node_Allocate(pContext, pKey, uKey);
         break;
       }
     }
@@ -118,7 +118,7 @@ static inline E8 RBTree_AddChild(RBTree *pTree, const Byte *pKey, U32 uKey
       if(pNode->pRight)
         pNode = pNode->pRight;
       else{
-        pNode->pRight = pNew = RBTree_Allocate(pContext, pKey, uKey);
+        pNode->pRight = pNew = RBTree_Node_Allocate(pContext, pKey, uKey);
         break;
       }
     }
