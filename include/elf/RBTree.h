@@ -12,7 +12,7 @@ typedef struct RBTree  RBTree;
 
 //User must implement "RBTree_Node_Allocate()", "RBTree_Node_Compare()" and "RBTree_Node_Free()"
 static inline RBTree_Node *RBTree_Node_Allocate(void *pContext, const Byte *pKey, U32 uKey);
-static inline void RBTree_Node_Free(RBTree_Node *pNode);
+static inline void RBTree_Node_Free(void *pContext, RBTree_Node *pNode);
 static inline I8 RBTree_Node_Compare(const Byte *pLeft, U32 uLeft, const RBTree_Node *pNode);
 
 static inline void RBTree_Initialize(RBTree *pTree);
@@ -45,20 +45,20 @@ static inline void RBTree_Initialize(RBTree *pTree){
   pTree->fAdd = RBTree_AddRoot;
 }
 
-static inline void RBTree_Free(RBTree_Node *pNode){
+static inline void RBTree_Free(RBTree_Node *pNode, void *pContext){
   if(pNode->pLeft)
-    RBTree_Free(pNode->pLeft);
+    RBTree_Free(pNode->pLeft, pContext);
 
   if(pNode->pRight)
-    RBTree_Free(pNode->pRight);
+    RBTree_Free(pNode->pRight, pContext);
 
-  RBTree_Node_Free(pNode);
+  RBTree_Node_Free(pContext, pNode);
 }
 
-static inline void RBTree_Finalize(RBTree *pTree){
+static inline void RBTree_Finalize(RBTree *pTree, void *pContext){
   RBTree_Node *pNode = RBTREE_ROOT(pTree);
   if(pNode){
-    RBTree_Free(pNode);
+    RBTree_Free(pNode, pContext);
     RBTREE_SET_ROOT(pTree, 0);
   }
 }

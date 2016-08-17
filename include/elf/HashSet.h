@@ -10,9 +10,10 @@
 //API
 typedef struct HashSet  HashSet;
 
-//User must implement "HashSet_Allocate()" and "HashSet_Compare()"
-static inline HashSet_Node *HashSet_Allocate(void *pContext, const Byte *pKey, U32 uKey);
-static inline I8 HashSet_Compare(const Byte *pLeft, U32 uLeft, const HashSet_Node *pNode);
+//User must implement "HashSet_Node_Allocate()" and "HashSet_Node_Compare()"
+static inline HashSet_Node *HashSet_Node_Allocate(void *pContext, const Byte *pKey, U32 uKey);
+static inline void HashSet_Node_Free(void *pContext, HashSet_Node *pNode);
+static inline I8 HashSet_Node_Compare(const Byte *pLeft, U32 uLeft, const HashSet_Node *pNode);
 
 static inline void HashSet_Initialize(HashSet *pSet);
 static inline void HashSet_Finalize(HashSet *pSet);
@@ -75,12 +76,16 @@ static inline void HashSet_Remove(HashSet *pSet, U32 uKey, HashSet_Node *pNode){
   --pSet->uCount;
 }
 
-static inline RBTree_Node *RBTree_Allocate(void *pContext, const Byte *pKey, U32 uKey){
-  return (RBTree_Node*)HashSet_Allocate(pContext, pKey, uKey);
+static inline RBTree_Node *RBTree_Node_Allocate(void *pContext, const Byte *pKey, U32 uKey){
+  return (RBTree_Node*)HashSet_Node_Allocate(pContext, pKey, uKey);
 }
 
-static inline I8 RBTree_Compare(const Byte *pKey, U32 uKey, const RBTree_Node *pNode){
-  return HashSet_Compare(pKey, uKey, (HashSet_Node*)pNode);
+static inline void RBTree_Node_Free(void *pContext, RBTree_Node *pNode){
+  HashSet_Node_Free(pContext, (HashSet_Node*)pNode);
+}
+
+static inline I8 RBTree_Node_Compare(const Byte *pKey, U32 uKey, const RBTree_Node *pNode){
+  return HashSet_Node_Compare(pKey, uKey, (HashSet_Node*)pNode);
 }
 
 #endif // HASHSET_H
