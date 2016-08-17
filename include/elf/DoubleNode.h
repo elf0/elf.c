@@ -29,8 +29,10 @@ static inline void DoubleNode_Link(DoubleNode *pNode, DoubleNode *pPrev, DoubleN
 }
 
 static inline void DoubleNode_Unlink(DoubleNode *pNode){
-    pNode->pPrev->pNext = pNode->pNext;
-    pNode->pNext->pPrev = pNode->pPrev;
+    DoubleNode *pNext = pNode->pNext;
+    DoubleNode *pPrev = pNode->pPrev;
+    pPrev->pNext = pNext;
+    pNext->pPrev = pPrev;
 }
 
 static inline void DoubleNode_Reset(DoubleNode *pNode){

@@ -102,8 +102,10 @@ static inline E8 RBTree_AddChild(RBTree *pTree, const Byte *pKey, U32 uKey
         break;
       }
     }
-    else
+    else{
+      *ppNode = pNode;
       return 1;
+    }
   }
 
   RBTREE_NODE_SET_PARENT(pNew, pNode);
