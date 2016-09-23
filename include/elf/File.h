@@ -36,7 +36,7 @@ static inline B File_Delete(const C *szPath){
 #ifdef __linux__
   return unlink((const char*)szPath) == 0;
 #else
-  return DeleteFileA(szPath);
+  return DeleteFileA((LPCSTR)szPath);
 #endif
 }
 
@@ -61,7 +61,7 @@ static inline B File_Create(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_RDWR, 0644);
   return pFile->fd != -1;
 #else
-  pFile->handle = CreateFileA(szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
@@ -71,7 +71,7 @@ static inline B File_Open(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_RDWR);
   return pFile->fd != -1;
 #else
-  pFile->handle = CreateFileA(szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
@@ -81,7 +81,7 @@ static inline B File_OpenForRead(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_RDONLY);
   return pFile->fd != -1;
 #else
-  pFile->handle = CreateFileA(szPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
@@ -91,7 +91,7 @@ static inline B File_CreateForWrite(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_WRONLY, 0644);
   return pFile->fd != -1;
 #else
-  pFile->handle = CreateFileA(szPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
@@ -101,7 +101,7 @@ static inline B File_OpenForWrite(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_WRONLY);
   return pFile->fd != -1;
 #else
-  pFile->handle = CreateFileA(szPath, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
@@ -118,7 +118,7 @@ static inline B File_PrepareForWrite(File *pFile, const C *szPath){
 
   return pFile->fd != -1;
 #else
-  pFile->handle = CreateFileA(szPath, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
@@ -158,7 +158,7 @@ static inline B File_Prepare(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_CREAT | O_RDWR, 0644);
   return pFile->fd != -1;
 #else
-  pFile->handle = CreateFileA(szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
@@ -254,7 +254,7 @@ static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 uSize){
   return read(pFile->fd, pBuffer, nSize);
 #else
   U32 uBytes;
-  if(ReadFile(pFile->handle, pBuffer, uSize, &uBytes, NULL))
+  if(ReadFile(pFile->handle, pBuffer, uSize, (LPDWORD)&uBytes, NULL))
     return uBytes;
   return -1;
 #endif
@@ -272,7 +272,7 @@ static inline I32 File_Write(const File *pFile, const Byte *pData, U32 uSize){
   return write(pFile->fd, pData, nSize);
 #else
   U32 uBytes;
-  if(WriteFile(pFile->handle, pData, uSize, &uBytes, NULL))
+  if(WriteFile(pFile->handle, pData, uSize, (LPDWORD)&uBytes, NULL))
     return uBytes;
   return -1;
 #endif
