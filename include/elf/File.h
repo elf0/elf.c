@@ -21,6 +21,7 @@ typedef struct{
   I32 fd;
   struct stat meta;
 #else
+  HANDLE handle;
 #endif
 }File;
 
@@ -59,6 +60,8 @@ static inline B File_Create(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_RDWR, 0644);
   return pFile->fd != -1;
 #else
+  pFile->handle = CreateFileA(szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
 
@@ -67,6 +70,8 @@ static inline B File_Open(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_RDWR);
   return pFile->fd != -1;
 #else
+  pFile->handle = CreateFileA(szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
 
@@ -75,6 +80,8 @@ static inline B File_OpenForRead(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_RDONLY);
   return pFile->fd != -1;
 #else
+  pFile->handle = CreateFileA(szPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
 
@@ -83,6 +90,8 @@ static inline B File_CreateForWrite(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_WRONLY, 0644);
   return pFile->fd != -1;
 #else
+  pFile->handle = CreateFileA(szPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
 
@@ -91,6 +100,8 @@ static inline B File_OpenForWrite(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_WRONLY);
   return pFile->fd != -1;
 #else
+  pFile->handle = CreateFileA(szPath, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
 
@@ -106,6 +117,8 @@ static inline B File_PrepareForWrite(File *pFile, const C *szPath){
 
   return pFile->fd != -1;
 #else
+  pFile->handle = CreateFileA(szPath, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
 
@@ -144,6 +157,8 @@ static inline B File_Prepare(File *pFile, const C *szPath){
   pFile->fd = open((const char*)szPath, O_CREAT | O_RDWR, 0644);
   return pFile->fd != -1;
 #else
+  pFile->handle = CreateFileA(szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle != INVALID_HANDLE_VALUE;
 #endif
 }
 
@@ -173,6 +188,7 @@ static inline void File_Close(File *pFile){
   close(pFile->fd);
   pFile->fd = -1;
 #else
+  CloseHandle(pFile->handle);
 #endif
 }
 
@@ -232,10 +248,14 @@ static inline B File_FlushData(File *pFile){
 #endif
 }
 
-static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 nSize){
+static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 uSize){
 #ifdef __linux__
   return read(pFile->fd, pBuffer, nSize);
 #else
+  U32 uBytes;
+  if(ReadFile(pFile->handle, pBuffer, uSize, &uBytes, NULL))
+    return uBytes;
+  return -1;
 #endif
 }
 
@@ -246,10 +266,14 @@ static inline I32 File_ReadFrom(const File *pFile, U64 uOffset, Byte *pBuffer, U
 #endif
 }
 
-static inline I32 File_Write(const File *pFile, const Byte *pData, U32 nSize){
+static inline I32 File_Write(const File *pFile, const Byte *pData, U32 uSize){
 #ifdef __linux__
   return write(pFile->fd, pData, nSize);
 #else
+  U32 uBytes;
+  if(WriteFile(pFile->handle, pData, uSize, &uBytes, NULL))
+    return uBytes;
+  return -1;
 #endif
 }
 
