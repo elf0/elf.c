@@ -6,7 +6,11 @@
 //EMail: elf@elf0.org
 
 #include "File.h"
+
+#ifdef __linux__
 #include <sys/mman.h>
+#else
+#endif
 /*
 #define PAGE_SHIFT 12
 //4096
@@ -20,6 +24,11 @@
 typedef struct{
   File file;
   Byte *pBegin;
+#ifdef __linux__
+#else
+  HANDLE hMap;
+#endif
+
 }MMFile;
 
 static inline E8 MMFile_Adjust(MMFile *pFile, I32 iSize);
@@ -103,8 +112,9 @@ static inline E8 MMFile_OpenForRead(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
   if(!File_OpenForRead(pfFile, szPath))
     return 1;
-  pFile->pBegin = null;
 
+  pFile->pBegin = null;
+#ifdef __linux__
   if(!File_ReadMeta(pfFile)){
     File_Close(pfFile);
     return 2;
@@ -115,13 +125,34 @@ static inline E8 MMFile_OpenForRead(MMFile *pFile, const C *szPath){
     File_Close(pfFile);
     return 3;
   }
+#else
+  HANDLE hMap = CreateFileMapping(pfFile->handle, 0, PAGE_READONLY, 0, 0, 0);
+  if(hMap == NULL){
+    File_Close(pfFile);
+    return 2;
+  }
+  
+  Byte *pBegin = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
+  if(pBegin == NULL){
+    CloseHandle(hMap);
+    File_Close(pfFile);
+    return 3;
+  }
+  
+  pFile->hMap = hMap;
+#endif
   pFile->pBegin = pBegin;
   return 0;
 }
 
 static inline void MMFile_Close(MMFile *pFile){
   if(pFile->pBegin){
+#ifdef __linux__
     munmap(pFile->pBegin, pFile->file.meta.st_size);
+#else
+    UnmapViewOfFile(pFile->pBegin);
+    CloseHandle(pFile->hMap);
+#endif
     pFile->pBegin = null;
   }
   File_Close(&pFile->file);

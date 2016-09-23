@@ -36,6 +36,7 @@ static inline B File_Delete(const C *szPath){
 #ifdef __linux__
   return unlink((const char*)szPath) == 0;
 #else
+  return DeleteFileA(szPath);
 #endif
 }
 
