@@ -13,25 +13,25 @@ static inline U16 String_ToU16(const C *pBegin, const C *pEnd);
 static inline U32 String_ToU32(const C *pBegin, const C *pEnd);
 static inline U64 String_ToU64(const C *pBegin, const C *pEnd);
 
-static inline B String_ParseU8(const C **ppszNumber, U8 *puValue);
-static inline B String_ParseU16(const C **ppszNumber, U16 *puValue);
-static inline B String_ParseU32(const C **ppszNumber, U32 *puValue);
-static inline B String_ParseU64(const C **ppszNumber, U64 *puValue);
+static inline E8 String_ParseU8(const C **ppszNumber, U8 *puValue);
+static inline E8 String_ParseU16(const C **ppszNumber, U16 *puValue);
+static inline E8 String_ParseU32(const C **ppszNumber, U32 *puValue);
+static inline E8 String_ParseU64(const C **ppszNumber, U64 *puValue);
 
 //Parse '0b' prefix youself
-static inline B String_ParseBinaryU32(const C **ppszNumber, U32 *puValue);
-static inline B String_ParseBinaryU64(const C **ppszNumber, U64 *puValue);
+static inline E8 String_ParseBinaryU32(const C **ppszNumber, U32 *puValue);
+static inline E8 String_ParseBinaryU64(const C **ppszNumber, U64 *puValue);
 
 //Parse '0o' prefix youself
-static inline B String_ParseOctalU32(const C **ppszNumber, U32 *puValue);
-static inline B String_ParseOctalU64(const C **ppszNumber, U64 *puValue);
+static inline E8 String_ParseOctalU32(const C **ppszNumber, U32 *puValue);
+static inline E8 String_ParseOctalU64(const C **ppszNumber, U64 *puValue);
 
 //Parse '0x' prefix youself
-static inline B String_ParseHexU32(const C **ppszNumber, U32 *puValue);
-static inline B String_ParseHexU64(const C **ppszNumber, U64 *puValue);
-static inline B String_ParseUHexU64(const C **ppszNumber, U64 *puValue);
+static inline E8 String_ParseHexU32(const C **ppszNumber, U32 *puValue);
+static inline E8 String_ParseHexU64(const C **ppszNumber, U64 *puValue);
+static inline E8 String_ParseUHexU64(const C **ppszNumber, U64 *puValue);
 
-static inline B String_ParseIp(const C **ppIp, U32 *puIp);
+static inline E8 String_ParseIp(const C **ppIp, U32 *puIp);
 ////////////////////////////////////////////////////////////////
 static inline U8 String_ToU8(const C *pBegin, const C *pEnd){
     const C *p = pBegin;
@@ -74,14 +74,14 @@ static inline U64 String_ToU64(const C *pBegin, const C *pEnd){
     return uValue;
 }
 
-static inline B String_ParseU8(const C **ppszNumber, U8 *puValue){
+static inline E8 String_ParseU8(const C **ppszNumber, U8 *puValue){
     const C *p = *ppszNumber;
     U8 uValue = *puValue;
     //Max: 255
 #define U8_OVERFLOW_BEFORE_MUL 25U
 #define U8_OVERFLOW_BEFORE_ADD 250U
 
-    while(true){
+    while(1){
         U8 uRange = *p - (C)'0';
         if(uRange > 9)
             break;
@@ -92,7 +92,7 @@ static inline B String_ParseU8(const C **ppszNumber, U8 *puValue){
         else if(uValue > U8_OVERFLOW_BEFORE_MUL || uRange > 5){
             *ppszNumber = p;
             *puValue = uValue;
-            return true;
+            return 1;
         }else
             uValue = U8_OVERFLOW_BEFORE_ADD + uRange;
 
@@ -101,17 +101,17 @@ static inline B String_ParseU8(const C **ppszNumber, U8 *puValue){
 
     *ppszNumber = p;
     *puValue = uValue;
-    return false;
+    return 0;
 }
 
-static inline B String_ParseU16(const C **ppszNumber, U16 *puValue){
+static inline E8 String_ParseU16(const C **ppszNumber, U16 *puValue){
     const C *p = *ppszNumber;
     U16 uValue = *puValue;
     //Max: 65535
 #define U16_OVERFLOW_BEFORE_MUL 6553U
 #define U16_OVERFLOW_BEFORE_ADD 65530U
 
-    while(true){
+    while(1){
         U8 uRange = *p - (C)'0';
         if(uRange > 9)
             break;
@@ -122,7 +122,7 @@ static inline B String_ParseU16(const C **ppszNumber, U16 *puValue){
         else if(uValue > U16_OVERFLOW_BEFORE_MUL || uRange > 5){
             *ppszNumber = p;
             *puValue = uValue;
-            return true;
+            return 1;
         }else
             uValue = U16_OVERFLOW_BEFORE_ADD + uRange;
 
@@ -131,17 +131,17 @@ static inline B String_ParseU16(const C **ppszNumber, U16 *puValue){
 
     *ppszNumber = p;
     *puValue = uValue;
-    return false;
+    return 0;
 }
 
-static inline B String_ParseU32(const C **ppszNumber, U32 *puValue){
+static inline E8 String_ParseU32(const C **ppszNumber, U32 *puValue){
     const C *p = *ppszNumber;
     U32 uValue = *puValue;
     //Max: 4294967295
 #define U32_OVERFLOW_BEFORE_MUL 429496729U
 #define U32_OVERFLOW_BEFORE_ADD 4294967290U
 
-    while(true){
+    while(1){
         U8 uRange = *p - (C)'0';
         if(uRange > 9)
             break;
@@ -152,7 +152,7 @@ static inline B String_ParseU32(const C **ppszNumber, U32 *puValue){
         else if(uValue > U32_OVERFLOW_BEFORE_MUL || uRange > 5){
             *ppszNumber = p;
             *puValue = uValue;
-            return true;
+            return 1;
         }else
             uValue = U32_OVERFLOW_BEFORE_ADD + uRange;
 
@@ -161,18 +161,18 @@ static inline B String_ParseU32(const C **ppszNumber, U32 *puValue){
 
     *ppszNumber = p;
     *puValue = uValue;
-    return false;
+    return 0;
 }
 
-static inline B String_ParseU64(const C **ppszNumber, U64 *puValue){
+static inline E8 String_ParseU64(const C **ppszNumber, U64 *puValue){
     const C *p = *ppszNumber;
     U64 uValue = *puValue;
 
     //Max: 18446744073709551615
-#define U64_OVERFLOW_BEFORE_MUL 1844674407370955161LLU
-#define U64_OVERFLOW_BEFORE_ADD 18446744073709551610LLU
+#define U64_OVERFLOW_BEFORE_MUL 1844674407370955161ULL
+#define U64_OVERFLOW_BEFORE_ADD 18446744073709551610ULL
 
-    while(true){
+    while(1){
         U8 uRange = *p - (C)'0';
         if(uRange > 9)
             break;
@@ -182,7 +182,7 @@ static inline B String_ParseU64(const C **ppszNumber, U64 *puValue){
         else if(uValue > U64_OVERFLOW_BEFORE_MUL || uRange > 5){
             *ppszNumber = p;
             *puValue = uValue;
-            return true;
+            return 1;
         }else
             uValue = U64_OVERFLOW_BEFORE_ADD + uRange;
 
@@ -191,16 +191,16 @@ static inline B String_ParseU64(const C **ppszNumber, U64 *puValue){
 
     *ppszNumber = p;
     *puValue = uValue;
-    return false;
+    return 0;
 }
 
-static inline B String_ParseBinaryU32(const C **ppszNumber, U32 *puValue){
+static inline E8 String_ParseBinaryU32(const C **ppszNumber, U32 *puValue){
     const C *p = *ppszNumber;
     U32 uValue = *puValue;
     //Max: 0b11111111111111111111111111111111
 #define BINARY_U32_OVERFLOW_BEFORE_MUL 0x7FFFFFFFU
 
-    while(true){
+    while(1){
         U8 uRange = *p - (C)'0';
         if(uRange > 1)
             break;
@@ -208,7 +208,7 @@ static inline B String_ParseBinaryU32(const C **ppszNumber, U32 *puValue){
         if(uValue > BINARY_U32_OVERFLOW_BEFORE_MUL){
             *ppszNumber = p;
             *puValue = uValue;
-            return true;
+            return 1;
         }
 
         uValue = (uValue << 1) + uRange;
@@ -218,16 +218,16 @@ static inline B String_ParseBinaryU32(const C **ppszNumber, U32 *puValue){
 
     *ppszNumber = p;
     *puValue = uValue;
-    return false;
+    return 0;
 }
 
-static inline B String_ParseBinaryU64(const C **ppszNumber, U64 *puValue){
+static inline E8 String_ParseBinaryU64(const C **ppszNumber, U64 *puValue){
     const C *p = *ppszNumber;
     U64 uValue = *puValue;
     //Max: 0b1111111111111111111111111111111111111111111111111111111111111111
-#define BINARY_U64_OVERFLOW_BEFORE_MUL 0x7FFFFFFFFFFFFFFFLLU
+#define BINARY_U64_OVERFLOW_BEFORE_MUL 0x7FFFFFFFFFFFFFFFULL
 
-    while(true){
+    while(1){
         U8 uRange = *p - (C)'0';
         if(uRange > 1)
             break;
@@ -235,7 +235,7 @@ static inline B String_ParseBinaryU64(const C **ppszNumber, U64 *puValue){
         if(uValue > BINARY_U64_OVERFLOW_BEFORE_MUL){
             *ppszNumber = p;
             *puValue = uValue;
-            return true;
+            return 1;
         }
 
         uValue = (uValue << 1) + uRange;
@@ -245,16 +245,16 @@ static inline B String_ParseBinaryU64(const C **ppszNumber, U64 *puValue){
 
     *ppszNumber = p;
     *puValue = uValue;
-    return false;
+    return 0;
 }
 
-static inline B String_ParseOctalU32(const C **ppszNumber, U32 *puValue){
+static inline E8 String_ParseOctalU32(const C **ppszNumber, U32 *puValue){
     const C *p = *ppszNumber;
     U32 uValue = *puValue;
     //Max: 0o37777777777
 #define OCTAL_U32_OVERFLOW_BEFORE_MUL 03777777777U
 
-    while(true){
+    while(1){
         U8 uRange = *p - (C)'0';
         if(uRange > 7)
             break;
@@ -262,7 +262,7 @@ static inline B String_ParseOctalU32(const C **ppszNumber, U32 *puValue){
         if(uValue > OCTAL_U32_OVERFLOW_BEFORE_MUL){
             *ppszNumber = p;
             *puValue = uValue;
-            return true;
+            return 1;
         }
 
         uValue = (uValue << 3) + uRange;
@@ -272,16 +272,16 @@ static inline B String_ParseOctalU32(const C **ppszNumber, U32 *puValue){
 
     *ppszNumber = p;
     *puValue = uValue;
-    return false;
+    return 0;
 }
 
-static inline B String_ParseOctalU64(const C **ppszNumber, U64 *puValue){
+static inline E8 String_ParseOctalU64(const C **ppszNumber, U64 *puValue){
     const C *p = *ppszNumber;
     U64 uValue = *puValue;
     //Max: 0o1777777777777777777777
-#define OCTAL_U64_OVERFLOW_BEFORE_MUL 0177777777777777777777LLU
+#define OCTAL_U64_OVERFLOW_BEFORE_MUL 0177777777777777777777ULL
 
-    while(true){
+    while(1){
         U8 uRange = *p - (C)'0';
         if(uRange > 7)
             break;
@@ -289,7 +289,7 @@ static inline B String_ParseOctalU64(const C **ppszNumber, U64 *puValue){
         if(uValue > OCTAL_U64_OVERFLOW_BEFORE_MUL){
             *ppszNumber = p;
             *puValue = uValue;
-            return true;
+            return 1;
         }
 
         uValue = (uValue << 3) + uRange;
@@ -299,22 +299,22 @@ static inline B String_ParseOctalU64(const C **ppszNumber, U64 *puValue){
 
     *ppszNumber = p;
     *puValue = uValue;
-    return false;
+    return 0;
 }
 
 //Max: 0xFFFFFFFF
 #define HEX_U32_OVERFLOW_BEFORE_MUL 0xFFFFFFFU
 
-static inline B String_ParseHexU32(const C **ppszNumber, U32 *puValue){
+static inline E8 String_ParseHexU32(const C **ppszNumber, U32 *puValue){
     const C *p = *ppszNumber;
     U32 uValue = *puValue;
-    B bOverflow = false;
+    B bOverflow = 0;
     U8 uRange;
-    while(true){
+    while(1){
       uRange = *p - (C)'0';
       if(uRange < 10){
         if(uValue > HEX_U32_OVERFLOW_BEFORE_MUL){
-          bOverflow = true;
+          bOverflow = 1;
           break;
         }
         else
@@ -324,7 +324,7 @@ static inline B String_ParseHexU32(const C **ppszNumber, U32 *puValue){
         uRange -= 17;
         if(uRange < 6){
           if(uValue > HEX_U32_OVERFLOW_BEFORE_MUL){
-            bOverflow = true;
+            bOverflow = 1;
             break;
           }
           else
@@ -336,7 +336,7 @@ static inline B String_ParseHexU32(const C **ppszNumber, U32 *puValue){
             break;
 
           if(uValue > HEX_U32_OVERFLOW_BEFORE_MUL){
-            bOverflow = true;
+            bOverflow = 1;
             break;
           }
           else
@@ -353,18 +353,18 @@ static inline B String_ParseHexU32(const C **ppszNumber, U32 *puValue){
 }
 
 //Max: 0xFFFFFFFFFFFFFFFF
-#define HEX_U64_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFLLU
+#define HEX_U64_OVERFLOW_BEFORE_MUL 0xFFFFFFFFFFFFFFFULL
 
-static inline B String_ParseHexU64(const C **ppszNumber, U64 *puValue){
+static inline E8 String_ParseHexU64(const C **ppszNumber, U64 *puValue){
     const C *p = *ppszNumber;
     U64 uValue = *puValue;
-    B bOverflow = false;
+    B bOverflow = 0;
     U8 uRange;
-    while(true){
+    while(1){
       uRange = *p - (C)'0';
       if(uRange < 10){
         if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
-          bOverflow = true;
+          bOverflow = 1;
           break;
         }
         else
@@ -374,7 +374,7 @@ static inline B String_ParseHexU64(const C **ppszNumber, U64 *puValue){
         uRange -= 17;
         if(uRange < 6){
           if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
-            bOverflow = true;
+            bOverflow = 1;
             break;
           }
           else
@@ -386,7 +386,7 @@ static inline B String_ParseHexU64(const C **ppszNumber, U64 *puValue){
             break;
 
           if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
-            bOverflow = true;
+            bOverflow = 1;
             break;
           }
           else
@@ -402,16 +402,16 @@ static inline B String_ParseHexU64(const C **ppszNumber, U64 *puValue){
     return bOverflow;
 }
 
-static inline B String_ParseUHexU64(const C **ppszNumber, U64 *puValue){
+static inline E8 String_ParseUHexU64(const C **ppszNumber, U64 *puValue){
     const C *p = *ppszNumber;
     U64 uValue = *puValue;
-    B bOverflow = false;
+    B bOverflow = 0;
     U8 uRange;
-    while(true){
+    while(1){
       uRange = *p - (C)'0';
       if(uRange < 10){
         if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
-          bOverflow = true;
+          bOverflow = 1;
           break;
         }
         else
@@ -423,7 +423,7 @@ static inline B String_ParseUHexU64(const C **ppszNumber, U64 *puValue){
           break;
 
         if(uValue > HEX_U64_OVERFLOW_BEFORE_MUL){
-          bOverflow = true;
+          bOverflow = 1;
           break;
         }
         else
@@ -438,11 +438,11 @@ static inline B String_ParseUHexU64(const C **ppszNumber, U64 *puValue){
     return bOverflow;
 }
 
-static inline B String_ParseIp(const C **ppIp, U32 *puIp){
+static inline E8 String_ParseIp(const C **ppIp, U32 *puIp){
     const C *p = *ppIp;
 
     if(C_IsNotDigit(*p))
-        return true;
+        return 1;
 
     union{
         U32 uIp;
@@ -453,60 +453,60 @@ static inline B String_ParseIp(const C **ppIp, U32 *puIp){
 
     if(String_ParseU8(&p, &ip.szIp[0])){
         *ppIp = p;
-        return true;
+        return 1;
     }
 
     if(*p != '.'){
         *ppIp = p;
-        return true;
+        return 1;
     }
     ++p;
 
     if(C_IsNotDigit(*p)){
         *ppIp = p;
-        return true;
+        return 1;
     }
 
     if(String_ParseU8(&p, &ip.szIp[1])){
         *ppIp = p;
-        return true;
+        return 1;
     }
 
     if(*p != '.'){
         *ppIp = p;
-        return true;
+        return 1;
     }
     ++p;
 
     if(C_IsNotDigit(*p)){
         *ppIp = p;
-        return true;
+        return 1;
     }
 
     if(String_ParseU8(&p, &ip.szIp[2])){
         *ppIp = p;
-        return true;
+        return 1;
     }
 
     if(*p != '.'){
         *ppIp = p;
-        return true;
+        return 1;
     }
     ++p;
 
     if(C_IsNotDigit(*p)){
         *ppIp = p;
-        return true;
+        return 1;
     }
 
     if(String_ParseU8(&p, &ip.szIp[3])){
         *ppIp = p;
-        return true;
+        return 1;
     }
 
     *ppIp = p;
     *puIp = ip.uIp;
-    return false;
+    return 0;
 }
 
 #endif // STRING2U_H

@@ -36,6 +36,10 @@ static inline B String_Equal4(const C *pLeft, const C *pRight);
 static inline B String_Equal6(const C *pLeft, const C *pRight4, const C *pRight2);
 static inline B String_Equal8(const C *pLeft, const C *pRight);
 
+static inline C *String_Hex8(U8 uValue, C *pBuffer);
+static inline C *String_Hex16(U16 uValue, C *pBuffer);
+static inline C *String_Hex32(U32 uValue, C *pBuffer);
+static inline C *String_Hex64(U64 uValue, C *pBuffer);
 
 ////////////////////////////////////////////////////////////////
 static inline const C *String_Find(const C *pBegin, const C *pEnd, C value){
@@ -229,6 +233,20 @@ static inline B String_Equal6(const C *pLeft, const C *pRight4, const C *pRight2
 
 static inline B String_Equal8(const C *pLeft, const C *pRight){
     return *(const U64*)pLeft == *(const U64*)pRight;
+}
+
+static inline C *String_Hex8(U8 uValue, C *pBuffer){
+   *p++ = "0123456789ABCDEF"[c >> 4];
+   *p++ = "0123456789ABCDEF"[c & 0x0F];
+   }
+
+static inline C *String_Hex16(U16 uValue, C *pBuffer){
+}
+
+static inline C *String_Hex32(U32 uValue, C *pBuffer){
+}
+
+static inline C *String_Hex64(U64 uValue, C *pBuffer){
 }
 
 #endif // STRING_H

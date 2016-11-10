@@ -228,9 +228,9 @@ static inline U64 File_GetSize(File *pFile){
 #endif
 }
 
-static inline B File_SetSize(File *pFile, U64 nSize){
+static inline B File_SetSize(File *pFile, U64 uSize){
 #ifdef __linux__
-  return ftruncate(pFile->fd, nSize) == 0;
+  return ftruncate(pFile->fd, uSize) == 0;
 #else
 #endif
 }
@@ -251,7 +251,7 @@ static inline B File_FlushData(File *pFile){
 
 static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 uSize){
 #ifdef __linux__
-  return read(pFile->fd, pBuffer, nSize);
+  return read(pFile->fd, pBuffer, uSize);
 #else
   U32 uBytes;
   if(ReadFile(pFile->handle, pBuffer, uSize, (LPDWORD)&uBytes, NULL))
@@ -260,16 +260,16 @@ static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 uSize){
 #endif
 }
 
-static inline I32 File_ReadFrom(const File *pFile, U64 uOffset, Byte *pBuffer, U32 nSize){
+static inline I32 File_ReadFrom(const File *pFile, U64 uOffset, Byte *pBuffer, U32 uSize){
 #ifdef __linux__
-  return pread(pFile->fd, pBuffer, nSize, uOffset);
+  return pread(pFile->fd, pBuffer, uSize, uOffset);
 #else
 #endif
 }
 
 static inline I32 File_Write(const File *pFile, const Byte *pData, U32 uSize){
 #ifdef __linux__
-  return write(pFile->fd, pData, nSize);
+  return write(pFile->fd, pData, uSize);
 #else
   U32 uBytes;
   if(WriteFile(pFile->handle, pData, uSize, (LPDWORD)&uBytes, NULL))
@@ -278,9 +278,9 @@ static inline I32 File_Write(const File *pFile, const Byte *pData, U32 uSize){
 #endif
 }
 
-static inline I32 File_WriteTo(const File *pFile, U64 uOffset, const Byte *pData, U32 nSize){
+static inline I32 File_WriteTo(const File *pFile, U64 uOffset, const Byte *pData, U32 uSize){
 #ifdef __linux__
-  return pwrite(pFile->fd, pData, nSize, uOffset);
+  return pwrite(pFile->fd, pData, uSize, uOffset);
 #else
 #endif
 }
