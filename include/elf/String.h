@@ -235,18 +235,52 @@ static inline B String_Equal8(const C *pLeft, const C *pRight){
     return *(const U64*)pLeft == *(const U64*)pRight;
 }
 
+#define HEXCHARS "0123456789ABCDEF"
+
 static inline C *String_Hex8(U8 uValue, C *pBuffer){
-   *p++ = "0123456789ABCDEF"[c >> 4];
-   *p++ = "0123456789ABCDEF"[c & 0x0F];
-   }
+   *pBuffer++ = HEXCHARS[uValue >> 4];
+   *pBuffer++ = HEXCHARS[uValue & 0x0F];
+  return pBuffer;
+}
 
 static inline C *String_Hex16(U16 uValue, C *pBuffer){
+  *pBuffer++ = HEXCHARS[uValue >> 12];
+  *pBuffer++ = HEXCHARS[(uValue >> 8) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 4) & 0x0F];
+  *pBuffer++ = HEXCHARS[uValue & 0x0F];
+  return pBuffer;
 }
 
 static inline C *String_Hex32(U32 uValue, C *pBuffer){
+  *pBuffer++ = HEXCHARS[uValue >> 28];
+  *pBuffer++ = HEXCHARS[(uValue >> 24) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 20) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 16) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 12) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 8) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 4) & 0x0F];
+  *pBuffer++ = HEXCHARS[uValue & 0x0F];
+  return pBuffer;
 }
 
 static inline C *String_Hex64(U64 uValue, C *pBuffer){
+  *pBuffer++ = HEXCHARS[uValue >> 60];
+  *pBuffer++ = HEXCHARS[(uValue >> 56) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 52) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 48) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 44) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 40) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 36) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 32) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 28) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 24) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 20) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 16) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 12) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 8) & 0x0F];
+  *pBuffer++ = HEXCHARS[(uValue >> 4) & 0x0F];
+  *pBuffer++ = HEXCHARS[uValue & 0x0F];
+  return pBuffer;
 }
 
 #endif // STRING_H
