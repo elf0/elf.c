@@ -10,6 +10,10 @@
 
 #include "String.h"
 
+#ifndef KVSReader_FILE_END
+#define KVSReader_FILE_END ":\n"
+#endif
+
 #ifndef KVReader_KEY_END_CHAR
 #define KVReader_KEY_END_CHAR ':'
 #endif
@@ -22,7 +26,7 @@
 typedef E8 (*KVReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 
 static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, KVReader_Handler onKV){
-  if((pEnd - pBegin) < 2 || *(U16*)(pEnd - 2) != *(U16*)":\n")
+  if((pEnd - pBegin) < 2 || *(U16*)(pEnd - 2) != *(U16*)KVSReader_FILE_END)
     return 1;
   --pEnd;
 
@@ -40,6 +44,10 @@ static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, 
     e = onKV(pContext, pKey, pKeyEnd, pValue, p++);
     if(e)
       return e;
+
+#ifndef KVReader_FORBID_EMPTY_LINE
+    p = String_Skip(p, (C)KVReader_VALUE_END_CHAR);
+#endif
   }
 
   return 0;

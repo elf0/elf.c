@@ -10,6 +10,10 @@
 
 #include "String.h"
 
+#ifndef KVSReader_FILE_END
+#define KVSReader_FILE_END ":\n"
+#endif
+
 #ifndef KVSReader_KEY_END_CHAR
 #define KVSReader_KEY_END_CHAR ':'
 #endif
@@ -22,13 +26,17 @@
 #define KVSReader_VALUE_CONTINUE_CHAR ' '
 #endif
 
+#ifndef KVSReader_OMIT_EMPTY_LINE
+#define KVSReader_OMIT_EMPTY_LINE ' '
+#endif
+
 typedef E8 (*KVReader_KVHandler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 typedef E8 (*KVSReader_ValueHandler)(void *pContext, const C *pBegin, const C *pEnd);
 
 static inline E8 KVSReader_Parse(void *pContext, const C *pBegin, const C *pEnd
                                  , KVReader_KVHandler onKV, KVSReader_ValueHandler onValue){
   size_t nSize = pEnd - pBegin;
-  if(nSize < 2 || *(U16*)(pEnd - 2) != *(U16*)":\n")
+  if(nSize < 2 || *(U16*)(pEnd - 2) != *(U16*)KVSReader_FILE_END)
     return 1;
   --pEnd;
 
@@ -43,7 +51,7 @@ static inline E8 KVSReader_Parse(void *pContext, const C *pBegin, const C *pEnd
     if(p == pEnd)
       break;
 
-    if(e = onKV(pContext, uIndent, pKey, pKeyEnd, pToken, p++))
+    if(e = onKV(pContext, pKey, pKeyEnd, pValue, p++))
       return e;
 
     while(*p == (C)KVSReader_VALUE_CONTINUE_CHAR){
@@ -54,6 +62,10 @@ static inline E8 KVSReader_Parse(void *pContext, const C *pBegin, const C *pEnd
       if(e = onValue(pContext, pValue, p++))
         return e;
     }
+
+#ifndef KVSReader_FORBID_EMPTY_LINE
+    p = String_Skip(p, (C)KVSReader_VALUE_END_CHAR);
+#endif
   }
 
   return 0;

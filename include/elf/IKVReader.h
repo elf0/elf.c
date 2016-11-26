@@ -10,6 +10,10 @@
 
 #include "String.h"
 
+#ifndef KVSReader_FILE_END
+#define KVSReader_FILE_END ":\n"
+#endif
+
 #ifndef IKVReader_KEY_END_CHAR
 #define IKVReader_KEY_END_CHAR ':'
 #endif
@@ -26,7 +30,7 @@ typedef E8 (*IKVReader_Handler)(void *pContext, U8 uIndent, const C *pKey, const
 
 static inline E8 IKVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, IKVReader_Handler onKV){
   size_t nSize = pEnd - pBegin;
-  if(nSize < 2 || *(U16*)(pEnd - 2) != *(U16*)":\n")
+  if(nSize < 2 || *(U16*)(pEnd - 2) != *(U16*)KVSReader_FILE_END)
     return 1;
   --pEnd;
 
@@ -47,6 +51,10 @@ static inline E8 IKVReader_Parse(void *pContext, const C *pBegin, const C *pEnd,
 
     if(e = onKV(pContext, uIndent, pKey, pKeyEnd, pToken, p++))
       return e;
+
+#ifndef IKVReader_FORBID_EMPTY_LINE
+    p = String_Skip(p, (C)IKVReader_VALUE_END_CHAR);
+#endif
   }
 
   return 0;
