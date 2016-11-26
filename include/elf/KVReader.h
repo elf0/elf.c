@@ -10,8 +10,8 @@
 
 #include "String.h"
 
-#ifndef KVSReader_FILE_END
-#define KVSReader_FILE_END ":\n"
+#ifndef KVReader_FILE_END
+#define KVReader_FILE_END ":\n"
 #endif
 
 #ifndef KVReader_KEY_END_CHAR
@@ -26,7 +26,7 @@
 typedef E8 (*KVReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 
 static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, KVReader_Handler onKV){
-  if((pEnd - pBegin) < 2 || *(U16*)(pEnd - 2) != *(U16*)KVSReader_FILE_END)
+  if((pEnd - pBegin) < 2 || *(U16*)(pEnd - 2) != *(U16*)KVReader_FILE_END)
     return 1;
   --pEnd;
 
