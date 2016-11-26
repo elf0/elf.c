@@ -32,12 +32,13 @@ static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, 
   while(1){
     p = String_SkipUntil(pKey = p, (C)KVReader_KEY_END_CHAR);
     pKeyEnd = p++;
-    p = String_SkipUntil(pValue = p, (C)KVReader_VALUE_END_CHAR);
 
+    p = String_SkipUntil(pValue = p, (C)KVReader_VALUE_END_CHAR);
     if(p == pEnd)
       break;
 
-    if(e = onKV(pContext, pKey, pKeyEnd, pValue, p++))
+    e = onKV(pContext, pKey, pKeyEnd, pValue, p++);
+    if(e)
       return e;
   }
 

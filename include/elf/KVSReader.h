@@ -19,57 +19,44 @@
 #endif
 
 #ifndef KVSReader_VALUE_CONTINUE_CHAR
-#define KVSReader_VALUE_CONTINUE_CHAR '.'
+#define KVSReader_VALUE_CONTINUE_CHAR ' '
 #endif
 
-typedef struct KVSReader KVSReader;
-typedef E8 (*KVSReader_Handler)(KVSReader *pReader, const C *pBegin, const C *pEnd);
+typedef E8 (*KVReader_KVHandler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
+typedef E8 (*KVSReader_ValueHandler)(void *pContext, const C *pBegin, const C *pEnd);
 
-struct KVSReader{
-  void *pContext;
-  KVSReader_Handler onKey;
-  KVSReader_Handler onValue;
-};
-
-static inline void KVSReader_Initialize(KVSReader *pReader
-                                       , void *pContext
-                                       , KVSReader_Handler onKey
-                                       , KVSReader_Handler onValue){
-  pReader->pContext = pContext;
-  pReader->onKey = onKey;
-  pReader->onValue = onValue;
-}
-
-static inline E8 KVSReader_Parse(KVSReader *pReader, const C *pBegin, const C *pEnd){
+static inline E8 KVSReader_Parse(void *pContext, const C *pBegin, const C *pEnd
+                                 , KVReader_KVHandler onKV, KVSReader_ValueHandler onValue){
   size_t nSize = pEnd - pBegin;
-  if(nSize < 2)
+  if(nSize < 2 || *(U16*)(pEnd - 2) != *(U16*)":\n")
     return 1;
-
-  if(*(U16*)(pEnd - 2) != *(U16*)":\n")
-    return 1;
+  --pEnd;
 
   E8 e;
-  const C *pData;
+  const C *pKey, *pKeyEnd, *pValue;
   const C *p = pBegin;
   while(1){
-    p = String_SkipUntil(pData = p, (C)KVSReader_KEY_END_CHAR);
-    if(e = pReader->onKey(pReader, pData, p++))
+    p = String_SkipUntil(pKey = p, (C)KVSReader_KEY_END_CHAR);
+    pKeyEnd = p++;
+
+    p = String_SkipUntil(pValue = p, (C)KVSReader_VALUE_END_CHAR);
+    if(p == pEnd)
+      break;
+
+    if(e = onKV(pContext, uIndent, pKey, pKeyEnd, pToken, p++))
       return e;
 
-    while(1){
-      p = String_SkipUntil(pData = p, (C)KVSReader_VALUE_END_CHAR);
-      if(e = pReader->onValue(pReader, pData, p++))
-        return e;
-
+    while(*p == (C)KVSReader_VALUE_CONTINUE_CHAR){
+      p = String_SkipUntil(pValue = ++p, (C)KVSReader_VALUE_END_CHAR);
       if(p == pEnd)
-        return 0;
+        return 1;
 
-      if(*p != (C)KVSReader_VALUE_CONTINUE_CHAR)
-        break;
-
-      ++p;
+      if(e = onValue(pContext, pValue, p++))
+        return e;
     }
   }
+
+  return 0;
 }
 
 #endif // KVSREADER_H
