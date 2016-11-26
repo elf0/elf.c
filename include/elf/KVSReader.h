@@ -26,10 +26,6 @@
 #define KVSReader_VALUE_CONTINUE_CHAR ' '
 #endif
 
-#ifndef KVSReader_OMIT_EMPTY_LINE
-#define KVSReader_OMIT_EMPTY_LINE ' '
-#endif
-
 typedef E8 (*KVReader_KVHandler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 typedef E8 (*KVSReader_ValueHandler)(void *pContext, const C *pBegin, const C *pEnd);
 
