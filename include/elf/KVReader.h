@@ -34,6 +34,10 @@ static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, 
   const C *pKey, *pKeyEnd, *pValue;
   const C *p = pBegin;
   while(1){
+#ifndef KVReader_FORBID_EMPTY_RECORD
+    p = String_Skip(p, (C)KVReader_VALUE_END_CHAR);
+#endif
+
     p = String_SkipUntil(pKey = p, (C)KVReader_KEY_END_CHAR);
     pKeyEnd = p++;
 
@@ -44,10 +48,6 @@ static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, 
     e = onKV(pContext, pKey, pKeyEnd, pValue, p++);
     if(e)
       return e;
-
-#ifndef KVReader_FORBID_EMPTY_LINE
-    p = String_Skip(p, (C)KVReader_VALUE_END_CHAR);
-#endif
   }
 
   return 0;

@@ -39,6 +39,10 @@ static inline E8 IKVReader_Parse(void *pContext, const C *pBegin, const C *pEnd,
   const C *pKey, *pKeyEnd, *pToken;
   const C *p = pBegin;
   while(1){
+#ifndef IKVReader_FORBID_EMPTY_RECORD
+    p = String_Skip(p, (C)IKVReader_VALUE_END_CHAR);
+#endif
+
     p = String_Skip(pToken = p, (C)IKVReader_INDENT_CHAR);
     uIndent = (U8)(p - pToken);
 
@@ -51,10 +55,6 @@ static inline E8 IKVReader_Parse(void *pContext, const C *pBegin, const C *pEnd,
 
     if(e = onKV(pContext, uIndent, pKey, pKeyEnd, pToken, p++))
       return e;
-
-#ifndef IKVReader_FORBID_EMPTY_LINE
-    p = String_Skip(p, (C)IKVReader_VALUE_END_CHAR);
-#endif
   }
 
   return 0;
