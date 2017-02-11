@@ -29,7 +29,7 @@
 typedef E8 (*IKVReader_Handler)(void *pContext, U8 uIndent, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 
 static inline E8 IKVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, IKVReader_Handler onKV){
-  size_t nSize = pEnd - pBegin;
+  U nSize = pEnd - pBegin;
   if(nSize < 2 || *(U16*)(pEnd - 2) != *(U16*)IKVReader_FILE_END)
     return 1;
   --pEnd;
