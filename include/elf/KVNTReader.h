@@ -1,5 +1,5 @@
-#ifndef KVREADER_H
-#define KVREADER_H
+#ifndef KVNTREADER_H
+#define KVNTREADER_H
 
 //License: Public Domain
 //Author: elf
@@ -9,34 +9,34 @@
 
 #include "String.h"
 
-#ifndef KVReader_KEY_END_CHAR
-#define KVReader_KEY_END_CHAR ':'
+#ifndef KVNTReader_KEY_END_CHAR
+#define KVNTReader_KEY_END_CHAR ':'
 #endif
 
-#ifndef KVReader_VALUE_END_CHAR
-#define KVReader_VALUE_END_CHAR '\n'
+#ifndef KVNTReader_VALUE_END_CHAR
+#define KVNTReader_VALUE_END_CHAR '\n'
 #endif
 
-typedef E8 (*KVReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
+typedef E8 (*KVNTReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 
-static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, KVReader_Handler onKV){
+static inline E8 KVNTReader_Parse(void *pContext, const C *pBegin, const C *pEnd, KVNTReader_Handler onKV){
   if((pEnd - pBegin) < 2
-     || *--pEnd != KVReader_VALUE_END_CHAR
-     || !String_FindLast(pBegin, pEnd, KVReader_KEY_END_CHAR))
+     || *--pEnd != KVNTReader_VALUE_END_CHAR
+     || !String_FindLast(pBegin, pEnd, KVNTReader_KEY_END_CHAR))
     return 1;
 
   E8 e;
   const C *pKey, *pKeyEnd, *pValue;
   const C *p = pBegin;
   do{
-#ifndef KVReader_FORBID_EMPTY_RECORD
-    p = String_Skip(p, (C)KVReader_VALUE_END_CHAR);
+#ifndef KVNTReader_FORBID_EMPTY_RECORD
+    p = String_Skip(p, (C)KVNTReader_VALUE_END_CHAR);
 #endif
 
-    p = String_SkipUntil(pKey = p, (C)KVReader_KEY_END_CHAR);
+    p = String_SkipUntil(pKey = p, (C)KVNTReader_KEY_END_CHAR);
     pKeyEnd = p++;
 
-    p = String_SkipUntil(pValue = p, (C)KVReader_VALUE_END_CHAR);
+    p = String_SkipUntil(pValue = p, (C)KVNTReader_VALUE_END_CHAR);
 
     e = onKV(pContext, pKey, pKeyEnd, pValue, p);
     if(e)
@@ -46,4 +46,4 @@ static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, 
   return 0;
 }
 
-#endif // KVREADER_H
+#endif // KVNTREADER_H
