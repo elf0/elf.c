@@ -21,12 +21,14 @@ static U8 VU30_Bytes(const Byte *pVU30){
 inline
 static const Byte *VU30_ToU32(const Byte *pVU30, U32 *pU32){
   const U8 *p = pVU30;
-  U8 uTail = *p++;
-  U32 uValue = uTail & 0x3F;
-  uTail >>= 6;
-  while(uTail--){
-    uValue <<= 8;
-    uValue |= *p++;
+  U32 uValue = *p++;
+  if(uValue > 0x3F){
+    U8 uTail = uValue >> 6;
+    uValue &= 0x3F;
+    do{
+      uValue <<= 8;
+      uValue |= *p++;
+    }while(--uTail);
   }
   *pU32 = uValue;
   return p;

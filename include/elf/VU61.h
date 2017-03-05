@@ -7,43 +7,52 @@
 
 #include "Type.h"
 
-static inline U8 VU61_TailBytes(const Byte *pVU61){
+inline
+static U8 VU61_TailBytes(const Byte *pVU61){
   return *pVU61 >> 5;
 }
 
-static inline U8 VU61_Bytes(const Byte *pVU61){
+inline
+static U8 VU61_Bytes(const Byte *pVU61){
   return 1 + VU61_TailBytes(pVU61);
 }
 
 //range: [0, 0x1FFFFFFFFFFFFFFF]
-static inline const Byte *VU61_ToU64(const Byte *pVU61, U64 *pU64){
+inline
+static const Byte *VU61_ToU64(const Byte *pVU61, U64 *pU64){
   const U8 *p = pVU61;
-  U8 uTail = *p++;
-  U64 uValue = uTail & 0x1F;
-  uTail >>= 5;
-  while(uTail--){
-    uValue <<= 8;
-    uValue |= *p++;
+  U64 uValue = *p++;
+  if(uValue > 0x1F){
+    U8 uTail = uValue >> 5;
+    uValue &= 0x1F;
+    do{
+      uValue <<= 8;
+      uValue |= *p++;
+    }while(--uTail);
   }
   *pU64 = uValue;
   return p;
 }
 
-static inline B VU61_Valid(U64 u64){
+inline
+static B VU61_Valid(U64 u64){
   return u64 < 0x2000000000000000;
 }
 
-static inline B VU61_Invalid(U64 u64){
+inline
+static B VU61_Invalid(U64 u64){
   return u64 > 0x1FFFFFFFFFFFFFFF;
 }
 
-static inline Byte *VU61_FromU5(Byte *pVU61, U8 u5){
+inline
+static Byte *VU61_FromU5(Byte *pVU61, U8 u5){
   U8 *p = pVU61;
   *p++ = u5;
   return p;
 }
 
-static inline Byte *VU61_FromU8(Byte *pVU61, U8 u8){
+inline
+static Byte *VU61_FromU8(Byte *pVU61, U8 u8){
   U8 *p = pVU61;
 
   if(u8 > 0x1F)
@@ -53,7 +62,8 @@ static inline Byte *VU61_FromU8(Byte *pVU61, U8 u8){
   return p;
 }
 
-static inline Byte *VU61_FromU16(Byte *pVU61, U16 u16){
+inline
+static Byte *VU61_FromU16(Byte *pVU61, U16 u16){
   U8 *p = pVU61;
 
   if(u16 > 0xFF){
@@ -71,7 +81,8 @@ static inline Byte *VU61_FromU16(Byte *pVU61, U16 u16){
   return p;
 }
 
-static inline Byte *VU61_FromU32(Byte *pVU61, U32 u32){
+inline
+static Byte *VU61_FromU32(Byte *pVU61, U32 u32){
   U8 *p = pVU61;
   if(u32 > 0xFFFF){
     if(u32 > 0xFFFFFF){
@@ -111,12 +122,14 @@ static inline Byte *VU61_FromU32(Byte *pVU61, U32 u32){
 }
 
 //u64 must in range[0, 0x1FFFFFFFFFFFFFFF]. Check it youself!
-static inline Byte *VU61_FromU64(Byte *pVU61, U64 u64){
+inline
+static Byte *VU61_FromU64(Byte *pVU61, U64 u64){
   U8 *p = pVU61;
   if(u64 > 0xFFFFFFFF){
     if(u64 > 0xFFFFFFFFFFFF){
       if(u64 > 0xFFFFFFFFFFFFFF){
         *p++ = u64 >> 56 | 0xE0;
+        *p++ = u64 >> 48;
       }
       else{
         if(u64 > 0x1FFFFFFFFFFFFF){
