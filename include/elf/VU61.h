@@ -124,42 +124,48 @@ static Byte *VU61_FromU32(Byte *pVU61, U32 u32){
 //u64 must in range[0, 0x1FFFFFFFFFFFFFFF]. Check it youself!
 inline
 static Byte *VU61_FromU64(Byte *pVU61, U64 u64){
+  U8 u8;
   U8 *p = pVU61;
   if(u64 > 0xFFFFFFFF){
     if(u64 > 0xFFFFFFFFFFFF){
+      u8 = u64 >> 48;
       if(u64 > 0xFFFFFFFFFFFFFF){
         *p++ = u64 >> 56 | 0xE0;
-        *p++ = u64 >> 48;
+        *p++ = u8;
       }
       else{
         if(u64 > 0x1FFFFFFFFFFFFF){
           *p++ = 0xE0;
-          *p++ = u64 >> 48;
+          *p++ = u8;
         }
         else
-          *p++ = u64 >> 48 | 0xC0;
+          *p++ = u8 | 0xC0;
       }
 
       *p++ = u64 >> 40;
       *p++ = u64 >> 32;
     }
-    else if(u64 > 0xFFFFFFFFFF){
-      if(u64 > 0x1FFFFFFFFFFF){
-        *p++ = 0xC0;
-        *p++ = u64 >> 40;
-      }
-      else
-        *p++ = u64 >> 40 | 0xA0;
-
-      *p++ = u64 >> 32;
-    }
     else{
-      if(u64 > 0x1FFFFFFFFF){
-        *p++ = 0xA0;
+      if(u64 > 0xFFFFFFFFFF){
+        u8 = u64 >> 40;
+        if(u64 > 0x1FFFFFFFFFFF){
+          *p++ = 0xC0;
+          *p++ = u8;
+        }
+        else
+          *p++ = u8 | 0xA0;
+
         *p++ = u64 >> 32;
       }
-      else
-        *p++ = u64 >> 32 | 0x80;
+      else{
+        u8 = u64 >> 32;
+        if(u64 > 0x1FFFFFFFFF){
+          *p++ = 0xA0;
+          *p++ = u8;
+        }
+        else
+          *p++ = u8 | 0x80;
+      }
     }
 
     *p++ = u64 >> 24;
@@ -168,33 +174,36 @@ static Byte *VU61_FromU64(Byte *pVU61, U64 u64){
   }
   else if(u64 > 0xFFFF){
     if(u64 > 0xFFFFFF){
+      u8 = u64 >> 24;
       if(u64 > 0x1FFFFFFF){
         *p++ = 0x80;
-        *p++ = u64 >> 24;
+        *p++ = u8;
       }
       else
-        *p++ = u64 >> 24 | 0x60;
+        *p++ = u8 | 0x60;
 
       *p++ = u64 >> 16;
     }
     else{
+      u8 = u64 >> 16;
       if(u64 > 0x1FFFFF){
         *p++ = 0x60;
-        *p++ = u64 >> 16;
+        *p++ = u8;
       }
       else
-        *p++ = u64 >> 16 | 0x40;
+        *p++ = u8 | 0x40;
     }
 
     *p++ = u64 >> 8;
   }
   else if(u64 > 0xFF){
+    u8 = u64 >> 8;
     if(u64 > 0x1FFF){
       *p++ = 0x40;
-      *p++ = u64 >> 8;
+      *p++ = u8;
     }
     else
-      *p++ = u64 >> 8 | 0x20;
+      *p++ = u8 | 0x20;
   }
   else if(u64 > 0x1F)
     *p++ = 0x20;
@@ -210,7 +219,7 @@ static Byte *VU61_Sum(Byte *pVU61, const Byte *pBegin, const Byte *pEnd){
   const Byte *p = pBegin;
   while(p != pEnd)
     uSum += *p++;
-    
+
   return VU61_FromU64(pVU61, uSum);
 }
 

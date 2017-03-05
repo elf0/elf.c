@@ -63,15 +63,16 @@ static Byte *VU15_FromU8(Byte *pVU15, U8 u8){
 //u16 must in range[0, 0x7FFF]. Check it youself!
 inline
 static Byte *VU15_FromU16(Byte *pVU15, U16 u16){
+  U8 u8;
   U8 *p = pVU15;
-
   if(u16 > 0xFF){
+    u8 = u16 >> 8;
     if(u16 > 0x7FFF){
       *p++ = 0x80;
-      *p++ = u16 >> 8;
+      *p++ = u8;
     }
     else
-      *p++ = u16 >> 8 | 0x80;
+      *p++ = u8 | 0x80;
   }
   else if(u16 > 0x7F)
     *p++ = 0x80;

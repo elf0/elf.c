@@ -84,30 +84,33 @@ static Byte *VU30_FromU16(Byte *pVU30, U16 u16){
 //u32 must in range[0, 0x3FFFFFFF]. Check it youself!
 inline
 static Byte *VU30_FromU32(Byte *pVU30, U32 u32){
+  U8 u8;
   U8 *p = pVU30;
   if(u32 > 0xFFFF){
+    u8 = u32 >> 16;
     if(u32 > 0xFFFFFF){
       *p++ = u32 >> 24 | 0xC0;
-      *p++ = u32 >> 16;
+      *p++ = u8;
     }
     else{
       if(u32 > 0x3FFFFF){
         *p++ = 0xC0;
-        *p++ = u32 >> 16;
+        *p++ = u8;
       }
       else
-        *p++ = u32 >> 16 | 0x80;
+        *p++ = u8 | 0x80;
     }
 
     *p++ = u32 >> 8;
   }
   else if(u32 > 0xFF){
+    u8 = u32 >> 8;
     if(u32 > 0x3FFF){
       *p++ = 0x80;
-      *p++ = u32 >> 8;
+      *p++ = u8;
     }
     else
-      *p++ = u32 >> 8 | 0x40;
+      *p++ = u8 | 0x40;
   }
   else if(u32 > 0x3F)
     *p++ = 0x40;
