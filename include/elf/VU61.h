@@ -121,20 +121,20 @@ static Byte *VU61_FromU32(Byte *pVU61, U32 u32){
   return p;
 }
 
-//u64 must in range[0, 0x1FFFFFFFFFFFFFFF]. Check it youself!
+//u61 must in range[0, 0x1FFFFFFFFFFFFFFF]. Check it youself!
 inline
-static Byte *VU61_FromU64(Byte *pVU61, U64 u64){
+static Byte *VU61_FromU61(Byte *pVU61, U64 u61){
   U8 u8;
   U8 *p = pVU61;
-  if(u64 > 0xFFFFFFFF){
-    if(u64 > 0xFFFFFFFFFFFF){
-      u8 = u64 >> 48;
-      if(u64 > 0xFFFFFFFFFFFFFF){
-        *p++ = u64 >> 56 | 0xE0;
+  if(u61 > 0xFFFFFFFF){
+    if(u61 > 0xFFFFFFFFFFFF){
+      u8 = u61 >> 48;
+      if(u61 > 0xFFFFFFFFFFFFFF){
+        *p++ = u61 >> 56 | 0xE0;
         *p++ = u8;
       }
       else{
-        if(u64 > 0x1FFFFFFFFFFFFF){
+        if(u61 > 0x1FFFFFFFFFFFFF){
           *p++ = 0xE0;
           *p++ = u8;
         }
@@ -142,24 +142,24 @@ static Byte *VU61_FromU64(Byte *pVU61, U64 u64){
           *p++ = u8 | 0xC0;
       }
 
-      *p++ = u64 >> 40;
-      *p++ = u64 >> 32;
+      *p++ = u61 >> 40;
+      *p++ = u61 >> 32;
     }
     else{
-      if(u64 > 0xFFFFFFFFFF){
-        u8 = u64 >> 40;
-        if(u64 > 0x1FFFFFFFFFFF){
+      if(u61 > 0xFFFFFFFFFF){
+        u8 = u61 >> 40;
+        if(u61 > 0x1FFFFFFFFFFF){
           *p++ = 0xC0;
           *p++ = u8;
         }
         else
           *p++ = u8 | 0xA0;
 
-        *p++ = u64 >> 32;
+        *p++ = u61 >> 32;
       }
       else{
-        u8 = u64 >> 32;
-        if(u64 > 0x1FFFFFFFFF){
+        u8 = u61 >> 32;
+        if(u61 > 0x1FFFFFFFFF){
           *p++ = 0xA0;
           *p++ = u8;
         }
@@ -168,25 +168,25 @@ static Byte *VU61_FromU64(Byte *pVU61, U64 u64){
       }
     }
 
-    *p++ = u64 >> 24;
-    *p++ = u64 >> 16;
-    *p++ = u64 >> 8;
+    *p++ = u61 >> 24;
+    *p++ = u61 >> 16;
+    *p++ = u61 >> 8;
   }
-  else if(u64 > 0xFFFF){
-    if(u64 > 0xFFFFFF){
-      u8 = u64 >> 24;
-      if(u64 > 0x1FFFFFFF){
+  else if(u61 > 0xFFFF){
+    if(u61 > 0xFFFFFF){
+      u8 = u61 >> 24;
+      if(u61 > 0x1FFFFFFF){
         *p++ = 0x80;
         *p++ = u8;
       }
       else
         *p++ = u8 | 0x60;
 
-      *p++ = u64 >> 16;
+      *p++ = u61 >> 16;
     }
     else{
-      u8 = u64 >> 16;
-      if(u64 > 0x1FFFFF){
+      u8 = u61 >> 16;
+      if(u61 > 0x1FFFFF){
         *p++ = 0x60;
         *p++ = u8;
       }
@@ -194,21 +194,21 @@ static Byte *VU61_FromU64(Byte *pVU61, U64 u64){
         *p++ = u8 | 0x40;
     }
 
-    *p++ = u64 >> 8;
+    *p++ = u61 >> 8;
   }
-  else if(u64 > 0xFF){
-    u8 = u64 >> 8;
-    if(u64 > 0x1FFF){
+  else if(u61 > 0xFF){
+    u8 = u61 >> 8;
+    if(u61 > 0x1FFF){
       *p++ = 0x40;
       *p++ = u8;
     }
     else
       *p++ = u8 | 0x20;
   }
-  else if(u64 > 0x1F)
+  else if(u61 > 0x1F)
     *p++ = 0x20;
 
-  *p++ = u64;
+  *p++ = u61;
   return p;
 }
 
@@ -220,7 +220,7 @@ static Byte *VU61_Sum(Byte *pVU61, const Byte *pBegin, const Byte *pEnd){
   while(p != pEnd)
     uSum += *p++;
 
-  return VU61_FromU64(pVU61, uSum);
+  return VU61_FromU61(pVU61, uSum);
 }
 
 #endif //VU61_H
