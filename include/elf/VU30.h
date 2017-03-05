@@ -7,16 +7,19 @@
 
 #include "Type.h"
 
-static inline U8 VU30_TailBytes(const Byte *pVU30){
+inline
+static U8 VU30_TailBytes(const Byte *pVU30){
   return *pVU30 >> 6;
 }
 
-static inline U8 VU30_Bytes(const Byte *pVU30){
+inline
+static U8 VU30_Bytes(const Byte *pVU30){
   return 1 + VU30_TailBytes(pVU30);
 }
 
 //range: [0, 0x3FFFFFFF]
-static inline const Byte *VU30_ToU32(const Byte *pVU30, U32 *pU32){
+inline
+static const Byte *VU30_ToU32(const Byte *pVU30, U32 *pU32){
   const U8 *p = pVU30;
   U8 uTail = *p++;
   U32 uValue = uTail & 0x3F;
@@ -29,21 +32,25 @@ static inline const Byte *VU30_ToU32(const Byte *pVU30, U32 *pU32){
   return p;
 }
 
-static inline B VU30_Valid(U32 u32){
+inline
+static B VU30_Valid(U32 u32){
   return u32 < 0x40000000;
 }
 
-static inline B VU30_Invalid(U32 u32){
+inline
+static B VU30_Invalid(U32 u32){
   return u32 > 0x3FFFFFFF;
 }
 
-static inline Byte *VU30_FromU6(Byte *pVU30, U8 u6){
+inline
+static Byte *VU30_FromU6(Byte *pVU30, U8 u6){
   U8 *p = pVU30;
   *p++ = u6;
   return p;
 }
 
-static inline Byte *VU30_FromU8(Byte *pVU30, U8 u8){
+inline
+static Byte *VU30_FromU8(Byte *pVU30, U8 u8){
   U8 *p = pVU30;
 
   if(u8 > 0x3F)
@@ -53,7 +60,8 @@ static inline Byte *VU30_FromU8(Byte *pVU30, U8 u8){
   return p;
 }
 
-static inline Byte *VU30_FromU16(Byte *pVU30, U16 u16){
+inline
+static Byte *VU30_FromU16(Byte *pVU30, U16 u16){
   U8 *p = pVU30;
 
   if(u16 > 0xFF){
@@ -72,7 +80,8 @@ static inline Byte *VU30_FromU16(Byte *pVU30, U16 u16){
 }
 
 //u32 must in range[0, 0x3FFFFFFF]. Check it youself!
-static inline Byte *VU30_FromU32(Byte *pVU30, U32 u32){
+inline
+static Byte *VU30_FromU32(Byte *pVU30, U32 u32){
   U8 *p = pVU30;
   if(u32 > 0xFFFF){
     if(u32 > 0xFFFFFF){
@@ -105,5 +114,16 @@ static inline Byte *VU30_FromU32(Byte *pVU30, U32 u32){
   return p;
 }
 
+//(pEnd - pBegin) SHOULD <= 0x404040
+inline
+static Byte *VU30_Sum(Byte *pVU30, const Byte *pBegin, const Byte *pEnd){
+  U32 uSum = 0;
+  const Byte *p = pBegin;
+  while(p != pEnd)
+    uSum += *p++;
+    
+  return VU30_FromU32(pVU30, uSum);
+}
+  
 #endif //VU30_H
 

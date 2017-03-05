@@ -190,5 +190,16 @@ static inline Byte *VU61_FromU64(Byte *pVU61, U64 u64){
   return p;
 }
 
+//(pEnd - pBegin) SHOULD <= 0x20202020202020
+inline
+static Byte *VU61_Sum(Byte *pVU61, const Byte *pBegin, const Byte *pEnd){
+  U64 uSum = 0;
+  const Byte *p = pBegin;
+  while(p != pEnd)
+    uSum += *p++;
+    
+  return VU61_FromU64(pVU61, uSum);
+}
+
 #endif //VU61_H
 
