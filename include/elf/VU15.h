@@ -42,6 +42,7 @@ static B VU15_Invalid(U16 u16){
   return u16 > 0x7FFF;
 }
 
+//u7 must in range[0, 0x7F]. Check it youself!
 inline
 static Byte *VU15_FromU7(Byte *pVU15, U8 u7){
   U8 *p = pVU15;
@@ -63,34 +64,26 @@ static Byte *VU15_FromU8(Byte *pVU15, U8 u8){
 //u15 must in range[0, 0x7FFF]. Check it youself!
 inline
 static Byte *VU15_FromU15(Byte *pVU15, U16 u15){
-  U8 u8;
   U8 *p = pVU15;
-  if(u15 > 0xFF){
-    u8 = u15 >> 8;
-    if(u15 > 0x7FFF){
-      *p++ = 0x80;
-      *p++ = u8;
-    }
-    else
-      *p++ = u8 | 0x80;
-  }
-  else if(u15 > 0x7F)
-    *p++ = 0x80;
+  if(u15 > 0x7F)
+    *p++ = (u15 >> 8) | 0x80;
 
   *p++ = u15;
   return p;
 }
 
+//(pEnd - pBegin) > 0
 //(pEnd - pBegin) SHOULD <= 0x80
 inline
 static Byte *VU15_Sum(Byte *pVU15, const Byte *pBegin, const Byte *pEnd){
   U16 uSum = 0;
   const Byte *p = pBegin;
-  while(p != pEnd)
+  do
     uSum += *p++;
-    
+  while(p != pEnd);
+
   return VU15_FromU15(pVU15, uSum);
 }
-  
+
 #endif //VU15_H
 

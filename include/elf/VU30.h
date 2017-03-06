@@ -44,6 +44,7 @@ static B VU30_Invalid(U32 u32){
   return u32 > 0x3FFFFFFF;
 }
 
+//u6 must in range[0, 0x3F]. Check it youself!
 inline
 static Byte *VU30_FromU6(Byte *pVU30, U8 u6){
   U8 *p = pVU30;
@@ -64,18 +65,14 @@ static Byte *VU30_FromU8(Byte *pVU30, U8 u8){
 
 inline
 static Byte *VU30_FromU16(Byte *pVU30, U16 u16){
+  U8 u8 = u16 >> 8;
   U8 *p = pVU30;
-
-  if(u16 > 0xFF){
-    if(u16 > 0x3FFF){
-      *p++ = 0x80;
-      *p++ = u16 >> 8;
-    }
-    else
-      *p++ = u16 >> 8 | 0x40;
+  if(u16 > 0x3FFF){
+    *p++ = 0x80;
+    *p++ = u8;
   }
-  else if(u16 > 0x3F)
-    *p++ = 0x40;
+  else  if(u16 > 0x3F)
+    *p++ = u8 | 0x40;
 
   *p++ = u16;
   return p;
@@ -84,51 +81,37 @@ static Byte *VU30_FromU16(Byte *pVU30, U16 u16){
 //u30 must in range[0, 0x3FFFFFFF]. Check it youself!
 inline
 static Byte *VU30_FromU30(Byte *pVU30, U32 u30){
-  U8 u8;
+  U8 u8 = u30 >> 8;
   U8 *p = pVU30;
-  if(u30 > 0xFFFF){
-    u8 = u30 >> 16;
-    if(u30 > 0xFFFFFF){
+  if(u30 > 0x3FFF){
+    if(u30 > 0x3FFFFF){
       *p++ = u30 >> 24 | 0xC0;
-      *p++ = u8;
-    }
-    else{
-      if(u30 > 0x3FFFFF){
-        *p++ = 0xC0;
-        *p++ = u8;
-      }
-      else
-        *p++ = u8 | 0x80;
-    }
-
-    *p++ = u30 >> 8;
-  }
-  else if(u30 > 0xFF){
-    u8 = u30 >> 8;
-    if(u30 > 0x3FFF){
-      *p++ = 0x80;
-      *p++ = u8;
+      *p++ = u30 >> 16;
     }
     else
-      *p++ = u8 | 0x40;
+      *p++ = u30 >> 16 | 0x80;
+
+    *p++ = u8;
   }
-  else if(u30 > 0x3F)
-    *p++ = 0x40;
+  else  if(u30 > 0x3F)
+    *p++ = u8 | 0x40;
 
   *p++ = u30;
   return p;
 }
 
+//(pEnd - pBegin) > 0
 //(pEnd - pBegin) SHOULD <= 0x404040
 inline
 static Byte *VU30_Sum(Byte *pVU30, const Byte *pBegin, const Byte *pEnd){
   U32 uSum = 0;
   const Byte *p = pBegin;
-  while(p != pEnd)
+  do
     uSum += *p++;
-    
+  while(p != pEnd);
+
   return VU30_FromU30(pVU30, uSum);
 }
-  
+
 #endif //VU30_H
 
