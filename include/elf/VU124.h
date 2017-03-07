@@ -17,6 +17,14 @@ static U8 VU124_Bytes(const Byte *pVU124){
   return 1 + VU124_TailBytes(pVU124);
 }
 
+//VU124 range: [0, 0xF]. Check it youself!
+inline
+static const Byte *VU124_ToU4(const Byte *pVU124, U8 *pU4){
+  const U8 *p = pVU124;
+  *pU4 = *p++;
+  return p;
+}
+
 //VU124 range: [0, 0xFF]. Check it youself!
 inline
 static const Byte *VU124_ToU8(const Byte *pVU124, U8 *pU8){
