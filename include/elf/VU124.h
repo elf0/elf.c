@@ -170,6 +170,34 @@ static Byte *VU124_FromU16(Byte *pVU124, U16 u16){
 }
 
 inline
+static U8 VU124_U8Bytes(U8 u8){
+  return u8 > 0x0F? 2 : 1;
+}
+
+inline
+static U8 VU124_U16Bytes(U16 u16){
+  if(u16 > 0x0FFF)
+    return 3;
+
+  return u16 > 0x0F? 2 : 1;
+}
+
+inline
+static U8 VU124_U32Bytes(U32 u32){
+  if(u32 > 0x0FFFFFFF)
+    return 5;
+
+  if(u32 > 0x0FFF){
+    if(u32 > 0x0FFFFF)
+      return 4;
+
+    return 3;
+  }
+
+  return u32 > 0x0F? 2 : 1;
+}
+
+inline
 static Byte *VU124_FromU32(Byte *pVU124, U32 u32){
   U8 u8 = u32 >> 8;
   U8 *p = pVU124;
@@ -194,6 +222,36 @@ static Byte *VU124_FromU32(Byte *pVU124, U32 u32){
 
   *p++ = u32;
   return p;
+}
+
+inline
+static U8 VU124_U64Bytes(U64 u64){
+  if(u64 > 0x0FFFFFFF){
+    if(u64 > 0x0FFFFFFFFFFF){
+      if(u64 > 0x0FFFFFFFFFFFFF){
+        if(u64 > 0x0FFFFFFFFFFFFFFF)
+          return 9;
+
+        return 8;
+      }
+
+      return 7;
+    }
+
+    if(u64 > 0x0FFFFFFFFF)
+      return 6;
+
+    return 5;
+  }
+
+  if(u64 > 0x0FFF){
+    if(u64 > 0x0FFFFF)
+      return 4;
+
+    return 3;
+  }
+
+  return u64 > 0x0F? 2 : 1;
 }
 
 inline
