@@ -53,7 +53,6 @@ static Byte *VU15_FromU7(Byte *pVU15, U8 u7){
 inline
 static Byte *VU15_FromU8(Byte *pVU15, U8 u8){
   U8 *p = pVU15;
-
   if(u8 > 0x7F)
     *p++ = 0x80;
 

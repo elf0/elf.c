@@ -55,7 +55,6 @@ static Byte *VU61_FromU5(Byte *pVU61, U8 u5){
 inline
 static Byte *VU61_FromU8(Byte *pVU61, U8 u8){
   U8 *p = pVU61;
-
   if(u8 > 0x1F)
     *p++ = 0x20;
 
@@ -66,14 +65,14 @@ static Byte *VU61_FromU8(Byte *pVU61, U8 u8){
 inline
 static Byte *VU61_FromU16(Byte *pVU61, U16 u16){
   U8 *p = pVU61;
-
   if(u16 > 0xFF){
+    U8 u8 = u16 >> 8;
     if(u16 > 0x1FFF){
       *p++ = 0x40;
-      *p++ = u16 >> 8;
+      *p++ = u8;
     }
     else
-      *p++ = u16 >> 8 | 0x20;
+      *p++ = u8 | 0x20;
   }
   else if(u16 > 0x1F)
     *p++ = 0x20;
@@ -114,9 +113,9 @@ inline
 static Byte *VU61_FromU61(Byte *pVU61, U64 u61){
   U8 u8 = u61 >> 8;
   U8 *p = pVU61;
-  if(u61 > 0x1FFFFFFF){
-    if(u61 > 0x1FFFFFFFFFFF){
-      if(u61 > 0x1FFFFFFFFFFFFF){
+  if(u61 > 0x1FFFFFFFULL){
+    if(u61 > 0x1FFFFFFFFFFFULL){
+      if(u61 > 0x1FFFFFFFFFFFFFULL){
         *p++ = u61 >> 56 | 0xE0;
         *p++ = u61 >> 48;
       }
@@ -130,7 +129,7 @@ static Byte *VU61_FromU61(Byte *pVU61, U64 u61){
       *p++ = u8;
     }
     else{
-      if(u61 > 0x1FFFFFFFFF){
+      if(u61 > 0x1FFFFFFFFFULL){
         *p++ = u61 >> 40 | 0xA0;
         *p++ = u61 >> 32;
       }
@@ -143,8 +142,8 @@ static Byte *VU61_FromU61(Byte *pVU61, U64 u61){
     }
   }
   else{
-    if(u61 > 0x1FFF){
-      if(u61 > 0x1FFFFF){
+    if(u61 > 0x1FFFULL){
+      if(u61 > 0x1FFFFFULL){
         *p++ = u61 >> 24 | 0x60;
         *p++ = u61 >> 16;
       }
@@ -153,7 +152,7 @@ static Byte *VU61_FromU61(Byte *pVU61, U64 u61){
 
       *p++ = u8;
     }
-    else  if(u61 > 0x1F)
+    else  if(u61 > 0x1FULL)
       *p++ = u8 | 0x20;
   }
   *p++ = u61;

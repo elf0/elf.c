@@ -2,9 +2,10 @@
 #include "VU15.h"
 #include "VU30.h"
 #include "VU61.h"
+#include "VU124.h"
 
 int main(int argc, char *argv[]){
-  Byte szVU[8];
+  Byte szVU[16];
   Byte szData[2] = {0xFF, 0xFF};
 
   VU15_Sum(szVU, szData, szData + 2);
@@ -162,6 +163,98 @@ int main(int argc, char *argv[]){
     VU61_ToU64(szVU, &r64);
     if(u64 != r64){
       fprintf(stderr, "%llX != %llX\n", u64, r64);
+      return 1;
+    }
+  }
+
+  //VU124/////////////////////////////////////////////////////////
+  U64 uL64, rH60, rL64;
+  for(uL64 = 0; uL64 < 0x10ULL; uL64 = (uL64 << 1) + 1){
+    //    fprintf(stderr, "%llX\n", uL64);
+
+    VU124_FromU4(szVU, uL64);
+    VU124_ToU124(szVU, &rH60, &rL64);
+    if(uL64 != rL64 || rH60){
+      fprintf(stderr, "%llX != %llX\n", uL64, rL64);
+      return 1;
+    }
+  }
+
+  for(uL64 = 0; uL64 < 0x100ULL; uL64 = (uL64 << 1) + 1){
+    //    fprintf(stderr, "%llX\n", uL64);
+
+    VU124_FromU8(szVU, uL64);
+    VU124_ToU124(szVU, &rH60, &rL64);
+    if(uL64 != rL64 || rH60){
+      fprintf(stderr, "%llX != %llX\n", uL64, rL64);
+      return 1;
+    }
+  }
+
+  for(uL64 = 0; uL64 < 0x10000ULL; uL64 = (uL64 << 1) + 1){
+    //    fprintf(stderr, "%llX\n", uL64);
+
+    VU124_FromU16(szVU, uL64);
+    VU124_ToU124(szVU, &rH60, &rL64);
+    if(uL64 != rL64 || rH60){
+      fprintf(stderr, "%llX != %llX\n", uL64, rL64);
+      return 1;
+    }
+  }
+
+  for(uL64 = 0; uL64 < 0x100000000ULL; uL64 = (uL64 << 1) + 1){
+    //    fprintf(stderr, "%llX\n", uL64);
+
+    VU124_FromU32(szVU, uL64);
+    VU124_ToU124(szVU, &rH60, &rL64);
+    if(uL64 != rL64 || rH60){
+      fprintf(stderr, "U32: %llX != %llX\n", uL64, rL64);
+      return 1;
+    }
+  }
+
+  for(uL64 = 0; uL64 < 0xFFFFFFFFFFFFFFFFULL; uL64 = (uL64 << 1) + 1){
+    //    fprintf(stderr, "%llX\n", uL64);
+
+    VU124_FromU64(szVU, uL64);
+    VU124_ToU124(szVU, &rH60, &rL64);
+    if(uL64 != rL64 || rH60){
+      fprintf(stderr, "U64: %llX != %llX\n", uL64, rL64);
+      return 1;
+    }
+  }
+  VU124_FromU64(szVU, uL64);
+  VU124_ToU124(szVU, &rH60, &rL64);
+  if(uL64 != rL64 || rH60){
+    fprintf(stderr, "U64: %llX != %llX\n", uL64, rL64);
+    return 1;
+  }
+
+  U64 uH60 = 0;
+  for(uL64 = 0; uL64 < 0xFFFFFFFFFFFFFFFFULL; uL64 = (uL64 << 1) + 1){
+    //    fprintf(stderr, "%llX\n", uL64);
+
+    VU124_FromU124(szVU, uH60, uL64);
+    VU124_ToU124(szVU, &rH60, &rL64);
+    if(uL64 != rL64 || uH60 != rH60){
+      fprintf(stderr, "U124L: %llX != %llX\n", uL64, rL64);
+      return 1;
+    }
+  }
+  VU124_FromU64(szVU, uL64);
+  VU124_ToU124(szVU, &rH60, &rL64);
+  if(uL64 != rL64 || uH60 != rH60){
+    fprintf(stderr, "U124L: %llX != %llX\n", uL64, rL64);
+    return 1;
+  }
+
+  for(uH60 = 0; uH60 < 0x1000000000000000ULL; uH60 = (uH60 << 1) + 1){
+    //    fprintf(stderr, "%llX\n", uH60);
+
+    VU124_FromU124(szVU, uH60, uL64);
+    VU124_ToU124(szVU, &rH60, &rL64);
+    if(uL64 != rL64 || uH60 != rH60){
+      fprintf(stderr, "U124H: %llX %llX != %llX %llX\n", uH60, uL64, rH60, rL64);
       return 1;
     }
   }
