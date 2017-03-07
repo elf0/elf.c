@@ -17,6 +17,54 @@ static U8 VU124_Bytes(const Byte *pVU124){
   return 1 + VU124_TailBytes(pVU124);
 }
 
+//VU124 range: [0, 0xFF]. Check it youself!
+inline
+static const Byte *VU124_ToU8(const Byte *pVU124, U8 *pU8){
+  const U8 *p = pVU124;
+  U8 uValue = *p++;
+  if(uValue > 0xF)
+    uValue = *p++;
+
+  *pU8 = uValue;
+  return p;
+}
+
+//VU124 range: [0, 0xFFFF]. Check it youself!
+inline
+static const Byte *VU124_ToU16(const Byte *pVU124, U16 *pU16){
+  const U8 *p = pVU124;
+  U16 uValue = *p++;
+  if(uValue > 0xF){
+    U8 uTail = uValue >> 4;
+    uValue &= 0xF;
+    do{
+      uValue <<= 8;
+      uValue |= *p++;
+    }while(--uTail);
+  }
+
+  *pU16 = uValue;
+  return p;
+}
+
+//VU124 range: [0, 0xFFFFFFFF]. Check it youself!
+inline
+static const Byte *VU124_ToU32(const Byte *pVU124, U32 *pU32){
+  const U8 *p = pVU124;
+  U32 uValue = *p++;
+  if(uValue > 0xF){
+    U8 uTail = uValue >> 4;
+    uValue &= 0xF;
+    do{
+      uValue <<= 8;
+      uValue |= *p++;
+    }while(--uTail);
+  }
+
+  *pU32 = uValue;
+  return p;
+}
+
 //VU124 range: [0, 0xFFFFFFFFFFFFFFFF]. Check it youself!
 inline
 static const Byte *VU124_ToU64(const Byte *pVU124, U64 *pU64){
