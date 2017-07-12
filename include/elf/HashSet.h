@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@elf0.org
+//EMail: elf@iamelf.com
 
 #include "RBTree.h"
 #include "HashSet_Node.h"
@@ -11,14 +11,21 @@
 typedef struct HashSet  HashSet;
 
 //User must implement "HashSet_Node_Allocate()" and "HashSet_Node_Compare()"
-static inline HashSet_Node *HashSet_Node_Allocate(void *pContext, const Byte *pKey, U32 uKey);
-static inline void HashSet_Node_Free(void *pContext, HashSet_Node *pNode);
-static inline I8 HashSet_Node_Compare(const Byte *pLeft, U32 uLeft, const HashSet_Node *pNode);
+inline
+static HashSet_Node *HashSet_Node_Allocate(void *pContext, const Byte *pKey, U32 uKey);
+inline
+static void HashSet_Node_Free(void *pContext, HashSet_Node *pNode);
+inline
+static I8 HashSet_Node_Compare(const Byte *pLeft, U32 uLeft, const HashSet_Node *pNode);
 
-static inline void HashSet_Initialize(HashSet *pSet);
-static inline void HashSet_Finalize(HashSet *pSet);
-static inline HashSet_Node *HashSet_Find(HashSet *pSet, const Byte *pKey, U32 uKey);
-static inline E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
+inline
+static void HashSet_Initialize(HashSet *pSet);
+inline
+static void HashSet_Finalize(HashSet *pSet);
+inline
+static HashSet_Node *HashSet_Find(HashSet *pSet, const Byte *pKey, U32 uKey);
+inline
+static E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
                              , void *pContext, HashSet_Node **ppNode);
 
 //Internal
@@ -35,7 +42,8 @@ struct HashSet{
   U32 uCount;
 };
 
-static inline void HashSet_Initialize(HashSet *pSet){
+inline
+static void HashSet_Initialize(HashSet *pSet){
   RBTree *pTree = pSet->trees;
   RBTree *ptEnd = pTree + SET_HASH_WIDTH;
   while(pTree != ptEnd)
@@ -44,7 +52,8 @@ static inline void HashSet_Initialize(HashSet *pSet){
   pSet->uCount = 0;
 }
 
-static inline void HashSet_Finalize(HashSet *pSet){
+inline
+static void HashSet_Finalize(HashSet *pSet){
   RBTree *pTree = pSet->trees;
   RBTree *ptEnd = pTree + SET_HASH_WIDTH;
   while(pTree != ptEnd)
@@ -53,11 +62,13 @@ static inline void HashSet_Finalize(HashSet *pSet){
   pSet->uCount = 0;
 }
 
-static inline HashSet_Node *HashSet_Find(HashSet *pSet, const Byte *pKey, U32 uKey){
+inline
+static HashSet_Node *HashSet_Find(HashSet *pSet, const Byte *pKey, U32 uKey){
   return (HashSet_Node*)RBTree_Find(&pSet->trees[SET_HASH_INDEX(uKey)], pKey, uKey);
 }
 
-static inline E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
+inline
+static E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
                              , void *pContext, HashSet_Node **ppNode){
   RBTree *pTree = &pSet->trees[SET_HASH_INDEX(uKey)];
   E8 e = pTree->fAdd(pTree, pKey, uKey
@@ -70,21 +81,25 @@ static inline E8 HashSet_Add(HashSet *pSet, const Byte *pKey, U32 uKey
 }
 
 //RBTree_Remove not implement yet
-static inline void HashSet_Remove(HashSet *pSet, U32 uKey, HashSet_Node *pNode){
+inline
+static void HashSet_Remove(HashSet *pSet, U32 uKey, HashSet_Node *pNode){
   RBTree *pTree = &pSet->trees[SET_HASH_INDEX(uKey)];
   RBTree_Remove(pTree, (RBTree_Node*)pNode);
   --pSet->uCount;
 }
 
-static inline RBTree_Node *RBTree_Node_Allocate(void *pContext, const Byte *pKey, U32 uKey){
+inline
+static RBTree_Node *RBTree_Node_Allocate(void *pContext, const Byte *pKey, U32 uKey){
   return (RBTree_Node*)HashSet_Node_Allocate(pContext, pKey, uKey);
 }
 
-static inline void RBTree_Node_Free(void *pContext, RBTree_Node *pNode){
+inline
+static void RBTree_Node_Free(void *pContext, RBTree_Node *pNode){
   HashSet_Node_Free(pContext, (HashSet_Node*)pNode);
 }
 
-static inline I8 RBTree_Node_Compare(const Byte *pKey, U32 uKey, const RBTree_Node *pNode){
+inline
+static I8 RBTree_Node_Compare(const Byte *pKey, U32 uKey, const RBTree_Node *pNode){
   return HashSet_Node_Compare(pKey, uKey, (HashSet_Node*)pNode);
 }
 

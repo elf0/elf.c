@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@elf0.org
+//EMail: elf@iamelf.com
 
 typedef struct{
  pthread_mutex_t mutex;

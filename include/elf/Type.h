@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@elf0.org
+//EMail: elf@iamelf.com
 
 #if defined(__GNUC__) \
     && defined(__BYTE_ORDER__)

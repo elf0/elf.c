@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@elf0.org
+//EMail: elf@iamelf.com
 
 //Structure: "Key0:Value0\nKey1:Value1\nKey2:Value2\n"
 

@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@elf0.org
+//EMail: elf@iamelf.com
 
 //Structure: "Key0:Value0\n.Key1:Value1\n..Key2:Value2\n:\n"
 //Buffer must ends with ":\n"

@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@elf0.org
+//EMail: elf@iamelf.com
 
 
 static inline C *UTF8_GetValidValue(C *pBegin, C *pEnd, C32 *pValue){

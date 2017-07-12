@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@elf0.org
+//EMail: elf@iamelf.com
 
 typedef enum{
     error_Error = 1, error_Argument, error_TimeOut, error_IllegalValue, error_Size,

@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@elf0.org
+//EMail: elf@iamelf.com
 
 #include "File.h"
 
@@ -48,7 +48,7 @@ typedef struct{
 }TextFile;
 
 static inline U32 TextFile_VerifyCode(const Byte *pBegin, const Byte *pEnd){
-    U32 nSequence = 0;
+    U8 nSequence = 0;
     U32 nResult = 0;
     const Byte *p = pBegin;
     while(p != pEnd)
