@@ -27,6 +27,8 @@ typedef struct{
 #endif
 }Dir_Entry;
 
+typedef E8 (*Dir_Entry_Handler)(void *pContext, const C *pName);
+
 inline
 static E8 Dir_Open(Dir *pDir, const C *pPath){
 #ifdef __linux__
@@ -55,6 +57,76 @@ static void Dir_Close(Dir *pDir){
  closedir(pDir->pDir);
 #else
 #endif
+}
+
+inline
+static E8 Dir_List(Dir *pDir, Dir_Entry_Handler handler, void *pContext){
+ E8 e;
+#ifdef __linux__
+ DIR *pDIR = pDir->pDir;
+ struct dirent *pEntry;
+ while((pEntry = readdir(pDIR))){
+   e = handler(pContext, (C*)pEntry->d_name);
+   if(e)
+    return e;
+ }
+#else
+#endif
+ return 0;
+}
+
+inline
+static E8 Dir_Files(Dir *pDir, Dir_Entry_Handler handler, void *pContext){
+ E8 e;
+#ifdef __linux__
+ DIR *pDIR = pDir->pDir;
+ struct dirent *pEntry;
+ while((pEntry = readdir(pDIR))){
+  if(pEntry->d_type == DT_REG){
+   e = handler(pContext, (C*)pEntry->d_name);
+   if(e)
+    return e;
+  }
+ }
+#else
+#endif
+ return 0;
+}
+
+inline
+static E8 Dir_Dirs(Dir *pDir, Dir_Entry_Handler handler, void *pContext){
+ E8 e;
+#ifdef __linux__
+ DIR *pDIR = pDir->pDir;
+ struct dirent *pEntry;
+ while((pEntry = readdir(pDIR))){
+  if(pEntry->d_type == DT_DIR){
+   e = handler(pContext, (C*)pEntry->d_name);
+   if(e)
+    return e;
+  }
+ }
+#else
+#endif
+ return 0;
+}
+
+inline
+static E8 Dir_Links(Dir *pDir, Dir_Entry_Handler handler, void *pContext){
+ E8 e;
+#ifdef __linux__
+ DIR *pDIR = pDir->pDir;
+ struct dirent *pEntry;
+ while((pEntry = readdir(pDIR))){
+  if(pEntry->d_type == DT_LNK){
+   e = handler(pContext, (C*)pEntry->d_name);
+   if(e)
+    return e;
+  }
+ }
+#else
+#endif
+ return 0;
 }
 
 inline
