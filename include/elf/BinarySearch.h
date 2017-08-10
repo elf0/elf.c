@@ -18,7 +18,7 @@ static U8 *U8s_Exists(U32 uSize, U8 *pBegin, U8 *pEnd, U8 uKey){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else
@@ -34,7 +34,7 @@ static B U8s_Find(U32 uSize, U8 *pBegin, U8 *pEnd, U8 uKey, U8 **ppPostion){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else{
@@ -53,7 +53,7 @@ static U16 *U16s_Exists(U32 uSize, U16 *pBegin, U16 *pEnd, U16 uKey){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else
@@ -69,7 +69,7 @@ static B U16s_Find(U32 uSize, U16 *pBegin, U16 *pEnd, U16 uKey, U16 **ppPostion)
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else{
@@ -88,7 +88,7 @@ static U32 *U32s_Exists(U32 uSize, U32 *pBegin, U32 *pEnd, U32 uKey){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else
@@ -104,7 +104,7 @@ static B U32s_Find(U32 uSize, U32 *pBegin, U32 *pEnd, U32 uKey, U32 **ppPostion)
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else{
@@ -123,7 +123,7 @@ static U64 *U64s_Exists(U32 uSize, U64 *pBegin, U64 *pEnd, U64 uKey){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else
@@ -139,7 +139,7 @@ static B U64s_Find(U32 uSize, U64 *pBegin, U64 *pEnd, U64 uKey, U64 **ppPostion)
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else{
@@ -158,7 +158,7 @@ static I8 *I8s_Exists(U32 uSize, I8 *pBegin, I8 *pEnd, I8 uKey){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else
@@ -174,7 +174,7 @@ static B I8s_Find(U32 uSize, I8 *pBegin, I8 *pEnd, I8 iKey, I8 **ppPostion){
   while(pBegin != pEnd){
     iValue = *(p = pBegin + (uSize >>= 1));
     if(iValue < iKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(iValue != iKey)
       pEnd = p;
     else{
@@ -193,7 +193,7 @@ static I16 *I16s_Exists(U32 uSize, I16 *pBegin, I16 *pEnd, I16 uKey){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else
@@ -209,7 +209,7 @@ static B I16s_Find(U32 uSize, I16 *pBegin, I16 *pEnd, I16 iKey, I16 **ppPostion)
   while(pBegin != pEnd){
     iValue = *(p = pBegin + (uSize >>= 1));
     if(iValue < iKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(iValue != iKey)
       pEnd = p;
     else{
@@ -228,7 +228,7 @@ static I32 *I32s_Exists(U32 uSize, I32 *pBegin, I32 *pEnd, I32 uKey){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else
@@ -244,7 +244,7 @@ static B I32s_Find(U32 uSize, I32 *pBegin, I32 *pEnd, I32 iKey, I32 **ppPostion)
   while(pBegin != pEnd){
     iValue = *(p = pBegin + (uSize >>= 1));
     if(iValue < iKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(iValue != iKey)
       pEnd = p;
     else{
@@ -263,7 +263,7 @@ static I64 *I64s_Exists(U32 uSize, I64 *pBegin, I64 *pEnd, I64 uKey){
   while(pBegin != pEnd){
     uValue = *(p = pBegin + (uSize >>= 1));
     if(uValue < uKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(uValue != uKey)
       pEnd = p;
     else
@@ -279,7 +279,7 @@ static B I64s_Find(U32 uSize, I64 *pBegin, I64 *pEnd, I64 iKey, I64 **ppPostion)
   while(pBegin != pEnd){
     iValue = *(p = pBegin + (uSize >>= 1));
     if(iValue < iKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(iValue != iKey)
       pEnd = p;
     else{
@@ -298,7 +298,7 @@ static F32 *F32s_Exists(U32 uSize, F32 *pBegin, F32 *pEnd, F32 fKey){
   while(pBegin != pEnd){
     fValue = *(p = pBegin + (uSize >>= 1));
     if(fValue < fKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(fValue != fKey)
       pEnd = p;
     else
@@ -314,7 +314,7 @@ static B F32s_Find(U32 uSize, F32 *pBegin, F32 *pEnd, F32 fKey, F32 **ppPostion)
   while(pBegin != pEnd){
     fValue = *(p = pBegin + (uSize >>= 1));
     if(fValue < fKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(fValue != fKey)
       pEnd = p;
     else{
@@ -333,7 +333,7 @@ static F64 *F64s_Exists(U32 uSize, F64 *pBegin, F64 *pEnd, F64 fKey){
   while(pBegin != pEnd){
     fValue = *(p = pBegin + (uSize >>= 1));
     if(fValue < fKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(fValue != fKey)
       pEnd = p;
     else
@@ -349,7 +349,7 @@ static B F64s_Find(U32 uSize, F64 *pBegin, F64 *pEnd, F64 fKey, F64 **ppPostion)
   while(pBegin != pEnd){
     fValue = *(p = pBegin + (uSize >>= 1));
     if(fValue < fKey)
-      pBegin = ++p;
+      pBegin = p;
     else if(fValue != fKey)
       pEnd = p;
     else{
