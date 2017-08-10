@@ -5,195 +5,359 @@
 //Author: elf
 //EMail: elf@iamelf.com
 
-//All uValues must not be 0!
+/*
+Find key in ascending sorted array
+*/
 
-static inline B U8Array_BinarySearch(U8 *pBegin, U8 *pEnd, U8 uValue, U8 **ppPosition){
-  U8 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(uValue > *pMid)
-      pB = pMid;
-    else if(uValue < *pMid)
-      pE = pMid;
-    else{
-      *ppPosition = pMid;
-      return true;
-    }
+#include "Type.h"
+
+inline
+static U8 *U8s_Exists(U32 uSize, U8 *pBegin, U8 *pEnd, U8 uKey){
+  U8 *p;
+  U8 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
+    else
+      return p;
   }
-
-  *ppPosition = pB;
-  return uValue == *pB;
+  return 0;
 }
 
-static inline B U16Array_BinarySearch(U16 *pBegin, U16 *pEnd, U16 uValue, U16 **ppPosition){
-  U16 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(uValue > *pMid)
-      pB = pMid;
-    else if(uValue < *pMid)
-      pE = pMid;
+inline
+static B U8s_Find(U32 uSize, U8 *pBegin, U8 *pEnd, U8 uKey, U8 **ppPostion){
+  U8 *p;
+  U8 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
     else{
-      *ppPosition = pMid;
-      return true;
+      *ppPostion = p;
+      return 1;
     }
   }
-
-  *ppPosition = pB;
-  return uValue == *pB;
+  *ppPostion = pBegin;
+  return 0;
 }
 
-static inline B U32Array_BinarySearch(U32 *pBegin, U32 *pEnd, U32 uValue, U32 **ppPosition){
-  U32 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(uValue > *pMid)
-      pB = pMid;
-    else if(uValue < *pMid)
-      pE = pMid;
-    else{
-      *ppPosition = pMid;
-      return true;
-    }
+inline
+static U16 *U16s_Exists(U32 uSize, U16 *pBegin, U16 *pEnd, U16 uKey){
+  U16 *p;
+  U16 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
+    else
+      return p;
   }
-
-  *ppPosition = pB;
-  return uValue == *pB;
+  return 0;
 }
 
-static inline B U64Array_BinarySearch(U64 *pBegin, U64 *pEnd, U64 uValue, U64 **ppPosition){
-  U64 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(uValue > *pMid)
-      pB = pMid;
-    else if(uValue < *pMid)
-      pE = pMid;
+inline
+static B U16s_Find(U32 uSize, U16 *pBegin, U16 *pEnd, U16 uKey, U16 **ppPostion){
+  U16 *p;
+  U16 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
     else{
-      *ppPosition = pMid;
-      return true;
+      *ppPostion = p;
+      return 1;
     }
   }
-
-  *ppPosition = pB;
-  return uValue == *pB;
+  *ppPostion = pBegin;
+  return 0;
 }
 
-static inline B I8Array_BinarySearch(I8 *pBegin, I8 *pEnd, I8 uValue, I8 **ppPosition){
-  I8 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(uValue > *pMid)
-      pB = pMid;
-    else if(uValue < *pMid)
-      pE = pMid;
-    else{
-      *ppPosition = pMid;
-      return true;
-    }
+inline
+static U32 *U32s_Exists(U32 uSize, U32 *pBegin, U32 *pEnd, U32 uKey){
+  U32 *p;
+  U32 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
+    else
+      return p;
   }
-
-  *ppPosition = pB;
-  return uValue == *pB;
+  return 0;
 }
 
-static inline B I16Array_BinarySearch(I16 *pBegin, I16 *pEnd, I16 iValue, I16 **ppPosition){
-  I16 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(iValue > *pMid)
-      pB = pMid;
-    else if(iValue < *pMid)
-      pE = pMid;
+inline
+static B U32s_Find(U32 uSize, U32 *pBegin, U32 *pEnd, U32 uKey, U32 **ppPostion){
+  U32 *p;
+  U32 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
     else{
-      *ppPosition = pMid;
-      return true;
+      *ppPostion = p;
+      return 1;
     }
   }
-
-  *ppPosition = pB;
-  return iValue == *pB;
+  *ppPostion = pBegin;
+  return 0;
 }
 
-static inline B I32Array_BinarySearch(I32 *pBegin, I32 *pEnd, I32 iValue, I32 **ppPosition){
-  I32 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(iValue > *pMid)
-      pB = pMid;
-    else if(iValue < *pMid)
-      pE = pMid;
-    else{
-      *ppPosition = pMid;
-      return true;
-    }
+inline
+static U64 *U64s_Exists(U32 uSize, U64 *pBegin, U64 *pEnd, U64 uKey){
+  U64 *p;
+  U64 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
+    else
+      return p;
   }
-
-  *ppPosition = pB;
-  return iValue == *pB;
+  return 0;
 }
 
-static inline B I64Array_BinarySearch(I64 *pBegin, I64 *pEnd, I64 iValue, I64 **ppPosition){
-  I64 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(iValue > *pMid)
-      pB = pMid;
-    else if(iValue < *pMid)
-      pE = pMid;
+inline
+static B U64s_Find(U32 uSize, U64 *pBegin, U64 *pEnd, U64 uKey, U64 **ppPostion){
+  U64 *p;
+  U64 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
     else{
-      *ppPosition = pMid;
-      return true;
+      *ppPostion = p;
+      return 1;
     }
   }
-
-  *ppPosition = pB;
-  return iValue == *pB;
+  *ppPostion = pBegin;
+  return 0;
 }
 
-static inline B F32Array_BinarySearch(F32 *pBegin, F32 *pEnd, F32 fValue, F32 **ppPosition){
-  F32 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(fValue > *pMid)
-      pB = pMid;
-    else if(fValue < *pMid)
-      pE = pMid;
-    else{
-      *ppPosition = pMid;
-      return true;
-    }
+inline
+static I8 *I8s_Exists(U32 uSize, I8 *pBegin, I8 *pEnd, I8 uKey){
+  I8 *p;
+  I8 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
+    else
+      return p;
   }
-
-  *ppPosition = pB;
-  return fValue == *pB;
+  return 0;
 }
 
-static inline B F64Array_BinarySearch(F64 *pBegin, F64 *pEnd, F64 fValue, F64 **ppPosition){
-  F64 *pB = pBegin, *pE = pEnd, *pMid;
-  U32 i;
-  while(i = pE - pB >> 1){
-    pMid = pB + i;
-    if(fValue > *pMid)
-      pB = pMid;
-    else if(fValue < *pMid)
-      pE = pMid;
+inline
+static B I8s_Find(U32 uSize, I8 *pBegin, I8 *pEnd, I8 iKey, I8 **ppPostion){
+  I8 *p;
+  I8 iValue;
+  while(pBegin != pEnd){
+    iValue = *(p = pBegin + (uSize >>= 1));
+    if(iValue < iKey)
+      pBegin = ++p;
+    else if(iValue != iKey)
+      pEnd = p;
     else{
-      *ppPosition = pMid;
-      return true;
+      *ppPostion = p;
+      return 1;
     }
   }
+  *ppPostion = pBegin;
+  return 0;
+}
 
-  *ppPosition = pB;
-  return fValue == *pB;
+inline
+static I16 *I16s_Exists(U32 uSize, I16 *pBegin, I16 *pEnd, I16 uKey){
+  I16 *p;
+  I16 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
+    else
+      return p;
+  }
+  return 0;
+}
+
+inline
+static B I16s_Find(U32 uSize, I16 *pBegin, I16 *pEnd, I16 iKey, I16 **ppPostion){
+  I16 *p;
+  I16 iValue;
+  while(pBegin != pEnd){
+    iValue = *(p = pBegin + (uSize >>= 1));
+    if(iValue < iKey)
+      pBegin = ++p;
+    else if(iValue != iKey)
+      pEnd = p;
+    else{
+      *ppPostion = p;
+      return 1;
+    }
+  }
+  *ppPostion = pBegin;
+  return 0;
+}
+
+inline
+static I32 *I32s_Exists(U32 uSize, I32 *pBegin, I32 *pEnd, I32 uKey){
+  I32 *p;
+  I32 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
+    else
+      return p;
+  }
+  return 0;
+}
+
+inline
+static B I32s_Find(U32 uSize, I32 *pBegin, I32 *pEnd, I32 iKey, I32 **ppPostion){
+  I32 *p;
+  I32 iValue;
+  while(pBegin != pEnd){
+    iValue = *(p = pBegin + (uSize >>= 1));
+    if(iValue < iKey)
+      pBegin = ++p;
+    else if(iValue != iKey)
+      pEnd = p;
+    else{
+      *ppPostion = p;
+      return 1;
+    }
+  }
+  *ppPostion = pBegin;
+  return 0;
+}
+
+inline
+static I64 *I64s_Exists(U32 uSize, I64 *pBegin, I64 *pEnd, I64 uKey){
+  I64 *p;
+  I64 uValue;
+  while(pBegin != pEnd){
+    uValue = *(p = pBegin + (uSize >>= 1));
+    if(uValue < uKey)
+      pBegin = ++p;
+    else if(uValue != uKey)
+      pEnd = p;
+    else
+      return p;
+  }
+  return 0;
+}
+
+inline
+static B I64s_Find(U32 uSize, I64 *pBegin, I64 *pEnd, I64 iKey, I64 **ppPostion){
+  I64 *p;
+  I64 iValue;
+  while(pBegin != pEnd){
+    iValue = *(p = pBegin + (uSize >>= 1));
+    if(iValue < iKey)
+      pBegin = ++p;
+    else if(iValue != iKey)
+      pEnd = p;
+    else{
+      *ppPostion = p;
+      return 1;
+    }
+  }
+  *ppPostion = pBegin;
+  return 0;
+}
+
+inline
+static F32 *F32s_Exists(U32 uSize, F32 *pBegin, F32 *pEnd, F32 fKey){
+  F32 *p;
+  F32 fValue;
+  while(pBegin != pEnd){
+    fValue = *(p = pBegin + (uSize >>= 1));
+    if(fValue < fKey)
+      pBegin = ++p;
+    else if(fValue != fKey)
+      pEnd = p;
+    else
+      return p;
+  }
+  return 0;
+}
+
+inline
+static B F32s_Find(U32 uSize, F32 *pBegin, F32 *pEnd, F32 fKey, F32 **ppPostion){
+  F32 *p;
+  F32 fValue;
+  while(pBegin != pEnd){
+    fValue = *(p = pBegin + (uSize >>= 1));
+    if(fValue < fKey)
+      pBegin = ++p;
+    else if(fValue != fKey)
+      pEnd = p;
+    else{
+      *ppPostion = p;
+      return 1;
+    }
+  }
+  *ppPostion = pBegin;
+  return 0;
+}
+
+inline
+static F64 *F64s_Exists(U32 uSize, F64 *pBegin, F64 *pEnd, F64 fKey){
+  F64 *p;
+  F64 fValue;
+  while(pBegin != pEnd){
+    fValue = *(p = pBegin + (uSize >>= 1));
+    if(fValue < fKey)
+      pBegin = ++p;
+    else if(fValue != fKey)
+      pEnd = p;
+    else
+      return p;
+  }
+  return 0;
+}
+
+inline
+static B F64s_Find(U32 uSize, F64 *pBegin, F64 *pEnd, F64 fKey, F64 **ppPostion){
+  F64 *p;
+  F64 fValue;
+  while(pBegin != pEnd){
+    fValue = *(p = pBegin + (uSize >>= 1));
+    if(fValue < fKey)
+      pBegin = ++p;
+    else if(fValue != fKey)
+      pEnd = p;
+    else{
+      *ppPostion = p;
+      return 1;
+    }
+  }
+  *ppPostion = pBegin;
+  return 0;
 }
 #endif //BINARYSEARCH_H
