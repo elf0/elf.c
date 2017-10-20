@@ -35,16 +35,16 @@ static inline E8 MMFile_Adjust(MMFile *pFile, I32 iSize);
 
 static inline E8 MMFile_Create(MMFile *pFile, const C *szPath, U32 uSize){
   File *pfFile = &pFile->file;
-  if(!File_Create(pfFile, szPath))
+  if(File_Create(pfFile, szPath))
     return 1;
   pFile->pBegin = null;
 
-  if(!File_SetSize(pfFile, uSize)){
+  if(File_SetSize(pfFile, uSize)){
     File_Close(pfFile);
     return 2;
   }
 
-  if(!File_ReadMeta(pfFile)){
+  if(File_ReadMeta(pfFile)){
     File_Close(pfFile);
     return 3;
   }
@@ -60,11 +60,11 @@ static inline E8 MMFile_Create(MMFile *pFile, const C *szPath, U32 uSize){
 
 static inline E8 MMFile_Open(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
-  if(!File_Open(pfFile, szPath))
+  if(File_Open(pfFile, szPath))
     return 1;
   pFile->pBegin = null;
 
-  if(!File_ReadMeta(pfFile)){
+  if(File_ReadMeta(pfFile)){
     File_Close(pfFile);
     return 2;
   }
@@ -79,30 +79,31 @@ static inline E8 MMFile_Open(MMFile *pFile, const C *szPath){
   return 0;
 }
 
-static inline E8 MMFile_Prepare(MMFile *pFile, const C *szPath, U32 uMinSize){
+static inline E8 MMFile_Prepare(MMFile *pFile, const C *szPath, U64 uMinSize){
   File *pfFile = &pFile->file;
-  if(!File_Prepare(pfFile, szPath))
+  if(File_Prepare(pfFile, szPath))
     return 1;
   pFile->pBegin = null;
 
-  if(!File_ReadMeta(pfFile)){
+  if(File_ReadMeta(pfFile)){
     File_Close(pfFile);
     return 2;
   }
 
   U64 uSize = File_GetSize(pfFile);
   if(uSize < uMinSize){
-   E8 e = MMFile_Adjust(pFile, uMinSize - uSize);
-   if(e){
-    File_Close(pfFile);
-    return e;
-   }
+    if(File_SetSize(pfFile, uMinSize)){
+      File_Close(pfFile);
+      return 3;
+    }
+    uSize = uMinSize;
+    pfFile->meta.st_size = uSize;
   }
 
-  Byte *pBegin = (Byte*)mmap(null, pfFile->meta.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
+  Byte *pBegin = (Byte*)mmap(null, uSize, PROT_READ | PROT_WRITE, MAP_SHARED, pfFile->fd, 0);
   if(pBegin == MAP_FAILED){
     File_Close(pfFile);
-    return 3;
+    return 4;
   }
   pFile->pBegin = pBegin;
   return 0;
@@ -110,12 +111,12 @@ static inline E8 MMFile_Prepare(MMFile *pFile, const C *szPath, U32 uMinSize){
 
 static inline E8 MMFile_OpenForRead(MMFile *pFile, const C *szPath){
   File *pfFile = &pFile->file;
-  if(!File_OpenForRead(pfFile, szPath))
+  if(File_OpenForRead(pfFile, szPath))
     return 1;
 
   pFile->pBegin = null;
 #ifdef __linux__
-  if(!File_ReadMeta(pfFile)){
+  if(File_ReadMeta(pfFile)){
     File_Close(pfFile);
     return 2;
   }
@@ -172,7 +173,7 @@ static inline E8 MMFile_Adjust(MMFile *pFile, I32 iSize){
   munmap(pFile->pBegin, uFileSize);
 
   uFileSize += iSize;
-  if(!File_SetSize(pfFile, uFileSize)){
+  if(File_SetSize(pfFile, uFileSize)){
     pFile->pBegin = null;
     return 1;
   }
@@ -197,7 +198,7 @@ static inline B MMFile_FlushData(MMFile *pFile){
 }
 
 static inline B MMFile_FlushRange(MMFile *pFile, Byte *pBegin, U64 uOffset){
-//  long lPageSize = sysconf(_SC_PAGESIZE);
+  //  long lPageSize = sysconf(_SC_PAGESIZE);
   return msync(pBegin, uOffset, MS_SYNC) == 0;
 }
 

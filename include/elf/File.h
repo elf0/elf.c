@@ -25,262 +25,356 @@ typedef struct{
 #endif
 }File;
 
-static inline B File_Exists(const C *szPath){
+inline
+static E8 File_Exists(const C *szPath){
 #ifdef __linux__
-  return access((const char*)szPath, F_OK) == 0;
+  return access((const char*)szPath, F_OK) != 0;
 #else
 #endif
 }
 
-static inline B File_Delete(const C *szPath){
+inline
+static E8 File_Delete(const C *szPath){
 #ifdef __linux__
-  return unlink((const char*)szPath) == 0;
+  return unlink((const char*)szPath) != 0;
 #else
-  return DeleteFileA((LPCSTR)szPath);
+  return !DeleteFileA((LPCSTR)szPath);
 #endif
 }
 
-static inline B File_Link(const C *pszOldName, const C *pszNewName){
+inline
+static E8 File_Link(const C *pszOldName, const C *pszNewName){
 #ifdef __linux__
-  return link((const char*)pszOldName, (const char*)pszNewName) == 0;
+  return link((const char*)pszOldName, (const char*)pszNewName) != 0;
 #else
 #endif
 }
 
-static inline B File_Rename(const C *pszOldName, const C *pszNewName){
+inline
+static E8 File_Rename(const C *pszOldName, const C *pszNewName){
 #ifdef __linux__
-  if(!File_Link(pszOldName, pszNewName))
-    return false;
+  E8 e = File_Link(pszOldName, pszNewName);
+  if(e)
+    return e;
   return File_Delete(pszOldName);
 #else
 #endif
 }
 
-static inline B File_Create(File *pFile, const C *szPath){
+inline
+static E8 File_Create(File *pFile, const C *szPath){
 #ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_RDWR, 0644);
-  return pFile->fd != -1;
+  int fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_RDWR, 0644);
+  if(fd < 0)
+    return errno;
+
+  pFile->fd = fd;
+  return 0;
 #else
   pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-  return pFile->handle != INVALID_HANDLE_VALUE;
+  return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
-static inline B File_Open(File *pFile, const C *szPath){
+inline
+static E8 File_CreateForWrite(File *pFile, const C *szPath){
 #ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_RDWR);
-  return pFile->fd != -1;
-#else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  return pFile->handle != INVALID_HANDLE_VALUE;
-#endif
-}
+  int fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+  if(fd < 0)
+    return errno;
 
-static inline B File_OpenForRead(File *pFile, const C *szPath){
-#ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_RDONLY);
-  return pFile->fd != -1;
-#else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  return pFile->handle != INVALID_HANDLE_VALUE;
-#endif
-}
-
-static inline B File_CreateForWrite(File *pFile, const C *szPath){
-#ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_WRONLY, 0644);
-  return pFile->fd != -1;
+  pFile->fd = fd;
+  return 0;
 #else
   pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-  return pFile->handle != INVALID_HANDLE_VALUE;
+  return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
-static inline B File_OpenForWrite(File *pFile, const C *szPath){
+inline
+static E8 File_Prepare(File *pFile, const C *szPath){
 #ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_WRONLY);
-  return pFile->fd != -1;
-#else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  return pFile->handle != INVALID_HANDLE_VALUE;
-#endif
-}
+  int fd = open((const char*)szPath, O_RDWR);
+  if(fd < 0){
+    E8 e = errno;
+    if(e != ENOENT)
+      return e;
 
-static inline B File_PrepareForWrite(File *pFile, const C *szPath){
-#ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_WRONLY);
-  if(pFile->fd == -1){
-    if(errno != ENOENT)
-      return false;
-
-    pFile->fd = open((const char*)szPath, O_CREAT | O_WRONLY, 0644);
+    fd = open((const char*)szPath, O_CREAT | O_RDWR, 0644);
+    if(fd < 0)
+      return errno;
   }
 
-  return pFile->fd != -1;
-#else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-  return pFile->handle != INVALID_HANDLE_VALUE;
-#endif
-}
-
-static inline B File_OpenForAppending(File *pFile, const C *szPath){
-#ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_APPEND);
-  return pFile->fd != -1;
-#else
-#endif
-}
-
-static inline B File_PrepareForAppending(File *pFile, const C *szPath){
-#ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_APPEND);
-  if(pFile->fd == -1){
-    if(errno != ENOENT)
-      return false;
-
-    pFile->fd = open((const char*)szPath, O_CREAT | O_APPEND, 0644);
-  }
-
-  return pFile->fd != -1;
-#else
-#endif
-}
-
-static inline B File_Prepare(File *pFile, const C *szPath){
-#ifdef __linux__
-  pFile->fd = open((const char*)szPath, O_RDWR);
-  if(pFile->fd != -1)
-    return true;
-
-  if(errno != ENOENT)
-    return false;
-
-  pFile->fd = open((const char*)szPath, O_CREAT | O_RDWR, 0644);
-  return pFile->fd != -1;
+  pFile->fd = fd;
+  return 0;
 #else
   pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-  return pFile->handle != INVALID_HANDLE_VALUE;
+  return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
-static inline void File_OpenStdIn(File *pFile){
+inline
+static E8 File_PrepareForAppending(File *pFile, const C *szPath){
+#ifdef __linux__
+  int fd = open((const char*)szPath, O_APPEND);
+  if(fd < 0){
+    E8 e = errno;
+    if(e != ENOENT)
+      return e;
+
+    fd = open((const char*)szPath, O_CREAT | O_APPEND, 0644);
+    if(fd < 0)
+      return errno;
+  }
+
+  pFile->fd = fd;
+  return 0;
+#else
+#endif
+}
+
+inline
+static E8 File_PrepareForWrite(File *pFile, const C *szPath){
+#ifdef __linux__
+  int fd = open((const char*)szPath, O_WRONLY);
+  if(fd < 0){
+    E8 e = errno;
+    if(e != ENOENT)
+      return e;
+
+    fd = open((const char*)szPath, O_CREAT | O_WRONLY, 0644);
+  }
+
+  pFile->fd = fd;
+  return 0;
+#else
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle == INVALID_HANDLE_VALUE;
+#endif
+}
+
+inline
+static E8 File_Open(File *pFile, const C *szPath){
+#ifdef __linux__
+  int fd = open((const char*)szPath, O_RDWR);
+  if(fd < 0)
+    return errno;
+
+  pFile->fd = fd;
+  return 0;
+#else
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle == INVALID_HANDLE_VALUE;
+#endif
+}
+
+inline
+static E8 File_OpenForAppending(File *pFile, const C *szPath){
+#ifdef __linux__
+  int fd = open((const char*)szPath, O_APPEND);
+  if(fd < 0)
+    return errno;
+
+  pFile->fd = fd;
+  return 0;
+#else
+#endif
+}
+
+inline
+static E8 File_OpenForRead(File *pFile, const C *szPath){
+#ifdef __linux__
+  int fd = open((const char*)szPath, O_RDONLY);
+  if(fd < 0)
+    return errno;
+
+  pFile->fd = fd;
+  return 0;
+#else
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle == INVALID_HANDLE_VALUE;
+#endif
+}
+
+inline
+static E8 File_OpenForWrite(File *pFile, const C *szPath){
+#ifdef __linux__
+  int fd = open((const char*)szPath, O_WRONLY);
+  if(fd < 0)
+    return errno;
+
+  pFile->fd = fd;
+  return 0;
+#else
+  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  return pFile->handle == INVALID_HANDLE_VALUE;
+#endif
+}
+
+inline
+static void File_OpenStdIn(File *pFile){
 #ifdef __linux__
   pFile->fd = 0;
 #else
 #endif
 }
 
-static inline void File_OpenStdOut(File *pFile){
+inline
+static void File_OpenStdOut(File *pFile){
 #ifdef __linux__
   pFile->fd = 1;
 #else
 #endif
 }
 
-static inline void File_OpenStdError(File *pFile){
+inline
+static void File_OpenStdError(File *pFile){
 #ifdef __linux__
   pFile->fd = 2;
 #else
 #endif
 }
 
-static inline void File_Close(File *pFile){
+inline
+static void File_Close(File *pFile){
 #ifdef __linux__
   close(pFile->fd);
   pFile->fd = -1;
 #else
   CloseHandle(pFile->handle);
+  pFile->handle = INVALID_HANDLE_VALUE;
 #endif
 }
 
-static inline I64 File_Seek(File *pFile, U64 uOffset){
+inline
+static I64 File_Seek(File *pFile, U64 uOffset){
 #ifdef __linux__
   return lseek(pFile->fd, uOffset, SEEK_SET);
 #else
 #endif
 }
 
-static inline I64 File_Offset(File *pFile){
+inline
+static I64 File_Offset(File *pFile){
 #ifdef __linux__
   return lseek(pFile->fd, 0, SEEK_CUR);
 #else
 #endif
 }
 
-static inline I64 File_SeekToEnd(File *pFile){
+inline
+static I64 File_SeekToEnd(File *pFile){
 #ifdef __linux__
   return lseek(pFile->fd, 0, SEEK_END);
 #else
 #endif
 }
 
-static inline B File_ReadMeta(File *pFile){
+inline
+static E8 File_ReadMeta(File *pFile){
 #ifdef __linux__
-  return fstat(pFile->fd, &pFile->meta) == 0;
+  if(fstat(pFile->fd, &pFile->meta) != 0)
+    return errno;
+
+  return 0;
 #else
 #endif
 }
 
-static inline U64 File_GetSize(File *pFile){
+inline
+static U64 File_GetSize(File *pFile){
 #ifdef __linux__
   return pFile->meta.st_size;
 #else
 #endif
 }
 
-static inline B File_SetSize(File *pFile, U64 uSize){
+inline
+static E8 File_SetSize(File *pFile, U64 uSize){
 #ifdef __linux__
-  return ftruncate(pFile->fd, uSize) == 0;
+  if(ftruncate(pFile->fd, uSize) != 0)
+    return errno;
+
+  pFile->meta.st_size = uSize;
+  return 0;
 #else
 #endif
 }
 
-static inline B File_Flush(File *pFile){
+inline
+static E8 File_Flush(File *pFile){
 #ifdef __linux__
-  return fsync(pFile->fd) == 0;
+  if(fsync(pFile->fd) != 0)
+    return errno;
+
+  return 0;
 #else
 #endif
 }
 
-static inline B File_FlushData(File *pFile){
+inline
+static E8 File_FlushData(File *pFile){
 #ifdef __linux__
-  return fdatasync(pFile->fd) == 0;
+  if(fdatasync(pFile->fd) != 0)
+    return errno;
+
+  return 0;
 #else
 #endif
 }
 
-static inline I32 File_Read(const File *pFile, Byte *pBuffer, U32 uSize){
+inline
+static R64 File_Read(const File *pFile, Byte *pBuffer, U64 uSize){
 #ifdef __linux__
-  return read(pFile->fd, pBuffer, uSize);
+  R64 rRead = read(pFile->fd, pBuffer, uSize);
+  if(rRead < 0)
+    return -errno;
+
+  return rRead;
 #else
-  U32 uBytes;
+  DWORD uBytes;
   if(ReadFile(pFile->handle, pBuffer, uSize, (LPDWORD)&uBytes, NULL))
     return uBytes;
   return -1;
 #endif
 }
 
-static inline I32 File_ReadFrom(const File *pFile, U64 uOffset, Byte *pBuffer, U32 uSize){
+inline
+static R64 File_ReadFrom(const File *pFile, U64 uOffset, Byte *pBuffer, U64 uSize){
 #ifdef __linux__
-  return pread(pFile->fd, pBuffer, uSize, uOffset);
+  R64 rRead = pread(pFile->fd, pBuffer, uSize, uOffset);
+  if(rRead < 0)
+    return -errno;
+
+  return rRead;
 #else
 #endif
 }
 
-static inline I32 File_Write(const File *pFile, const Byte *pData, U32 uSize){
+inline
+static R64 File_Write(const File *pFile, const Byte *pData, U64 uSize){
 #ifdef __linux__
-  return write(pFile->fd, pData, uSize);
+  R64 rWrote = write(pFile->fd, pData, uSize);
+  if(rWrote < 0)
+    return -errno;
+
+  return rWrote;
 #else
-  U32 uBytes;
+  DWORD uBytes;
   if(WriteFile(pFile->handle, pData, uSize, (LPDWORD)&uBytes, NULL))
     return uBytes;
   return -1;
 #endif
 }
 
-static inline I32 File_WriteTo(const File *pFile, U64 uOffset, const Byte *pData, U32 uSize){
+inline
+static R64 File_WriteTo(const File *pFile, U64 uOffset, const Byte *pData, U64 uSize){
 #ifdef __linux__
-  return pwrite(pFile->fd, pData, uSize, uOffset);
+  R64 rWrote = pwrite(pFile->fd, pData, uSize, uOffset);
+  if(rWrote < 0)
+    return -errno;
+
+  return rWrote;
 #else
 #endif
 }
@@ -290,30 +384,50 @@ typedef struct{
   U uBytes;
 }FileData;
 
-static inline I32 File_ReadDatas(const File *pFile, const FileData *szBuffers, U32 uBuffers){
+inline
+static R64 File_ReadDatas(const File *pFile, const FileData *szBuffers, U32 uBuffers){
 #ifdef __linux__
-  return readv(pFile->fd, (struct iovec*)szBuffers, uBuffers);
+  R64 rRead = readv(pFile->fd, (struct iovec*)szBuffers, uBuffers);
+  if(rRead < 0)
+    return -errno;
+
+  return rRead;
 #else
 #endif
 }
 
-static inline I32 File_ReadDatasFrom(const File *pFile, U64 uOffset, const FileData *szBuffers, U32 uBuffers){
+inline
+static R64 File_ReadDatasFrom(const File *pFile, U64 uOffset, const FileData *szBuffers, U32 uBuffers){
 #ifdef __linux__
-  return preadv(pFile->fd, (struct iovec*)szBuffers, uBuffers, uOffset);
+  R64 rRead = preadv(pFile->fd, (struct iovec*)szBuffers, uBuffers, uOffset);
+  if(rRead < 0)
+    return -errno;
+
+  return rRead;
 #else
 #endif
 }
 
-static inline I32 File_WriteDatas(const File *pFile, const FileData *szDatas, U32 uDatas){
+inline
+static R64 File_WriteDatas(const File *pFile, const FileData *szDatas, U32 uDatas){
 #ifdef __linux__
-  return writev(pFile->fd, (struct iovec*)szDatas, uDatas);
+  R64 rWrote = writev(pFile->fd, (struct iovec*)szDatas, uDatas);
+  if(rWrote < 0)
+    return -errno;
+
+  return rWrote;
 #else
 #endif
 }
 
-static inline I32 File_WriteDatasTo(const File *pFile, U64 uOffset, const FileData *szDatas, U32 uDatas){
+inline
+static R64 File_WriteDatasTo(const File *pFile, U64 uOffset, const FileData *szDatas, U32 uDatas){
 #ifdef __linux__
-  return pwritev(pFile->fd, (struct iovec*)szDatas, uDatas, uOffset);
+  R64 rWrote = pwritev(pFile->fd, (struct iovec*)szDatas, uDatas, uOffset);
+  if(rWrote < 0)
+    return -errno;
+
+  return rWrote;
 #else
 #endif
 }
