@@ -26,19 +26,19 @@ typedef struct{
 }File;
 
 inline
-static E8 File_Exists(const C *szPath){
+static E8 File_Exists(const C *pPath){
 #ifdef __linux__
-  return access((const char*)szPath, F_OK) != 0;
+  return access((const char*)pPath, F_OK) != 0;
 #else
 #endif
 }
 
 inline
-static E8 File_Delete(const C *szPath){
+static E8 File_Delete(const C *pPath){
 #ifdef __linux__
-  return unlink((const char*)szPath) != 0;
+  return unlink((const char*)pPath) != 0;
 #else
-  return !DeleteFileA((LPCSTR)szPath);
+  return !DeleteFileA((LPCSTR)pPath);
 #endif
 }
 
@@ -62,45 +62,45 @@ static E8 File_Rename(const C *pszOldName, const C *pszNewName){
 }
 
 inline
-static E8 File_Create(File *pFile, const C *szPath){
+static E8 File_Create(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_RDWR, 0644);
+  int fd = open((const char*)pPath, O_CREAT | O_TRUNC | O_RDWR, 0644);
   if(fd < 0)
     return errno;
 
   pFile->fd = fd;
   return 0;
 #else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)pPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
 inline
-static E8 File_CreateForWrite(File *pFile, const C *szPath){
+static E8 File_CreateForWrite(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+  int fd = open((const char*)pPath, O_CREAT | O_TRUNC | O_WRONLY, 0644);
   if(fd < 0)
     return errno;
 
   pFile->fd = fd;
   return 0;
 #else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)pPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
 inline
-static E8 File_Prepare(File *pFile, const C *szPath){
+static E8 File_Prepare(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_RDWR);
+  int fd = open((const char*)pPath, O_RDWR);
   if(fd < 0){
     E8 e = errno;
     if(e != ENOENT)
       return e;
 
-    fd = open((const char*)szPath, O_CREAT | O_RDWR, 0644);
+    fd = open((const char*)pPath, O_CREAT | O_RDWR, 0644);
     if(fd < 0)
       return errno;
   }
@@ -108,21 +108,21 @@ static E8 File_Prepare(File *pFile, const C *szPath){
   pFile->fd = fd;
   return 0;
 #else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)pPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
 inline
-static E8 File_PrepareForAppending(File *pFile, const C *szPath){
+static E8 File_PrepareForAppending(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_APPEND);
+  int fd = open((const char*)pPath, O_APPEND);
   if(fd < 0){
     E8 e = errno;
     if(e != ENOENT)
       return e;
 
-    fd = open((const char*)szPath, O_CREAT | O_APPEND, 0644);
+    fd = open((const char*)pPath, O_CREAT | O_APPEND, 0644);
     if(fd < 0)
       return errno;
   }
@@ -134,44 +134,44 @@ static E8 File_PrepareForAppending(File *pFile, const C *szPath){
 }
 
 inline
-static E8 File_PrepareForWrite(File *pFile, const C *szPath){
+static E8 File_PrepareForWrite(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_WRONLY);
+  int fd = open((const char*)pPath, O_WRONLY);
   if(fd < 0){
     E8 e = errno;
     if(e != ENOENT)
       return e;
 
-    fd = open((const char*)szPath, O_CREAT | O_WRONLY, 0644);
+    fd = open((const char*)pPath, O_CREAT | O_WRONLY, 0644);
   }
 
   pFile->fd = fd;
   return 0;
 #else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)pPath, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
 inline
-static E8 File_Open(File *pFile, const C *szPath){
+static E8 File_Open(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_RDWR);
+  int fd = open((const char*)pPath, O_RDWR);
   if(fd < 0)
     return errno;
 
   pFile->fd = fd;
   return 0;
 #else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)pPath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
 inline
-static E8 File_OpenForAppending(File *pFile, const C *szPath){
+static E8 File_OpenForAppending(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_APPEND);
+  int fd = open((const char*)pPath, O_APPEND);
   if(fd < 0)
     return errno;
 
@@ -182,31 +182,31 @@ static E8 File_OpenForAppending(File *pFile, const C *szPath){
 }
 
 inline
-static E8 File_OpenForRead(File *pFile, const C *szPath){
+static E8 File_OpenForRead(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_RDONLY);
+  int fd = open((const char*)pPath, O_RDONLY);
   if(fd < 0)
     return errno;
 
   pFile->fd = fd;
   return 0;
 #else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)pPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
 
 inline
-static E8 File_OpenForWrite(File *pFile, const C *szPath){
+static E8 File_OpenForWrite(File *pFile, const C *pPath){
 #ifdef __linux__
-  int fd = open((const char*)szPath, O_WRONLY);
+  int fd = open((const char*)pPath, O_WRONLY);
   if(fd < 0)
     return errno;
 
   pFile->fd = fd;
   return 0;
 #else
-  pFile->handle = CreateFileA((LPCSTR)szPath, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  pFile->handle = CreateFileA((LPCSTR)pPath, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   return pFile->handle == INVALID_HANDLE_VALUE;
 #endif
 }
