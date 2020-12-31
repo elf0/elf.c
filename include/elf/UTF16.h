@@ -49,7 +49,7 @@ static C32 UTF16_Surrogate(C32 lead, C16 trail) {
 }
 
 inline
-static U64 UTF8_Count(const C16 *p, const C16 *pEnd) {
+static U64 UTF16_Count(const C16 *p, const C16 *pEnd) {
     U64 uCount = 0;
     while (p != pEnd) {
         ++uCount;
@@ -73,10 +73,10 @@ static B UTF16_Valid(const C16 *p, const C16 *pEnd) {
 
 inline
 static C32 UTF16_Parse(const C16 **ppBegin, const C16 *pEnd) {
-    C16 *p = *ppBegin;
+    const C16 *p = *ppBegin;
     C32 c32 = *p++;
     if ((c32 >> 11) == 0x1B) {
-        if (c > 0xDBFF || p == pEnd)
+        if (c32 > 0xDBFF || p == pEnd)
             c32 |= 0x80000000;
         else {
             C16 c16 = *p++;
@@ -92,13 +92,13 @@ static C32 UTF16_Parse(const C16 **ppBegin, const C16 *pEnd) {
     return c32;
 }
 inline
-static U64 UTF8_ParseCount(const C **ppBegin, const C *pEnd) {
+static U64 UTF16_ParseCount(const C16 **ppBegin, const C16 *pEnd) {
     U64 uCount = 0;
-    C16 *p = *ppBegin;
+    const C16 *p = *ppBegin;
     while (p != pEnd) {
         C32 c32 = *p++;
         if ((c32 >> 11) == 0x1B) {
-            if (c > 0xDBFF || p == pEnd) {
+            if (c32 > 0xDBFF || p == pEnd) {
                 --p;
                 uCount |= 0x8000000000000000;
                 break;
@@ -124,6 +124,11 @@ static C32 UTF16_Read(const C16 **ppString) {
         c32 = UTF16_Surrogate(c32, *p++);
     *ppString = p;
     return c32;
+}
+
+inline
+static U8 UTF16_Bytes(C32 value) {
+    return value < 0x10000? 2 : 4;
 }
 
 //caller must input valid utf value

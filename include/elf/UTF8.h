@@ -108,6 +108,11 @@ static C32 UTF8_Read(const C **ppString) {
     return c32;
 }
 
+inline
+static U8 UTF8_Bytes(C32 value) {
+    return value < 0x80? 1 : value < 0x0800? 2 : value < 0x10000? 3 : 4;
+}
+
 //pBuffer size should >= 4 bytes
 //caller must input valid utf c32
 inline
