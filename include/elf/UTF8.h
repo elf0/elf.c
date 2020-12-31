@@ -5,69 +5,95 @@
 //Author: elf
 //EMail: elf@iamelf.com
 
-// Max value: 0x10FFFF
+// Max unicode: 0x10FFFF
 // Max utf8: F4 8F BF BF
+
+#define UNICODE_INVALID(c32) (c32 > 0x10FFFF)
 
 inline
 static const C *UTF8_Skip(const C *p) {
-    U8 u8 = *p++;
-    if (u8 < 0x80)
-        return p;
+    U8 u8 = *p;
+    if (u8 < 0x80) // 0xxxxxxx
+        return p + 1;
 
-    ++p;
-    if (u8 < 0xE0)//110xxxxx 10xxxxxx
-        return p;
+    if (u8 < 0xE0) // 110xxxxx 10xxxxxx
+        return p + 2;
 
-    ++p;
-    if (u8 < 0xF0)//1110xxxx 10xxxxxx 10xxxxxx
-        return p;
+    if (u8 < 0xF0) // 1110xxxx 10xxxxxx 10xxxxxx
+        return p + 3;
 
-    return ++p;
+    return p + 4; // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 }
 
 inline
 static const C *UTF8_SkipTail(C cHead, const C *pTail) {
-    ++pTail;
-    if (cHead < 0xE0)//110xxxxx 10xxxxxx
-        return pTail;
+    if (cHead < 0xE0) // 110xxxxx 10xxxxxx
+        return pTail + 1;
 
-    ++pTail;
-    if (cHead < 0xF0)//1110xxxx 10xxxxxx 10xxxxxx
-        return pTail;
+    if (cHead < 0xF0) // 1110xxxx 10xxxxxx 10xxxxxx
+        return pTail + 2;
 
-    return ++pTail;
+    return pTail + 3; // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 }
 
 inline
 static B UTF8_Valid(const C *p, const C *pEnd) {
-    while(p != pEnd) {
-        C c = *p++;
-        if (c < 0x80)//0xxxxxxx
-            continue;
-
-        if (c < 0xC0)//110xxxxx 10xxxxxx
-            return 0;
-
-        if (c > 0xDF) {//1110xxxx 10xxxxxx 10xxxxxx
-            if (c > 0xEF) {//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                if (c > 0xF4)
+    while (p != pEnd) {
+        C32 c32 = *p++;
+        // 0xxxxxxx
+        if (c32 > 0x7F) {
+            if (c32 < 0xE0) { // 110xxxxx 10xxxxxx
+                if (c32 < 0xC2 || p == pEnd)
                     return 0;
-
-                if (p == pEnd || (*p++ & 0xC0) != 0x80)
-                    return 0;
+                else {
+                    C t = *p++;
+                    if (t < 0x80 || t > 0xBF)
+                        return 0;
+                }
             }
-            if (p == pEnd || (*p++ & 0xC0) != 0x80)
+            else if (c32 < 0xF0) { // 1110xxxx 10xxxxxx 10xxxxxx
+                if (p + 1 >= pEnd)
+                    return 0;
+                else {
+                    C t0 = *p++;
+                    if (t0 < 0x80 || t0 > 0xBF || (t0 < 0xA0 && c32 == 0xE0))
+                        return 0;
+                    else {
+                        C t1 = *p++;
+                        if (t1 < 0x80 || t1 > 0xBF)
+                            return 0;
+                    }
+                }
+            }
+            else if (c32 < 0xF5) { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                if (p + 2 >= pEnd)
+                    return 0;
+                else {
+                    C t0 = *p++;
+                    if (t0 < 0x80 || t0 > 0xBF || (t0 > 0x8F && c32 == 0xF4) || (t0 < 0x90 && c32 == 0xF0))
+                        return 0;
+                    else {
+                        C t1 = *p++;
+                        if (t1 < 0x80 || t1 > 0xBF)
+                            return 0;
+                        else {
+                            C t2 = *p++;
+                            if (t2 < 0x80 || t2 > 0xBF)
+                                return 0;
+                        }
+                    }
+                }
+            }
+            else
                 return 0;
         }
-        if (p == pEnd || (*p++ & 0xC0) != 0x80)
-            return 0;
     }
     return 1;
 }
 
 inline
-static U UTF8_Count(const C *p, const C *pEnd) {
-    U uCount = 0;
+static U64 UTF8_Count(const C *p, const C *pEnd) {
+    U64 uCount = 0;
     while (p != pEnd) {
         ++uCount;
         C c = *p++;
@@ -84,167 +110,266 @@ static U UTF8_Count(const C *p, const C *pEnd) {
 }
 
 inline
-static const C *UTF8_ParseCount(const C *pBegin, const C *pEnd, U *puCount) {
-    U uCount = 0;
-    const C *p = pBegin;
+static C32 UTF8_Parse(const C **ppBegin, const C *pEnd) {
+    const C *p = *ppBegin;
+    C32 c32 = *p++;
+    // 0xxxxxxx
+    if (c32 > 0x7F) {
+        if (c32 < 0xE0) { // 110xxxxx 10xxxxxx
+            if (c32 < 0xC2 || p == pEnd)
+                c32 |= 0x80000000;
+            else {
+                C t = *p++;
+                if (t < 0x80 || t > 0xBF) {
+                    --p;
+                    c32 |= 0x80000000;
+                }
+                else {
+                    t &= 0x3F;
+                    c32 &= 0x1F;
+                    c32 <<= 6;
+                    c32 |= t;
+                }
+            }
+        }
+        else if (c32 < 0xF0) { // 1110xxxx 10xxxxxx 10xxxxxx
+            if (p + 1 >= pEnd)
+                c32 |= 0x80000000;
+            else {
+                C t0 = *p++;
+                if (t0 < 0x80 || t0 > 0xBF || (t0 < 0xA0 && c32 == 0xE0)) {
+                    --p;
+                    c32 |= 0x80000000;
+                }
+                else {
+                    C t1 = *p++;
+                    if (t1 < 0x80 || t1 > 0xBF) {
+                        p -= 2;
+                        c32 |= 0x80000000;
+                    }
+                    else {
+                        c32 &= 0x0F;
+                        c32 <<= 6;
+                        t0 &= 0x3F;
+                        c32 |= t0;
+                        c32 <<= 6;
+                        t1 &= 0x3F;
+                        c32 |= t1;
+                    }
+                }
+            }
+        }
+        else if (c32 < 0xF5) { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+            if (p + 2 >= pEnd)
+                c32 |= 0x80000000;
+            else {
+                C t0 = *p++;
+                if (t0 < 0x80 || t0 > 0xBF || (t0 > 0x8F && c32 == 0xF4) || (t0 < 0x90 && c32 == 0xF0)) {
+                    --p;
+                    c32 |= 0x80000000;
+                }
+                else {
+                    C t1 = *p++;
+                    if (t1 < 0x80 || t1 > 0xBF) {
+                        p -= 2;
+                        c32 |= 0x80000000;
+                    }
+                    else {
+                        C t2 = *p++;
+                        if (t2 < 0x80 || t2 > 0xBF) {
+                            p -= 3;
+                            c32 |= 0x80000000;
+                        }
+                        else {
+                            c32 &= 0x0F;
+                            c32 <<= 6;
+                            t0 &= 0x3F;
+                            c32 |= t0;
+                            c32 <<= 6;
+                            t1 &= 0x3F;
+                            c32 |= t1;
+                            c32 <<= 6;
+                            t2 &= 0x3F;
+                            c32 |= t2;
+                        }
+                    }
+                }
+            }
+        }
+        else
+            c32 |= 0x80000000;
+    }
+    *ppBegin = p;
+    return c32;
+}
+
+inline
+static U64 UTF8_ParseCount(const C **ppBegin, const C *pEnd) {
+    U64 uCount = 0;
+    const C *p = *ppBegin;
     while (p != pEnd) {
-        pBegin = p;
-        C c = *p++;
-        if (c > 0x7F) { //0xxxxxxx
-            if (c < 0xC0) {//110xxxxx 10xxxxxx
-                *puCount = uCount;
-                return pBegin;
-            }
-
-            if (c > 0xDF) {//1110xxxx 10xxxxxx 10xxxxxx
-                if (c > 0xEF) {//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                    if (c > 0xF4) {
-                        *puCount = uCount;
-                        return pBegin;
-                    }
-
-                    if (p == pEnd || (*p++ & 0xC0) != 0x80) {
-                        *puCount = uCount;
-                        return pBegin;
+        C32 c32 = *p++;
+        // 0xxxxxxx
+        if (c32 > 0x7F) {
+            if (c32 < 0xE0) { // 110xxxxx 10xxxxxx
+                if (c32 < 0xC2 || p == pEnd) {
+                    --p;
+                    uCount |= 0x8000000000000000;
+                    break;
+                }
+                else {
+                    C t = *p++;
+                    if (t < 0x80 || t > 0xBF) {
+                        p -= 2;
+                        uCount |= 0x8000000000000000;
+                        break;
                     }
                 }
-                if (p == pEnd || (*p++ & 0xC0) != 0x80) {
-                    *puCount = uCount;
-                    return pBegin;
+            }
+            else if (c32 < 0xF0) { // 1110xxxx 10xxxxxx 10xxxxxx
+                if (p + 1 >= pEnd) {
+                    uCount |= 0x8000000000000000;
+                    break;
+                }
+                else {
+                    C t0 = *p++;
+                    if (t0 < 0x80 || t0 > 0xBF || (t0 < 0xA0 && c32 == 0xE0)) {
+                        p -= 2;
+                        uCount |= 0x8000000000000000;
+                        break;
+                    }
+                    else {
+                        C t1 = *p++;
+                        if (t1 < 0x80 || t1 > 0xBF) {
+                            p -= 3;
+                            uCount |= 0x8000000000000000;
+                            break;
+                        }
+                    }
                 }
             }
-            if (p == pEnd || (*p++ & 0xC0) != 0x80) {
-                *puCount = uCount;
-                return pBegin;
+            else if (c32 < 0xF5) { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                if (p + 2 >= pEnd) {
+                    --p;
+                    uCount |= 0x8000000000000000;
+                    break;
+                }
+                else {
+                    C t0 = *p++;
+                    if (t0 < 0x80 || t0 > 0xBF || (t0 > 0x8F && c32 == 0xF4) || (t0 < 0x90 && c32 == 0xF0)) {
+                        p -= 2;
+                        uCount |= 0x8000000000000000;
+                        break;
+                    }
+                    else {
+                        C t1 = *p++;
+                        if (t1 < 0x80 || t1 > 0xBF) {
+                            p -= 3;
+                            uCount |= 0x8000000000000000;
+                            break;
+                        }
+                        else {
+                            C t2 = *p++;
+                            if (t2 < 0x80 || t2 > 0xBF) {
+                                p -= 4;
+                                uCount |= 0x8000000000000000;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                --p;
+                uCount |= 0x8000000000000000;
+                break;
             }
         }
         ++uCount;
     }
-    *puCount = uCount;
-    return p;
-}
-
-inline
-static const C *UTF8_Parse(const C *pBegin, const C *pEnd, C32 *pValue) {
-    const C *p = pBegin;
-    C32 value = *p++;
-    //0xxxxxxx
-    if (value > 0x7F) {
-        if (value < 0xC0)
-            return pBegin;
-        else {
-            if (value < 0xE0)//110xxxxx 10xxxxxx
-                value = (value & 0x1F) << 6;
-            else {
-                if (value < 0xF0)//1110xxxx 10xxxxxx 10xxxxxx
-                    value = (value & 0x0F) << 12;
-                else if (value < 0xF5) {//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                    value = (value & 0x07) << 18;
-                    if (p == pEnd || ((*p & 0xC0) != 0x80))
-                        return pBegin;
-
-                    value |= (*p++ & 0x3F) << 12;
-                }
-                else
-                    return pBegin;
-
-                if (p == pEnd || ((*p & 0xC0) != 0x80))
-                    return pBegin;
-
-                value |= (*p++ & 0x3F) << 6;
-            }
-
-            if (p == pEnd || ((*p & 0xC0) != 0x80))
-                return pBegin;
-
-            value |= *p++ & 0x3F;
-        }
-    }
-
-    *pValue = value;
-    return p;
+    *ppBegin = p;
+    return uCount;
 }
 
 //caller must input valid utf-8 string
 inline
-static const C *UTF8_ReadMultibytes(const C *pString, C32 *pValue) {
-    const C *p = pString;
-    C32 value = *p++;
-    if (value < 0xE0)//110xxxxx 10xxxxxx
-        value = (value & 0x001F) << 6;
+static C32 UTF8_ReadTail(C32 cHead, const C **ppTail) {
+    const C *p = *ppTail;
+    if (cHead < 0xE0) { // 110xxxxx 10xxxxxx
+        cHead &= 0x1F;
+        cHead <<= 6;
+    }
     else {
-        if (value < 0xF0)//1110xxxx 10xxxxxx 10xxxxxx
-            value = (value & 0x0F) << 12;
-        else {//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-            value = (value & 0x07) << 18;
-            value |= (*p++ & 0x3F) << 12;
+        if (cHead < 0xF0) {//1110xxxx 10xxxxxx 10xxxxxx
+            cHead &= 0x0F;
+            cHead <<= 12;
         }
-
-        value |= (*p++ & 0x3F) << 6;
+        else {//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+            cHead &= 0x07;
+            cHead <<= 18;
+            cHead |= (*p++ & 0x3F) << 12;
+        }
+        cHead |= (*p++ & 0x3F) << 6;
     }
-
-    value |= *p++ & 0x3F;
-    *pValue = value;
-    return p;
+    cHead |= *p++ & 0x3F;
+    *ppTail = p;
+    return cHead;
 }
 
 //caller must input valid utf-8 string
 inline
-static const C *UTF8_Read(const C *pString, C32 *pValue) {
-    const C *p = pString;
-    C32 value = *p++;
-    if (value > 0x7F) {//0xxxxxxx
-        if (value < 0xE0)//110xxxxx 10xxxxxx
-            value = (value & 0x1F) << 6;
-        else {
-            if (value < 0xF0)//1110xxxx 10xxxxxx 10xxxxxx
-                value = (value & 0x0F) << 12;
-            else {//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                value = (value & 0x07) << 18;
-                value |= (*p++ & 0x3F) << 12;
-            }
-
-            value |= (*p++ & 0x3F) << 6;
+static C32 UTF8_Read(const C **ppString) {
+    const C *p = *ppString;
+    C32 c32 = *p++;
+    if (c32 > 0x7F) { // 0xxxxxxx
+        if (c32 < 0xE0) { // 110xxxxx 10xxxxxx
+            c32 &= 0x1F;
+            c32 <<= 6;
         }
-
-        value |= *p++ & 0x3F;
+        else {
+            if (c32 < 0xF0) {//1110xxxx 10xxxxxx 10xxxxxx
+                c32 &= 0x0F;
+                c32 <<= 12;
+            }
+            else {//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                c32 &= 0x07;
+                c32 <<= 18;
+                c32 |= (*p++ & 0x3F) << 12;
+            }
+            c32 |= (*p++ & 0x3F) << 6;
+        }
+        c32 |= *p++ & 0x3F;
     }
-
-    *pValue = value;
-    return p;
+    *ppString = p;
+    return c32;
 }
 
 //pBuffer size should >= 4 bytes
-//caller must input valid utf value
+//caller must input valid utf c32
 inline
-static C *UTF8_Write(C *pBuffer, C32 value) {
+static C *UTF8_Write(C *pBuffer, C32 c32) {
     C *p = pBuffer;
-    if (value < 0x80) {//0xxxxxxx
-        *p = value;
-        return ++p;
+    if (c32 < 0x80) { // 0xxxxxxx
+        *p++ = c32;
+        return p;
     }
 
-    if (value < 0x0800)//110xxxxx 10xxxxxx
-        *p = 0xC0 | (value >> 6);
-    else{
-        if (value < 0x10000) {//1110xxxx 10xxxxxx 10xxxxxx
-            //            assert(value < 0xD800 || value >= 0xE000);
-            *p = 0xE0 | (value >> 12);
+    if (c32 < 0x0800) // 110xxxxx 10xxxxxx
+        *p++ = 0xC0 | (c32 >> 6);
+    else {
+        if (c32 < 0x10000) {//1110xxxx 10xxxxxx 10xxxxxx
+            //            assert(c32 < 0xD800 || c32 >= 0xE000);
+            *p++ = 0xE0 | (c32 >> 12);
         }
-        else{//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-            //            assert(value < 0x110000);
-            *p = 0xF0 | (value >> 18);
-            ++p;
-            *p = 0x80 | ((value >> 12) & 0x3F);
+        else {//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+            //            assert(c32 < 0x110000);
+            *p++ = 0xF0 | (c32 >> 18);
+            *p++ = 0x80 | ((c32 >> 12) & 0x3F);
         }
-
-        ++p;
-        *p = 0x80 | ((value >> 6) & 0x3F);
+        *p++ = 0x80 | ((c32 >> 6) & 0x3F);
     }
-
-    ++p;
-    *p = 0x80 | (value & 0x3F);
-    return ++p;
+    *p++ = 0x80 | (c32 & 0x3F);
+    return p;
 }
 
 #endif //UTF8_H
