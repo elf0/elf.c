@@ -18,6 +18,11 @@ static U8 VU15_Bytes(const Byte *pVU15) {
 }
 
 inline
+static U8 VU15_NeedBytes(U16 u15) {
+  return u15 < 0x7F? 1 : 2;
+}
+
+inline
 static U16 VU15_Read(const Byte **ppVU15) {
   const Byte *pVU15 = *ppVU15;
   U16 u15 = *pVU15++;

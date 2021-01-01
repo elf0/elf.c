@@ -8,6 +8,7 @@
 // Max utf8: F4 8F BF BF
 // Unicode: [0, 0x10FFFF]
 // Surrogate: [0xD800, 0xDFFF]
+// BOM: EF BB BF
 
 #define UNICODE_INVALID(c32) (c32 > 0x10FFFF)
 
@@ -109,7 +110,7 @@ static C32 UTF8_Read(const C **ppString) {
 }
 
 inline
-static U8 UTF8_Bytes(C32 value) {
+static U8 UTF8_NeedBytes(C32 value) {
     return value < 0x80? 1 : value < 0x0800? 2 : value < 0x10000? 3 : 4;
 }
 

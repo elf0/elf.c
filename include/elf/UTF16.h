@@ -9,7 +9,9 @@
 // Surrogate: [0xD800, 0xDFFF]
 // High surrogate: [0xD800, 0xDBFF]
 // Low surrogate: [0xDC00, 0xDFFF]
-
+// BOM:
+// BE: FE FF
+// LE: FF FE
 inline
 static B UTF16_IsBasic(C16 c) {
     return (c >> 11) != 0x1B;
@@ -67,6 +69,8 @@ static B UTF16_Valid(const C16 *p, const C16 *pEnd) {
             if (c16 > 0xDBFF || p == pEnd || (*p++ >> 10) != 0x37)
                 return 0;
         }
+        else if (c16 == 0x0A00)
+            return 0;
     }
     return 1;
 }
@@ -88,6 +92,8 @@ static C32 UTF16_Parse(const C16 **ppBegin, const C16 *pEnd) {
             }
         }
     }
+    else if (c32 == 0x0A00)
+        c32 |= 0x80000000;
     *ppBegin = p;
     return c32;
 }
@@ -109,6 +115,11 @@ static U64 UTF16_ParseCount(const C16 **ppBegin, const C16 *pEnd) {
                 break;
             }
         }
+        else if (c32 == 0x0A00) {
+            --p;
+            uCount |= 0x8000000000000000;
+            break;
+        }
         ++uCount;
     }
     *ppBegin = p;
@@ -127,7 +138,7 @@ static C32 UTF16_Read(const C16 **ppString) {
 }
 
 inline
-static U8 UTF16_Bytes(C32 value) {
+static U8 UTF16_NeedBytes(C32 value) {
     return value < 0x10000? 2 : 4;
 }
 

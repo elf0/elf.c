@@ -18,6 +18,11 @@ static U8 VU30_Bytes(const Byte *pVU30) {
 }
 
 inline
+static U8 VU30_NeedBytes(U32 u30) {
+  return u30 < 0x40? 1 : u30 < 0x4000? 2 : u30 < 0x400000? 3 : 4;
+}
+
+inline
 static U32 VU30_Read(const Byte **ppVU30) {
   const Byte *pVU30 = *ppVU30;
   U32 u30 = *pVU30++;
