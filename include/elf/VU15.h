@@ -20,14 +20,14 @@ static U8 VU15_Bytes(const Byte *pVU15) {
 inline
 static U16 VU15_Read(const Byte **ppVU15) {
   const Byte *pVU15 = *ppVU15;
-  U16 uValue = *pVU15++;
-  if (uValue > 0x7F) {
-    uValue &= 0x7F;
-    uValue <<= 8;
-    uValue |= *pVU15++;
+  U16 u15 = *pVU15++;
+  if (u15 > 0x7F) {
+    u15 &= 0x7F;
+    u15 <<= 8;
+    u15 |= *pVU15++;
   }
   *ppVU15 = pVU15;
-  return uValue;
+  return u15;
 }
 
 inline

@@ -26,19 +26,19 @@ static U8 VU22_Bytes(const Byte *pVU22) {
 inline
 static U32 VU22_Read(const Byte **ppVU22) {
   const Byte *pVU22 = *ppVU22;
-  U32 u32 = *pVU22++;
-  if (u32 > 0x7F) {
-    U32 uHead = u32;
-    u32 &= 0x3F;
+  U32 u22 = *pVU22++;
+  if (u22 > 0x7F) {
+    U32 uHead = u22;
+    u22 &= 0x3F;
     if (uHead > 0xBF) {
-      u32 <<= 8;
-      u32 |= *pVU22++;
+      u22 <<= 8;
+      u22 |= *pVU22++;
     }
-    u32 <<= 8;
-    u32 |= *pVU22++;
+    u22 <<= 8;
+    u22 |= *pVU22++;
   }
   *ppVU22 = pVU22;
-  return u32;
+  return u22;
 }
 
 inline
