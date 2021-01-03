@@ -110,6 +110,17 @@ static C32 UTF8_Read(const C **ppString) {
 }
 
 inline
+static C32 UTF8_Max(const C *p, const C *pEnd) {
+  C32 cMax = 0;
+  while (p != pEnd) {
+    C32 c32 = UTF8_Read(&p);
+    if (c32 > cMax)
+      cMax = c32;
+  }
+  return cMax;
+}
+
+inline
 static U8 UTF8_NeedBytes(C32 value) {
     return value < 0x80? 1 : value < 0x0800? 2 : value < 0x10000? 3 : 4;
 }
