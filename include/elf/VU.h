@@ -6,6 +6,22 @@
 //EMail: elf@iamelf.com
 
 inline
+static U8 VU_U21NeedBytes(U32 u21) {
+  if (u21 < 0x80)
+    return 1;
+  return u21 < 0x4000? 2 : 3;
+}
+
+inline
+static U8 VU_U28NeedBytes(U32 u28) {
+  if (u28 < 0x80)
+    return 1;
+  if (u28 < 0x4000)
+    return 2;
+  return u28 < 0x200000? 3 : 4;
+}
+
+inline
 static U8 VU_U32NeedBytes(U32 u32) {
   if (u32 < 0x80)
     return 1;
@@ -37,75 +53,76 @@ static U8 VU_U63NeedBytes(U64 u63) {
 
 inline
 static U16 VU_Read14(const U8 **ppVU) {
-  const U8 *pVU = *ppVU;
-  U16 u14 = *pVU++;
-  if (u14 > 0x7F) {
-    u14 &= 0x7F;
-    u14 <<= 7;
-    u14 |= *pVU++;
+  const U8 *p = *ppVU;
+  U8 u8 = *p++;
+  U16 uValue = u8;
+  if (u8 & 0x80) {
+    uValue &= 0x7F;
+    uValue <<= 7;
+    uValue |= *p++;
   }
-  *ppVU = pVU;
-  return u14;
+  *ppVU = p;
+  return uValue;
 }
 
 inline
 static U32 VU_Read21(const U8 **ppVU) {
-  const U8 *pVU = *ppVU;
-  U32 u21 = *pVU++;
-  if (u21 > 0x7F) {
-    u21 &= 0x7F;
-    u21 <<= 7;
-    U8 u7 = *pVU++;
-    if (u7 > 0x7F) {
-      u7 &= 0x7F;
-      u21 |= u7;
-      u21 <<= 7;
-      u7 = *pVU++;
+  const U8 *p = *ppVU;
+  U8 u8 = *p++;
+  U32 uValue = u8;
+  if (u8 & 0x80) {
+    uValue &= 0x7F;
+    uValue <<= 7;
+    u8 = *p++;
+    if (u8 & 0x80) {
+      uValue |= u8 & 0x7F;
+      uValue <<= 7;
+      u8 = *p++;
     }
-    u21 |= u7;
+    uValue |= u8;
   }
-  *ppVU = pVU;
-  return u21;
+  *ppVU = p;
+  return uValue;
 }
 
 inline
 static U32 VU_Read28(const U8 **ppVU) {
-  const U8 *pVU = *ppVU;
-  U32 u28 = *pVU++;
-  if (u28 > 0x7F) {
-    u28 &= 0x7F;
+  const U8 *p = *ppVU;
+  U8 u8 = *p++;
+  U32 uValue = u8;
+  if (u8 & 0x80) {
+    uValue &= 0x7F;
 NEXT:
-    u28 <<= 7;
-    U8 u7 = *pVU++;
-    if (u7 > 0x7F) {
-      u28 |= u7 & 0x7F;
+    uValue <<= 7;
+    u8 = *p++;
+    if (u8 & 0x80) {
+      uValue |= u8 & 0x7F;
       goto NEXT;
     }
-    else
-      u28 |= u7;
+    uValue |= u8;
   }
-  *ppVU = pVU;
-  return u28;
+  *ppVU = p;
+  return uValue;
 }
 
 inline
 static U64 VU_Read63(const U8 **ppVU) {
-  const U8 *pVU = *ppVU;
-  U64 u63 = *pVU++;
-  if (u63 > 0x7F) {
-    u63 &= 0x7F;
+  const U8 *p = *ppVU;
+  U8 u8 = *p++;
+  U64 uValue = u8;
+  if (u8 & 0x80) {
+    uValue &= 0x7F;
 NEXT:
-    u63 <<= 7;
-    U8 u7 = *pVU++;
-    if (u7 > 0x7F) {
-      u63 |= u7 & 0x7F;
+    uValue <<= 7;
+    u8 = *p++;
+    if (u8 & 0x80) {
+      uValue |= u8 & 0x7F;
       goto NEXT;
     }
-    else
-      u63 |= u7;
+    uValue |= u8;
   }
-  *ppVU = pVU;
-  return u63;
+  *ppVU = p;
+  return uValue;
 }
 
 inline

@@ -24,24 +24,18 @@ static U8 VU30_NeedBytes(U32 u30) {
 
 inline
 static U32 VU30_Read(const Byte **ppVU30) {
-  const Byte *pVU30 = *ppVU30;
-  U32 u30 = *pVU30++;
-  if (u30 > 0x3F) {
-    U32 uHead = u30;
-    u30 &= 0x3F;
-    if (uHead > 0x7F) {
-      if (uHead > 0xBF) {
-        u30 <<= 8;
-        u30 |= *pVU30++;
-      }
-      u30 <<= 8;
-      u30 |= *pVU30++;
-    }
-    u30 <<= 8;
-    u30 |= *pVU30++;
+  const Byte *p = *ppVU30;
+  U32 uValue = *p++;
+  if (uValue > 0x3F) {
+    const Byte *pEnd = p + (uValue >> 6);
+    uValue &= 0x3F;
+    do {
+      uValue <<= 8;
+      uValue |= *p++;
+    } while (p != pEnd);
   }
-  *ppVU30 = pVU30;
-  return u30;
+  *ppVU30 = p;
+  return uValue;
 }
 
 inline

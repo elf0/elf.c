@@ -8,42 +8,36 @@
 // Range: [0, 0x3FFFFF]
 
 inline
-static U8 VU22_TailBytes(const Byte *pVU22) {
-  U8 u8 = *pVU22;
-  if (u8 < 0x80)
-    return 0;
-  return (u8 >> 6) - 1;
+static U8 VU22_TailBytes(U8 uHead) {
+  return uHead & 0x80? ((uHead >> 6) - 1) : 1;
 }
 
 inline
-static U8 VU22_Bytes(const Byte *pVU22) {
-  U8 u8 = *pVU22;
-  if (u8 < 0x80)
-    return 1;
-  return u8 >> 6;
+static U8 VU22_Bytes(U8 uHead) {
+  return uHead & 0x80? (uHead >> 6) : 1;
 }
 
 inline
 static U8 VU22_NeedBytes(U32 u22) {
-  return u22 < 0x7F? 1 : u22 < 0x4000? 2 : 3;
+  return u22 < 0x80? 1 : u22 < 0x4000? 2 : 3;
 }
 
 inline
 static U32 VU22_Read(const Byte **ppVU22) {
-  const Byte *pVU22 = *ppVU22;
-  U32 u22 = *pVU22++;
-  if (u22 > 0x7F) {
-    U32 uHead = u22;
-    u22 &= 0x3F;
-    if (uHead > 0xBF) {
-      u22 <<= 8;
-      u22 |= *pVU22++;
+  const Byte *p = *ppVU22;
+  U8 uHead = *p++;
+  U32 uValue = uHead;
+  if (uHead & 0x80) {
+    uValue &= 0x3F;
+    if (uHead & 0x40) {
+      uValue <<= 8;
+      uValue |= *p++;
     }
-    u22 <<= 8;
-    u22 |= *pVU22++;
+    uValue <<= 8;
+    uValue |= *p++;
   }
-  *ppVU22 = pVU22;
-  return u22;
+  *ppVU22 = p;
+  return uValue;
 }
 
 inline
