@@ -1,0 +1,238 @@
+#ifndef STRING_TO_U32_H
+#define STRING_TO_U32_H
+
+//License: Public Domain
+//Author: elf
+//EMail: elf@iamelf.com
+
+#include "Type.h"
+
+//String to U32
+
+//From 'pBegin' to 'pEnd' MUST be a valid number string.
+inline
+static U32 String_ToU32_2(const C *pBegin, const C *pEnd) {
+  const C *p = pBegin;
+  U32 uValue = *p++ - (C)'0';
+  while (p != pEnd) {
+    uValue <<= 1;
+    uValue |= *p++ - (C)'0';
+  }
+
+  return uValue;
+}
+
+inline
+static U32 String_ToU32_4(const C *pBegin, const C *pEnd) {
+  const C *p = pBegin;
+  U32 uValue = *p++ - (C)'0';
+  while (p != pEnd) {
+    uValue <<= 2;
+    uValue |= *p++ - (C)'0';
+  }
+
+  return uValue;
+}
+
+inline
+static U32 String_ToU32_8(const C *pBegin, const C *pEnd) {
+  const C *p = pBegin;
+  U32 uValue = *p++ - (C)'0';
+  while (p != pEnd) {
+    uValue <<= 3;
+    uValue |= *p++ - (C)'0';
+  }
+
+  return uValue;
+}
+
+inline
+static U32 String_ToU32_10(const C *pBegin, const C *pEnd) {
+  const C *p = pBegin;
+  U32 uValue = *p++ - (C)'0';
+  while (p != pEnd) {
+    uValue *= 10;
+    uValue += *p++ - (C)'0';
+  }
+
+  return uValue;
+}
+
+inline
+static U32 String_ToU32_16(const C *pBegin, const C *pEnd) {
+  const C *p = pBegin;
+  U32 uValue = *p++ - (C)'0';
+  if (uValue > 9) {
+    uValue &= 0xDF;
+    uValue -= 0x11;
+  }
+
+  while (p != pEnd) {
+    uValue <<= 4;
+    U8 u8 = *p++ - (C)'0';
+    if (u8 > 9) {
+      u8 &= 0xDF;
+      u8 -= 0x11;
+    }
+
+    uValue |= u8;
+
+  }
+
+  return uValue;
+}
+
+//Parse '0b' prefix youself
+inline
+static E8 String_ParseU32_2(U32 uValue, const C **ppTail, U32 *puValue) {
+  U8 uRange;
+  while ((uRange = *p - (C)'0') < 2) {
+    if (uValue > 0x7FFFFFFF) {
+      *ppTail = p;
+      return 1;
+    }
+
+    uValue <<= 1;
+    uValue |= uRange;
+    ++p;
+  }
+
+  *ppTail = p;
+  *puValue = uValue;
+  return 0;
+}
+
+inline
+static E8 String_ParseU32_4(U32 uValue, const C **ppTail, U32 *puValue) {
+  U8 uRange;
+  while ((uRange = *p - (C)'0') < 4) {
+    if (uValue > 0x3FFFFFFF) {
+      *ppTail = p;
+      return 1;
+    }
+
+    uValue <<= 2;
+    uValue |= uRange;
+    ++p;
+  }
+
+  *ppTail = p;
+  *puValue = uValue;
+  return 0;
+}
+
+//Parse '0o' prefix youself
+inline
+static E8 String_ParseU32_8(U32 uValue, const C **ppTail, U32 *puValue) {
+  const C *p = *ppTail;
+  U8 uRange;
+  while ((uRange = *p - (C)'0') < 8) {
+    if (uValue > 0x1FFFFFFF) {
+      *ppTail = p;
+      return 1;
+    }
+
+    uValue <<= 3;
+    uValue |= uRange;
+    ++p;
+  }
+
+  *ppTail = p;
+  *puValue = uValue;
+  return 0;
+}
+
+inline
+static E8 String_ParseU32_10(U32 uValue, const C **ppTail, U32 *puValue) {
+  const C *p = *ppTail;
+  U8 uRange;
+  while ((uRange = *p - (C)'0') < 10) {
+    if (uValue < 0x19999999) {
+      uValue *= 10;
+      uValue += uRange;
+    }
+    else if (uValue > 0x19999999) {
+      *ppTail = p;
+      return 1;
+    }
+    else {
+      if (uRange > 5) {
+        *ppTail = p;
+        return 1;
+      }
+      uValue = 0xFFFFFFFA + uRange;
+    }
+    ++p;
+  }
+  *ppTail = p;
+  *puValue = uValue;
+  return 0;
+}
+
+//Parse '0x' prefix youself
+inline
+static E8 String_ParseU32_16(U32 uValue, const C **ppTail, U32 *puValue) {
+  const C *p = *ppTail;
+  while (1) {
+    U8 uRange = *p - (C)'0';
+    if (uRange > 9) {
+      uRange &= 0xDF;
+      uRange -= 0x11;
+      if (uRange > 5)
+        break;
+
+      uRange += 10;
+    }
+
+    if (uValue > 0xFFFFFFF) {
+      *ppTail = p;
+      return 1;
+    }
+
+    uValue <<= 4;
+    uValue |= uRange;
+    ++p;
+  }
+
+  *ppTail = p;
+  *puValue = uValue;
+  return 0;
+}
+
+inline
+static E8 String_ParseU32_36(U32 uValue, const C **ppTail, U32 *puValue) {
+  const C *p = *ppTail;
+  while (1) {
+    U8 uRange = *p - (C)'0';
+    if (uRange > 9) {
+      uRange |= 0x20;
+      uRange -= 0x31;
+      if (uRange > 25)
+        break;
+
+      uRange += 10;
+    }
+
+    if (uValue < 0x71C71C7) {
+      uValue *= 0x24;
+      uValue += uRange;
+    }
+    else if (uValue > 0x71C71C7) {
+      *ppTail = p;
+      return 1;
+    } else {
+      if (uRange > 3) {
+        *ppTail = p;
+        return 1;
+      }
+      uValue = 0xFFFFFFFC + uRange;
+    }
+    ++p;
+  }
+
+  *ppTail = p;
+  *puValue = uValue;
+  return 0;
+}
+
+#endif // STRING_TO_U32_H
