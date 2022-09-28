@@ -7,9 +7,9 @@
 
 // 65 points
 // void DrawBeizer3(U32 p0x, U32 p0y, U32 p1x, U32 p1y, U32 p2x, U32 p2y, U32 p3x, U32 p3y) {
-//   U32 x0 = p0x;
-//   U32 y0 = p0y;
-//   MoveTo(x0, y0);
+//   U32 x = p0x;
+//   U32 y = p0y;
+//   MoveTo(x, y);
 //   U32 *pC = bezier3_coefficients_16384;
 //   U32 *pCR = &bezier3_coefficients_16384[125];
 //   U32 *pCEnd = pC + 126;
@@ -18,13 +18,11 @@
 //     U32 c1 = *pC++;
 //     U32 c2 = *pCR--;
 //     U32 c3 = *pCR--;
-//     U32 x1 = (c0 * p0x + c1 * p1x + c2 * p2x + c3 * p3x) >> 18;
-//     U32 y1 = (c0 * p0y + c1 * p1y + c2 * p2y + c3 * p3y) >> 18;
-//     LineTo(x0, y0, x1, y1);
-//     x0 = x1;
-//     y0 = y1;
+//     x = (c0 * p0x + c1 * p1x + c2 * p2x + c3 * p3x) >> 18;
+//     y = (c0 * p0y + c1 * p1y + c2 * p2y + c3 * p3y) >> 18;
+//     LineTo(x, y);
 //   }
-//   LineTo(x0, y0, p3x, p3y);
+//   LineTo(p3x, p3y);
 // }
 static U32 bezier3_coefficients_16384[126] = {
   250047, 11907, 238328, 23064, 226981, 33489,
