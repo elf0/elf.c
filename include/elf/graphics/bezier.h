@@ -6,25 +6,75 @@
 //EMail: elf@iamelf.com
 
 // 65 points
+// The value of control point should < 1048576
+// example:
+// void DrawBeizer2(U32 p0x, U32 p0y, U32 p1x, U32 p1y, U32 p2x, U32 p2y) {
+//   MoveTo(p0x, p0x);
+//   U32 *pC = bezier2_coefficients_65;
+//   U32 *pCR = &bezier2_coefficients_65[124];
+//   U32 *pCEnd = pC + 126;
+//   while (pC != pCEnd) {
+//     U32 c0 = *pC++;
+//     U32 c1 = *pC++;
+//     U32 c2 = *pCR;
+//     pCR-= 2;
+//     U32 x = (c0 * p0x + c1 * p1x + c2 * p2x) >> 12;
+//     U32 y = (c0 * p0y + c1 * p1y + c2 * p2y) >> 12;
+//     LineTo(x, y);
+//   }
+//   LineTo(p3x, p3y);
+// }
+
+static U32 bezier2_coefficients_65[126] = {
+  3969, 126, 3844, 248, 3721, 366,
+  3600, 480, 3481, 590, 3364, 696,
+  3249, 798, 3136, 896, 3025, 990,
+  2916, 1080, 2809, 1166, 2704, 1248,
+  2601, 1326, 2500, 1400, 2401, 1470,
+  2304, 1536, 2209, 1598, 2116, 1656,
+  2025, 1710, 1936, 1760, 1849, 1806,
+  1764, 1848, 1681, 1886, 1600, 1920,
+  1521, 1950, 1444, 1976, 1369, 1998,
+  1296, 2016, 1225, 2030, 1156, 2040,
+  1089, 2046, 1024, 2048, 961, 2046,
+  900, 2040, 841, 2030, 784, 2016,
+  729, 1998, 676, 1976, 625, 1950,
+  576, 1920, 529, 1886, 484, 1848,
+  441, 1806, 400, 1760, 361, 1710,
+  324, 1656, 289, 1598, 256, 1536,
+  225, 1470, 196, 1400, 169, 1326,
+  144, 1248, 121, 1166, 100, 1080,
+  81, 990, 64, 896, 49, 798,
+  36, 696, 25, 590, 16, 480,
+  9, 366, 4, 248, 1, 126
+};
+
+inline static
+U32 bezier2_65(U32 c0, U32 p0, U32 c1, U32 p1, U32 c2, U32 p2) {
+  return (c0 * p0 + c1 * p1 + c2 * p2) >> 12;
+}
+
+// 65 points
+// The value of control point should < 16384
+// example:
 // void DrawBeizer3(U32 p0x, U32 p0y, U32 p1x, U32 p1y, U32 p2x, U32 p2y, U32 p3x, U32 p3y) {
-//   U32 x = p0x;
-//   U32 y = p0y;
-//   MoveTo(x, y);
-//   U32 *pC = bezier3_coefficients_16384;
-//   U32 *pCR = &bezier3_coefficients_16384[125];
+//   MoveTo(p0x, p0y);
+//   U32 *pC = bezier3_coefficients_65;
+//   U32 *pCR = &bezier3_coefficients_65[125];
 //   U32 *pCEnd = pC + 126;
 //   while (pC != pCEnd) {
 //     U32 c0 = *pC++;
 //     U32 c1 = *pC++;
 //     U32 c2 = *pCR--;
 //     U32 c3 = *pCR--;
-//     x = (c0 * p0x + c1 * p1x + c2 * p2x + c3 * p3x) >> 18;
-//     y = (c0 * p0y + c1 * p1y + c2 * p2y + c3 * p3y) >> 18;
+//     U32 x = (c0 * p0x + c1 * p1x + c2 * p2x + c3 * p3x) >> 18;
+//     U32 y = (c0 * p0y + c1 * p1y + c2 * p2y + c3 * p3y) >> 18;
 //     LineTo(x, y);
 //   }
 //   LineTo(p3x, p3y);
 // }
-static U32 bezier3_coefficients_16384[126] = {
+
+static U32 bezier3_coefficients_65[126] = {
   250047, 11907, 238328, 23064, 226981, 33489,
   216000, 43200, 205379, 52215, 195112, 60552,
   185193, 68229, 175616, 75264, 166375, 81675,
@@ -48,10 +98,8 @@ static U32 bezier3_coefficients_16384[126] = {
   27, 1647, 8, 744, 1, 189
 };
 
-// coefficients c0, c1, c2, c3 from bezier3_coefficients_16384
-// control points p0, p1, p2, p3 SHOULD < 16384
 inline static
-U32 bezier3_16384(U32 c0, U32 p0, U32 c1, U32 p1, U32 c2, U32 p2, U32 c3, U32 p3) {
+U32 bezier3_65(U32 c0, U32 p0, U32 c1, U32 p1, U32 c2, U32 p2, U32 c3, U32 p3) {
   return (c0 * p0 + c1 * p1 + c2 * p2 + c3 * p3) >> 18;
 }
 
