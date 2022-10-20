@@ -1,19 +1,12 @@
-#ifndef DRAW_LINE_H
-#define DRAW_LINE_H
-
-//License: Public Domain
-//Author: elf
-//EMail: elf@iamelf.com
-
-#ifndef DRAW_LINE_H
-#define DRAW_LINE_H
+#ifndef LINE_H
+#define LINE_H
 
 //License: Public Domain
 //Author: elf
 //EMail: elf@iamelf.com
 
 inline
-static void DrawLine1(U8 *pPixels, U32 uPitch, U32 uX0, U32 uY0, U32 uX1, U32 uY1, U8 uValue) {
+static void DrawLine1(U8 *pPixels, U32 uPitch, U32 uX0, U32 uY0, U32 uX1, U32 uY1, U8 uColor) {
   I32 dy;
   I32 iPitch;
   if (uY1 < uY0) {
@@ -52,7 +45,7 @@ static void DrawLine1(U8 *pPixels, U32 uPitch, U32 uX0, U32 uY0, U32 uX1, U32 uY
   U8 *p = pPixels + uY0 * uPitch + uX0;
   U8 *pLast = pPixels + uY1 * uPitch + uX1;
   while (1) {
-    *p = uValue;
+    *p = uColor;
     if (p == pLast)
       break;
 
@@ -118,7 +111,7 @@ static void DrawLine2(U8 *pPixels, U32 uPitch, U32 uX0, U32 uY0, U32 uX1, U32 uY
   }
 }
 
-static void DrawLine3(U8 *pPixels, U32 uPitch, U32 uX0, U32 uY0, U32 uX1, U32 uY1, U8 uValue0, U8 uValue1, U8 uValue2) {
+static void DrawLine3(U8 *pPixels, U32 uPitch, U32 uX0, U32 uY0, U32 uX1, U32 uY1, U8 uColor0, U8 uColor1, U8 uColor2) {
   I32 dy;
   I32 iPitch;
   if (uY1 < uY0) {
@@ -157,9 +150,9 @@ static void DrawLine3(U8 *pPixels, U32 uPitch, U32 uX0, U32 uY0, U32 uX1, U32 uY
   U8 *p = pPixels + uY0 * uPitch + uX0 * 3;
   U8 *pLast = pPixels + uY1 * uPitch + uX1 * 3;
   while (1) {
-    *p = uValue0;
-    p[1] = uValue1;
-    p[2] = uValue2;
+    *p = uColor0;
+    p[1] = uColor1;
+    p[2] = uColor2;
     if (p == pLast)
       break;
 
@@ -225,5 +218,4 @@ static void DrawLine4(U8 *pPixels, U32 uPitch, U32 uX0, U32 uY0, U32 uX1, U32 uY
   }
 }
 
-#endif //DRAW_LINE_H
-
+#endif //LINE_H

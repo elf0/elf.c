@@ -5,222 +5,500 @@
 //Author: elf
 //EMail: elf@iamelf.com
 
-// 65 points
-// (c0 * p0 + c1 * p1 + c2 * p2) can not overflow
-// The values of control points should be in range [-524288, 524287] for I32
-// example:
-// void DrawBeizer2_65(I32 p0x, I32 p0y, I32 p1x, I32 p1y, I32 p2x, I32 p2y) {
-//   MoveTo(p0x, p0x);
-//   I16 *pC = bezier2_coefficients_65;
-//   I16 *pCR = &bezier2_coefficients_65[124];
-//   I16 *pCEnd = pC + 126;
-//   while (pC != pCEnd) {
-//     I32 or I64 c0 = *pC++;
-//     I32 or I64 c1 = *pC++;
-//     I32 or I64 c2 = *pCR;
-//     pCR-= 2;
-//     I32 x = (c0 * p0x + c1 * p1x + c2 * p2x) >> 12;
-//     I32 y = (c0 * p0y + c1 * p1y + c2 * p2y) >> 12;
-//     LineTo(x, y);
-//   }
-//   LineTo(p3x, p3y);
-// }
-
-static I16 bezier2_coefficients_65[126] = {
-  3969, 126, 3844, 248, 3721, 366, 3600, 480,
-  3481, 590, 3364, 696, 3249, 798, 3136, 896,
-  3025, 990, 2916, 1080, 2809, 1166, 2704, 1248,
-  2601, 1326, 2500, 1400, 2401, 1470, 2304, 1536,
-  2209, 1598, 2116, 1656, 2025, 1710, 1936, 1760,
-  1849, 1806, 1764, 1848, 1681, 1886, 1600, 1920,
-  1521, 1950, 1444, 1976, 1369, 1998, 1296, 2016,
-  1225, 2030, 1156, 2040, 1089, 2046, 1024, 2048,
-  961, 2046, 900, 2040, 841, 2030, 784, 2016,
-  729, 1998, 676, 1976, 625, 1950, 576, 1920,
-  529, 1886, 484, 1848, 441, 1806, 400, 1760,
-  361, 1710, 324, 1656, 289, 1598, 256, 1536,
-  225, 1470, 196, 1400, 169, 1326, 144, 1248,
-  121, 1166, 100, 1080, 81, 990, 64, 896,
-  49, 798, 36, 696, 25, 590, 16, 480,
-  9, 366, 4, 248, 1, 126
-};
-
 inline static
-I32 bezier2_65(I32 c0, I32 p0, I32 c1, I32 p1, I32 c2, I32 p2) {
-  return (c0 * p0 + c1 * p1 + c2 * p2) >> 12;
+void DrawQuadricBezier1(U8 *pPixels, I32 iPitch, I32 x0, I32 y0, I32 x1, I32 y1, I32 x2, I32 y2, U8 uColor) {
+  I32 iMin = y0;
+  if (y1 < iMin)
+    iMin = y1;
+
+  if (y2 < iMin)
+    iMin = y2;
+
+  I32 iMax = y0;
+  if (y1 > iMax)
+    iMax = y1;
+
+  if (y2 > iMax)
+    iMax = y2;
+
+  I32 n = iMax - iMin;
+
+  iMin = x0;
+  if (x1 < iMin)
+    iMin = x1;
+
+  if (x2 < iMin)
+    iMin = x2;
+
+  iMax = x0;
+  if (x1 > iMax)
+    iMax = x1;
+
+  if (x2 > iMax)
+    iMax = x2;
+
+  I32 nx = iMax - iMin;
+  if (nx < n)
+    n = nx;
+
+  I32 px0 = x0;
+  I32 py0 = y0;
+  if (n) {
+    I64 n2 = n * n;
+    for (I32 t = 1, tr = n - 1; t != n; ++t, --tr) {
+      I64 tr2 = tr * tr;
+      I64 ttr2 = tr * t << 1;
+      I64 t2 = t * t;
+      I32 px1 = (tr2 * x0 + ttr2 * x1 + t2 * x2) / n2;
+      I32 py1 = (tr2 * y0 + ttr2 * y1 + t2 * y2) / n2;
+      DrawLine1(pPixels, iPitch, px0, py0, px1, py1, uColor);
+      px0 = px1;
+      py0 = py1;
+    }
+  }
+  DrawLine1(pPixels, iPitch, px0, py0, x2, y2, uColor);
 }
 
-// 129 points
-// (c0 * p0 + c1 * p1 + c2 * p2) can not overflow
-// The values of control points should be in range [-131072, 131071] for I32
-// example:
-// void DrawBeizer2_129(I32 p0x, I32 p0y, I32 p1x, I32 p1y, I32 p2x, I32 p2y) {
-//   MoveTo(p0x, p0x);
-//   I16 *pC = bezier2_coefficients_129;
-//   I16 *pCR = &bezier2_coefficients_129[252];
-//   I16 *pCEnd = pC + 254;
-//   while (pC != pCEnd) {
-//     I32 or I64 c0 = *pC++;
-//     I32 or I64 c1 = *pC++;
-//     I32 or I64 c2 = *pCR;
-//     pCR-= 2;
-//     I32 x = (c0 * p0x + c1 * p1x + c2 * p2x) >> 14;
-//     I32 y = (c0 * p0y + c1 * p1y + c2 * p2y) >> 14;
-//     LineTo(x, y);
-//   }
-//   LineTo(p3x, p3y);
-// }
-
-static I16 bezier2_coefficients_129[254] = {
-  16129, 254, 15876, 504, 15625, 750, 15376, 992,
-  15129, 1230, 14884, 1464, 14641, 1694, 14400, 1920,
-  14161, 2142, 13924, 2360, 13689, 2574, 13456, 2784,
-  13225, 2990, 12996, 3192, 12769, 3390, 12544, 3584,
-  12321, 3774, 12100, 3960, 11881, 4142, 11664, 4320,
-  11449, 4494, 11236, 4664, 11025, 4830, 10816, 4992,
-  10609, 5150, 10404, 5304, 10201, 5454, 10000, 5600,
-  9801, 5742, 9604, 5880, 9409, 6014, 9216, 6144,
-  9025, 6270, 8836, 6392, 8649, 6510, 8464, 6624,
-  8281, 6734, 8100, 6840, 7921, 6942, 7744, 7040,
-  7569, 7134, 7396, 7224, 7225, 7310, 7056, 7392,
-  6889, 7470, 6724, 7544, 6561, 7614, 6400, 7680,
-  6241, 7742, 6084, 7800, 5929, 7854, 5776, 7904,
-  5625, 7950, 5476, 7992, 5329, 8030, 5184, 8064,
-  5041, 8094, 4900, 8120, 4761, 8142, 4624, 8160,
-  4489, 8174, 4356, 8184, 4225, 8190, 4096, 8192,
-  3969, 8190, 3844, 8184, 3721, 8174, 3600, 8160,
-  3481, 8142, 3364, 8120, 3249, 8094, 3136, 8064,
-  3025, 8030, 2916, 7992, 2809, 7950, 2704, 7904,
-  2601, 7854, 2500, 7800, 2401, 7742, 2304, 7680,
-  2209, 7614, 2116, 7544, 2025, 7470, 1936, 7392,
-  1849, 7310, 1764, 7224, 1681, 7134, 1600, 7040,
-  1521, 6942, 1444, 6840, 1369, 6734, 1296, 6624,
-  1225, 6510, 1156, 6392, 1089, 6270, 1024, 6144,
-  961, 6014, 900, 5880, 841, 5742, 784, 5600,
-  729, 5454, 676, 5304, 625, 5150, 576, 4992,
-  529, 4830, 484, 4664, 441, 4494, 400, 4320,
-  361, 4142, 324, 3960, 289, 3774, 256, 3584,
-  225, 3390, 196, 3192, 169, 2990, 144, 2784,
-  121, 2574, 100, 2360, 81, 2142, 64, 1920,
-  49, 1694, 36, 1464, 25, 1230, 16, 992,
-  9, 750, 4, 504, 1, 254
-};
-
 inline static
-I32 bezier2_129(I32 c0, I32 p0, I32 c1, I32 p1, I32 c2, I32 p2) {
-  return (c0 * p0 + c1 * p1 + c2 * p2) >> 14;
+void DrawQuadricBezier2(U8 *pPixels, I32 iPitch, I32 x0, I32 y0, I32 x1, I32 y1, I32 x2, I32 y2, U16 uColor) {
+  I32 iMin = y0;
+  if (y1 < iMin)
+    iMin = y1;
+
+  if (y2 < iMin)
+    iMin = y2;
+
+  I32 iMax = y0;
+  if (y1 > iMax)
+    iMax = y1;
+
+  if (y2 > iMax)
+    iMax = y2;
+
+  I32 n = iMax - iMin;
+
+  iMin = x0;
+  if (x1 < iMin)
+    iMin = x1;
+
+  if (x2 < iMin)
+    iMin = x2;
+
+  iMax = x0;
+  if (x1 > iMax)
+    iMax = x1;
+
+  if (x2 > iMax)
+    iMax = x2;
+
+  I32 nx = iMax - iMin;
+  if (nx < n)
+    n = nx;
+
+  I32 px0 = x0;
+  I32 py0 = y0;
+  if (n) {
+    I64 n2 = n * n;
+    for (I32 t = 1, tr = n - 1; t != n; ++t, --tr) {
+      I64 tr2 = tr * tr;
+      I64 ttr2 = tr * t << 1;
+      I64 t2 = t * t;
+      I32 px1 = (tr2 * x0 + ttr2 * x1 + t2 * x2) / n2;
+      I32 py1 = (tr2 * y0 + ttr2 * y1 + t2 * y2) / n2;
+      DrawLine2(pPixels, iPitch, px0, py0, px1, py1, uColor);
+      px0 = px1;
+      py0 = py1;
+    }
+  }
+  DrawLine2(pPixels, iPitch, px0, py0, x2, y2, uColor);
 }
 
-// 65 points
-// (c0 * p0 + c1 * p1 + c2 * p2 + c3 * p3) can not overflow
-// The values of control points should be in range [-8192, 8191] for I32
-// example:
-// void DrawBeizer3_65(I32 p0x, I32 p0y, I32 p1x, I32 p1y, I32 p2x, I32 p2y, I32 p3x, I32 p3y) {
-//   MoveTo(p0x, p0y);
-//   I32 *pC = bezier3_coefficients_65;
-//   I32 *pCR = &bezier3_coefficients_65[125];
-//   I32 *pCEnd = pC + 126;
-//   while (pC != pCEnd) {
-//     I32 or I64 c0 = *pC++;
-//     I32 or I64 c1 = *pC++;
-//     I32 or I64 c2 = *pCR--;
-//     I32 or I64 c3 = *pCR--;
-//     I32 x = (c0 * p0x + c1 * p1x + c2 * p2x + c3 * p3x) >> 18;
-//     I32 y = (c0 * p0y + c1 * p1y + c2 * p2y + c3 * p3y) >> 18;
-//     LineTo(x, y);
-//   }
-//   LineTo(p3x, p3y);
-// }
-
-static I32 bezier3_coefficients_65[126] = {
-  250047, 11907, 238328, 23064, 226981, 33489,
-  216000, 43200, 205379, 52215, 195112, 60552,
-  185193, 68229, 175616, 75264, 166375, 81675,
-  157464, 87480, 148877, 92697, 140608, 97344,
-  132651, 101439, 125000, 105000, 117649, 108045,
-  110592, 110592, 103823, 112659, 97336, 114264,
-  91125, 115425, 85184, 116160, 79507, 116487,
-  74088, 116424, 68921, 115989, 64000, 115200,
-  59319, 114075, 54872, 112632, 50653, 110889,
-  46656, 108864, 42875, 106575, 39304, 104040,
-  35937, 101277, 32768, 98304, 29791, 95139,
-  27000, 91800, 24389, 88305, 21952, 84672,
-  19683, 80919, 17576, 77064, 15625, 73125,
-  13824, 69120, 12167, 65067, 10648, 60984,
-  9261, 56889, 8000, 52800, 6859, 48735,
-  5832, 44712, 4913, 40749, 4096, 36864,
-  3375, 33075, 2744, 29400, 2197, 25857,
-  1728, 22464, 1331, 19239, 1000, 16200,
-  729, 13365, 512, 10752, 343, 8379,
-  216, 6264, 125, 4425, 64, 2880,
-  27, 1647, 8, 744, 1, 189
-};
-
 inline static
-I32 bezier3_65(I32 c0, I32 p0, I32 c1, I32 p1, I32 c2, I32 p2, I32 c3, I32 p3) {
-  return (c0 * p0 + c1 * p1 + c2 * p2 + c3 * p3) >> 18;
+void DrawQuadricBezier3(U8 *pPixels, I32 iPitch, I32 x0, I32 y0, I32 x1, I32 y1, I32 x2, I32 y2, U8 uColor0, U8 uColor1, U8 uColor2) {
+  I32 iMin = y0;
+  if (y1 < iMin)
+    iMin = y1;
+
+  if (y2 < iMin)
+    iMin = y2;
+
+  I32 iMax = y0;
+  if (y1 > iMax)
+    iMax = y1;
+
+  if (y2 > iMax)
+    iMax = y2;
+
+  I32 n = iMax - iMin;
+
+  iMin = x0;
+  if (x1 < iMin)
+    iMin = x1;
+
+  if (x2 < iMin)
+    iMin = x2;
+
+  iMax = x0;
+  if (x1 > iMax)
+    iMax = x1;
+
+  if (x2 > iMax)
+    iMax = x2;
+
+  I32 nx = iMax - iMin;
+  if (nx < n)
+    n = nx;
+
+  I32 px0 = x0;
+  I32 py0 = y0;
+  if (n) {
+    I64 n2 = n * n;
+    for (I32 t = 1, tr = n - 1; t != n; ++t, --tr) {
+      I64 tr2 = tr * tr;
+      I64 ttr2 = tr * t << 1;
+      I64 t2 = t * t;
+      I32 px1 = (tr2 * x0 + ttr2 * x1 + t2 * x2) / n2;
+      I32 py1 = (tr2 * y0 + ttr2 * y1 + t2 * y2) / n2;
+      DrawLine3(pPixels, iPitch, px0, py0, px1, py1, uColor0, uColor1, uColor2);
+      px0 = px1;
+      py0 = py1;
+    }
+  }
+  DrawLine3(pPixels, iPitch, px0, py0, x2, y2, uColor0, uColor1, uColor2);
 }
 
-// 129 points
-// (c0 * p0 + c1 * p1 + c2 * p2 + c3 * p3) can not overflow
-// The values of control points should be in range [-1024, 1023] for I32
-// example:
-// void DrawBeizer3_129(I32 p0x, I32 p0y, I32 p1x, I32 p1y, I32 p2x, I32 p2y, I32 p3x, I32 p3y) {
-//   MoveTo(p0x, p0y);
-//   I32 *pC = bezier3_coefficients_129;
-//   I32 *pCR = &bezier3_coefficients_129[253];
-//   I32 *pCEnd = pC + 254;
-//   while (pC != pCEnd) {
-//     I32 or I64 c0 = *pC++;
-//     I32 or I64 c1 = *pC++;
-//     I32 or I64 c2 = *pCR--;
-//     I32 or I64 c3 = *pCR--;
-//     I32 x = (c0 * p0x + c1 * p1x + c2 * p2x + c3 * p3x) >> 21;
-//     I32 y = (c0 * p0y + c1 * p1y + c2 * p2y + c3 * p3y) >> 21;
-//     LineTo(x, y);
-//   }
-//   LineTo(p3x, p3y);
-// }
+inline static
+void DrawQuadricBezier4(U8 *pPixels, I32 iPitch, I32 x0, I32 y0, I32 x1, I32 y1, I32 x2, I32 y2, U32 uColor) {
+  I32 iMin = y0;
+  if (y1 < iMin)
+    iMin = y1;
 
-static I32 bezier3_coefficients_129[254] = {
-  2048383, 48387, 2000376, 95256, 1953125, 140625, 1906624, 184512,
-  1860867, 226935, 1815848, 267912, 1771561, 307461, 1728000, 345600,
-  1685159, 382347, 1643032, 417720, 1601613, 451737, 1560896, 484416,
-  1520875, 515775, 1481544, 545832, 1442897, 574605, 1404928, 602112,
-  1367631, 628371, 1331000, 653400, 1295029, 677217, 1259712, 699840,
-  1225043, 721287, 1191016, 741576, 1157625, 760725, 1124864, 778752,
-  1092727, 795675, 1061208, 811512, 1030301, 826281, 1000000, 840000,
-  970299, 852687, 941192, 864360, 912673, 875037, 884736, 884736,
-  857375, 893475, 830584, 901272, 804357, 908145, 778688, 914112,
-  753571, 919191, 729000, 923400, 704969, 926757, 681472, 929280,
-  658503, 930987, 636056, 931896, 614125, 932025, 592704, 931392,
-  571787, 930015, 551368, 927912, 531441, 925101, 512000, 921600,
-  493039, 917427, 474552, 912600, 456533, 907137, 438976, 901056,
-  421875, 894375, 405224, 887112, 389017, 879285, 373248, 870912,
-  357911, 862011, 343000, 852600, 328509, 842697, 314432, 832320,
-  300763, 821487, 287496, 810216, 274625, 798525, 262144, 786432,
-  250047, 773955, 238328, 761112, 226981, 747921, 216000, 734400,
-  205379, 720567, 195112, 706440, 185193, 692037, 175616, 677376,
-  166375, 662475, 157464, 647352, 148877, 632025, 140608, 616512,
-  132651, 600831, 125000, 585000, 117649, 569037, 110592, 552960,
-  103823, 536787, 97336, 520536, 91125, 504225, 85184, 487872,
-  79507, 471495, 74088, 455112, 68921, 438741, 64000, 422400,
-  59319, 406107, 54872, 389880, 50653, 373737, 46656, 357696,
-  42875, 341775, 39304, 325992, 35937, 310365, 32768, 294912,
-  29791, 279651, 27000, 264600, 24389, 249777, 21952, 235200,
-  19683, 220887, 17576, 206856, 15625, 193125, 13824, 179712,
-  12167, 166635, 10648, 153912, 9261, 141561, 8000, 129600,
-  6859, 118047, 5832, 106920, 4913, 96237, 4096, 86016,
-  3375, 76275, 2744, 67032, 2197, 58305, 1728, 50112,
-  1331, 42471, 1000, 35400, 729, 28917, 512, 23040,
-  343, 17787, 216, 13176, 125, 9225, 64, 5952,
-  27, 3375, 8, 1512, 1, 381
-};
+  if (y2 < iMin)
+    iMin = y2;
+
+  I32 iMax = y0;
+  if (y1 > iMax)
+    iMax = y1;
+
+  if (y2 > iMax)
+    iMax = y2;
+
+  I32 n = iMax - iMin;
+
+  iMin = x0;
+  if (x1 < iMin)
+    iMin = x1;
+
+  if (x2 < iMin)
+    iMin = x2;
+
+  iMax = x0;
+  if (x1 > iMax)
+    iMax = x1;
+
+  if (x2 > iMax)
+    iMax = x2;
+
+  I32 nx = iMax - iMin;
+  if (nx < n)
+    n = nx;
+
+  I32 px0 = x0;
+  I32 py0 = y0;
+  if (n) {
+    I64 n2 = n * n;
+    for (I32 t = 1, tr = n - 1; t != n; ++t, --tr) {
+      I64 tr2 = tr * tr;
+      I64 ttr2 = tr * t << 1;
+      I64 t2 = t * t;
+      I32 px1 = (tr2 * x0 + ttr2 * x1 + t2 * x2) / n2;
+      I32 py1 = (tr2 * y0 + ttr2 * y1 + t2 * y2) / n2;
+      DrawLine4(pPixels, iPitch, px0, py0, px1, py1, uColor);
+      px0 = px1;
+      py0 = py1;
+    }
+  }
+  DrawLine4(pPixels, iPitch, px0, py0, x2, y2, uColor);
+}
 
 inline static
-I32 bezier3_129(I32 c0, I32 p0, I32 c1, I32 p1, I32 c2, I32 p2, I32 c3, I32 p3) {
-  return (c0 * p0 + c1 * p1 + c2 * p2 + c3 * p3) >> 21;
+void DrawCubicBezier1(U8 *pPixels, I32 iPitch, I32 x0, I32 y0, I32 x1, I32 y1, I32 x2, I32 y2, I32 x3, I32 y3, U8 uColor) {
+  I32 iMin = y0;
+  if (y1 < iMin)
+    iMin = y1;
+
+  if (y2 < iMin)
+    iMin = y2;
+
+  if (y3 < iMin)
+    iMin = y3;
+
+  I32 iMax = y0;
+  if (y1 > iMax)
+    iMax = y1;
+
+  if (y2 > iMax)
+    iMax = y2;
+
+  if (y3 > iMax)
+    iMax = y3;
+
+  I32 n = iMax - iMin;
+
+  iMin = x0;
+  if (x1 < iMin)
+    iMin = x1;
+
+  if (x2 < iMin)
+    iMin = x2;
+
+  if (x3 < iMin)
+    iMin = x3;
+
+  iMax = x0;
+  if (x1 > iMax)
+    iMax = x1;
+
+  if (x2 > iMax)
+    iMax = x2;
+
+  if (x3 > iMax)
+    iMax = x3;
+
+  I32 nx = iMax - iMin;
+  if (nx < n)
+    n = nx;
+
+  I32 px0 = x0;
+  I32 py0 = y0;
+  if (n) {
+    I64 n3 = n * n;
+    n3 *= n;
+    for (I32 t = 1, tr = n - 1; t != n; ++t, --tr) {
+      I64 t2 = t * t;
+      I64 t3 = t2 * t;
+      I64 tr2 = tr * tr;
+      I64 tr3 = tr2 * tr;
+      I64 c1 = 3 * t * tr2;
+      I64 c2 = 3 * t2 * tr;
+      I32 px1 = (tr3 * x0 + c1 * x1 + c2 * x2 + t3 * x3) / n3;
+      I32 py1 = (tr3 * y0 + c1 * y1 + c2 * y2 + t3 * y3) / n3;
+      DrawLine1(pPixels, iPitch, px0, py0, px1, py1, uColor);
+      px0 = px1;
+      py0 = py1;
+    }
+  }
+  DrawLine1(pPixels, iPitch, px0, py0, x3, y3, uColor);
+}
+
+inline static
+void DrawCubicBezier2(U8 *pPixels, I32 iPitch, I32 x0, I32 y0, I32 x1, I32 y1, I32 x2, I32 y2, I32 x3, I32 y3, U16 uColor) {
+  I32 iMin = y0;
+  if (y1 < iMin)
+    iMin = y1;
+
+  if (y2 < iMin)
+    iMin = y2;
+
+  if (y3 < iMin)
+    iMin = y3;
+
+  I32 iMax = y0;
+  if (y1 > iMax)
+    iMax = y1;
+
+  if (y2 > iMax)
+    iMax = y2;
+
+  if (y3 > iMax)
+    iMax = y3;
+
+  I32 n = iMax - iMin;
+
+  iMin = x0;
+  if (x1 < iMin)
+    iMin = x1;
+
+  if (x2 < iMin)
+    iMin = x2;
+
+  if (x3 < iMin)
+    iMin = x3;
+
+  iMax = x0;
+  if (x1 > iMax)
+    iMax = x1;
+
+  if (x2 > iMax)
+    iMax = x2;
+
+  if (x3 > iMax)
+    iMax = x3;
+
+  I32 nx = iMax - iMin;
+  if (nx < n)
+    n = nx;
+
+  I32 px0 = x0;
+  I32 py0 = y0;
+  if (n) {
+    I64 n3 = n * n;
+    n3 *= n;
+    for (I32 t = 1, tr = n - 1; t != n; ++t, --tr) {
+      I64 t2 = t * t;
+      I64 t3 = t2 * t;
+      I64 tr2 = tr * tr;
+      I64 tr3 = tr2 * tr;
+      I64 c1 = 3 * t * tr2;
+      I64 c2 = 3 * t2 * tr;
+      I32 px1 = (tr3 * x0 + c1 * x1 + c2 * x2 + t3 * x3) / n3;
+      I32 py1 = (tr3 * y0 + c1 * y1 + c2 * y2 + t3 * y3) / n3;
+      DrawLine2(pPixels, iPitch, px0, py0, px1, py1, uColor);
+      px0 = px1;
+      py0 = py1;
+    }
+  }
+  DrawLine2(pPixels, iPitch, px0, py0, x3, y3, uColor);
+}
+
+inline static
+void DrawCubicBezier3(U8 *pPixels, I32 iPitch, I32 x0, I32 y0, I32 x1, I32 y1, I32 x2, I32 y2, I32 x3, I32 y3, U8 uColor0, U8 uColor1, U8 uColor2) {
+  I32 iMin = y0;
+  if (y1 < iMin)
+    iMin = y1;
+
+  if (y2 < iMin)
+    iMin = y2;
+
+  if (y3 < iMin)
+    iMin = y3;
+
+  I32 iMax = y0;
+  if (y1 > iMax)
+    iMax = y1;
+
+  if (y2 > iMax)
+    iMax = y2;
+
+  if (y3 > iMax)
+    iMax = y3;
+
+  I32 n = iMax - iMin;
+
+  iMin = x0;
+  if (x1 < iMin)
+    iMin = x1;
+
+  if (x2 < iMin)
+    iMin = x2;
+
+  if (x3 < iMin)
+    iMin = x3;
+
+  iMax = x0;
+  if (x1 > iMax)
+    iMax = x1;
+
+  if (x2 > iMax)
+    iMax = x2;
+
+  if (x3 > iMax)
+    iMax = x3;
+
+  I32 nx = iMax - iMin;
+  if (nx < n)
+    n = nx;
+
+  I32 px0 = x0;
+  I32 py0 = y0;
+  if (n) {
+    I64 n3 = n * n;
+    n3 *= n;
+    for (I32 t = 1, tr = n - 1; t != n; ++t, --tr) {
+      I64 t2 = t * t;
+      I64 t3 = t2 * t;
+      I64 tr2 = tr * tr;
+      I64 tr3 = tr2 * tr;
+      I64 c1 = 3 * t * tr2;
+      I64 c2 = 3 * t2 * tr;
+      I32 px1 = (tr3 * x0 + c1 * x1 + c2 * x2 + t3 * x3) / n3;
+      I32 py1 = (tr3 * y0 + c1 * y1 + c2 * y2 + t3 * y3) / n3;
+      DrawLine3(pPixels, iPitch, px0, py0, px1, py1, uColor0, uColor1, uColor2);
+      px0 = px1;
+      py0 = py1;
+    }
+  }
+  DrawLine3(pPixels, iPitch, px0, py0, x3, y3, uColor0, uColor1, uColor2);
+}
+
+inline static
+void DrawCubicBezier4(U8 *pPixels, I32 iPitch, I32 x0, I32 y0, I32 x1, I32 y1, I32 x2, I32 y2, I32 x3, I32 y3, U32 uColor) {
+  I32 iMin = y0;
+  if (y1 < iMin)
+    iMin = y1;
+
+  if (y2 < iMin)
+    iMin = y2;
+
+  if (y3 < iMin)
+    iMin = y3;
+
+  I32 iMax = y0;
+  if (y1 > iMax)
+    iMax = y1;
+
+  if (y2 > iMax)
+    iMax = y2;
+
+  if (y3 > iMax)
+    iMax = y3;
+
+  I32 n = iMax - iMin;
+
+  iMin = x0;
+  if (x1 < iMin)
+    iMin = x1;
+
+  if (x2 < iMin)
+    iMin = x2;
+
+  if (x3 < iMin)
+    iMin = x3;
+
+  iMax = x0;
+  if (x1 > iMax)
+    iMax = x1;
+
+  if (x2 > iMax)
+    iMax = x2;
+
+  if (x3 > iMax)
+    iMax = x3;
+
+  I32 nx = iMax - iMin;
+  if (nx < n)
+    n = nx;
+
+  I32 px0 = x0;
+  I32 py0 = y0;
+  if (n) {
+    I64 n3 = n * n;
+    n3 *= n;
+    for (I32 t = 1, tr = n - 1; t != n; ++t, --tr) {
+      I64 t2 = t * t;
+      I64 t3 = t2 * t;
+      I64 tr2 = tr * tr;
+      I64 tr3 = tr2 * tr;
+      I64 c1 = 3 * t * tr2;
+      I64 c2 = 3 * t2 * tr;
+      I32 px1 = (tr3 * x0 + c1 * x1 + c2 * x2 + t3 * x3) / n3;
+      I32 py1 = (tr3 * y0 + c1 * y1 + c2 * y2 + t3 * y3) / n3;
+      DrawLine4(pPixels, iPitch, px0, py0, px1, py1, uColor);
+      px0 = px1;
+      py0 = py1;
+    }
+  }
+  DrawLine4(pPixels, iPitch, px0, py0, x3, y3, uColor);
 }
 
 #endif
-
