@@ -86,7 +86,7 @@ static U32 String_ToU32_16(const C *pBegin, const C *pEnd) {
 inline
 static E8 String_ParseU32_2(U32 uValue, const C **ppTail, U32 *puValue) {
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 2) {
+  while ((uRange = *p - '0') < 2) {
     if (uValue > 0x7FFFFFFF) {
       *ppTail = p;
       return 1;
@@ -105,7 +105,7 @@ static E8 String_ParseU32_2(U32 uValue, const C **ppTail, U32 *puValue) {
 inline
 static E8 String_ParseU32_4(U32 uValue, const C **ppTail, U32 *puValue) {
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 4) {
+  while ((uRange = *p - '0') < 4) {
     if (uValue > 0x3FFFFFFF) {
       *ppTail = p;
       return 1;
@@ -126,7 +126,7 @@ inline
 static E8 String_ParseU32_8(U32 uValue, const C **ppTail, U32 *puValue) {
   const C *p = *ppTail;
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 8) {
+  while ((uRange = *p - '0') < 8) {
     if (uValue > 0x1FFFFFFF) {
       *ppTail = p;
       return 1;
@@ -146,7 +146,7 @@ inline
 static E8 String_ParseU32_10(U32 uValue, const C **ppTail, U32 *puValue) {
   const C *p = *ppTail;
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 10) {
+  while ((uRange = *p - '0') < 10) {
     if (uValue < 0x19999999) {
       uValue *= 10;
       uValue += uRange;
@@ -169,12 +169,13 @@ static E8 String_ParseU32_10(U32 uValue, const C **ppTail, U32 *puValue) {
   return 0;
 }
 
-//Parse '0x' prefix youself
+//Parse '0x' prefix and first digit youself
 inline
-static E8 String_ParseU32_16(U32 uValue, const C **ppTail, U32 *puValue) {
+static E8 String_ParseU32_16(U32 *puValue, const C **ppTail) {
+  U32 uValue = *puValue;
   const C *p = *ppTail;
   while (1) {
-    U8 uRange = *p - (C)'0';
+    U8 uRange = *p - '0';
     if (uRange > 9) {
       uRange &= 0xDF;
       uRange -= 0x11;
@@ -203,7 +204,7 @@ inline
 static E8 String_ParseU32_36(U32 uValue, const C **ppTail, U32 *puValue) {
   const C *p = *ppTail;
   while (1) {
-    U8 uRange = *p - (C)'0';
+    U8 uRange = *p - '0';
     if (uRange > 9) {
       uRange |= 0x20;
       uRange -= 0x31;

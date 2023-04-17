@@ -64,7 +64,7 @@ static U64 String_ToU64_16(const C *p, const C *pEnd) {
 
   while (p != pEnd) {
     uValue <<= 4;
-    U8 u8 = *p++ - (C)'0';
+    U8 u8 = *p++ - '0';
     if (u8 > 9) {
       u8 &= 0xDF;
       u8 -= 0x11;
@@ -82,7 +82,7 @@ static E8 String_ParseU64_2(U64 *puValue, const C **ppTail) {
   U64 uValue = *puValue;
   const C *p = *ppTail;
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 2) {
+  while ((uRange = *p - '0') < 2) {
     if (uValue > 0x7FFFFFFFFFFFFFFF) {
       *ppTail = p;
       return 1;
@@ -103,7 +103,7 @@ static E8 String_ParseU64_4(U64 *puValue, const C **ppTail) {
   U64 uValue = *puValue;
   const C *p = *ppTail;
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 4) {
+  while ((uRange = *p - '0') < 4) {
     if (uValue > 0x3FFFFFFFFFFFFFFF) {
       *ppTail = p;
       return 1;
@@ -125,7 +125,7 @@ static E8 String_ParseU64_8(U64 *puValue, const C **ppTail) {
   U64 uValue = *puValue;
   const C *p = *ppTail;
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 8) {
+  while ((uRange = *p - '0') < 8) {
     if (uValue > 0x1FFFFFFFFFFFFFFF) {
       *ppTail = p;
       return 1;
@@ -146,7 +146,7 @@ static E8 String_ParseU64_10(U64 *puValue, const C **ppTail) {
   U64 uValue = *puValue;
   const C *p = *ppTail;
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 10) {
+  while ((uRange = *p - '0') < 10) {
     if (uValue < 0x1999999999999999)
       uValue = uValue * 10 + uRange;
     else if (uValue == 0x1999999999999999 && uRange < 6)
@@ -168,7 +168,7 @@ static E8 String_ParseU64_16(U64 *puValue, const C **ppTail) {
   U64 uValue = *puValue;
   const C *p = *ppTail;
   while (1) {
-    U8 uRange = *p - (C)'0';
+    U8 uRange = *p - '0';
     if (uRange > 9) {
       uRange &= 0xDF;
       uRange -= 0x11;

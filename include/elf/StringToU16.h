@@ -86,7 +86,7 @@ static U16 String_ToU16_16(const C *pBegin, const C *pEnd) {
 inline
 static E8 String_ParseU16_2(U16 uValue, const C **ppTail, U16 *puValue) {
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 2) {
+  while ((uRange = *p - '0') < 2) {
     if (uValue > 0x7FFF) {
       *ppTail = p;
       return 1;
@@ -105,7 +105,7 @@ static E8 String_ParseU16_2(U16 uValue, const C **ppTail, U16 *puValue) {
 inline
 static E8 String_ParseU16_4(U16 uValue, const C **ppTail, U16 *puValue) {
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 4) {
+  while ((uRange = *p - '0') < 4) {
     if (uValue > 0x3FFF) {
       *ppTail = p;
       return 1;
@@ -126,7 +126,7 @@ inline
 static E8 String_ParseU16_8(U16 uValue, const C **ppTail, U16 *puValue) {
   const C *p = *ppTail;
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 8) {
+  while ((uRange = *p - '0') < 8) {
     if (uValue > 0x1FFF) {
       *ppTail = p;
       return 1;
@@ -146,7 +146,7 @@ inline
 static E8 String_ParseU16_10(U16 uValue, const C **ppTail, U16 *puValue) {
   const C *p = *ppTail;
   U8 uRange;
-  while ((uRange = *p - (C)'0') < 10) {
+  while ((uRange = *p - '0') < 10) {
     if (uValue < 0x1999) {
       uValue *= 10;
       uValue += uRange;
@@ -175,7 +175,7 @@ inline
 static E8 String_ParseU16_16(U16 uValue, const C **ppTail, U16 *puValue) {
   const C *p = *ppTail;
   while (1) {
-    U8 uRange = *p - (C)'0';
+    U8 uRange = *p - '0';
     if (uRange > 9) {
       uRange &= 0xDF;
       uRange -= 0x11;

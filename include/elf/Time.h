@@ -5,6 +5,23 @@
 //Author: elf
 //EMail: elf@iamelf.com
 
+#ifdef __linux__
+
+inline
+static U64 Time_Tick() {
+    U64 uTick;
+    asm volatile(
+        "mfence\n\t"
+        "rdtsc\n\t"
+        "lfence\n\t"
+        "shl $32, %%rdx\n\t"
+        "or %%rdx, %0"
+        : "=a" (uTick)
+        :
+        : "rdx");
+    return uTick;
+} 
+
 #include <time.h>
 
 #define MILLISECONDS_PER_SECOND 1000
@@ -46,17 +63,6 @@ static void Time_Coarse(Time *pTime) {
     clock_gettime(CLOCK_MONOTONIC_COARSE, pTime);
 }
 
-inline
-static void Time_Elapsed(const Time *ptBegin, const Time *ptEnd, Time *ptElapsed) {
-    I64 nSeconds = ptEnd->tv_sec - ptBegin->tv_sec;
-    I64 nNanoSeconds = ptEnd->tv_nsec - ptBegin->tv_nsec;
-    if(nNanoSeconds < 0) {
-        --nSeconds;
-        nNanoSeconds += NANOSECONDS_PER_SECOND;
-    }
-    ptElapsed->tv_sec = nSeconds;
-    ptElapsed->tv_nsec = nNanoSeconds;
-}
 
 inline
 static U64 Time_Seconds(const Time *pTime) {
@@ -65,57 +71,40 @@ static U64 Time_Seconds(const Time *pTime) {
 
 inline
 static U64 Time_Milliseconds(const Time *pTime) {
-    U64 nSecondPart = pTime->tv_sec;
-    nSecondPart *= MILLISECONDS_PER_SECOND;
-    U64 nNanoPart = pTime->tv_nsec;
-    nNanoPart /= NANOSECONDS_PER_MILLISECOND;
-    return nSecondPart + nNanoPart;
+    return pTime->tv_sec * MILLISECONDS_PER_SECOND + pTime->tv_nsec / NANOSECONDS_PER_MILLISECOND;
 }
 
 inline
 static U64 Time_Microseconds(const Time *pTime) {
-    U64 nSecondPart = pTime->tv_sec;
-    nSecondPart *= MICROSECONDS_PER_SECOND;
-    U64 nNanoPart = pTime->tv_nsec;
-    nNanoPart /= NANOSECONDS_PER_MICROSECOND;
-    return nSecondPart + nNanoPart;
+    return pTime->tv_sec * MICROSECONDS_PER_SECOND + pTime->tv_nsec / NANOSECONDS_PER_MICROSECOND;
 }
 
 inline
 static U64 Time_Nanoseconds(const Time *pTime) {
-    U64 nNanoseconds = pTime->tv_sec;
-    nNanoseconds *= NANOSECONDS_PER_SECOND;
-    nNanoseconds += pTime->tv_nsec;
-    return nNanoseconds;
+    return pTime->tv_sec * NANOSECONDS_PER_SECOND + pTime->tv_nsec;
 }
 
 inline
 static U64 Time_ElapsedSeconds(const Time *ptBegin, const Time *ptEnd) {
-    I64 nSeconds = ptEnd->tv_sec - ptBegin->tv_sec;
-    if(ptEnd->tv_nsec < ptBegin->tv_nsec)
-        --nSeconds;
-    return nSeconds;
+    return ptEnd->tv_sec - ptBegin->tv_sec;
 }
 
 inline
 static U64 Time_ElapsedMilliseconds(const Time *ptBegin, const Time *ptEnd) {
-    I64 iMilliseconds = (ptEnd->tv_sec - ptBegin->tv_sec) * MILLISECONDS_PER_SECOND;
-    iMilliseconds += (ptEnd->tv_nsec - ptBegin->tv_nsec) / NANOSECONDS_PER_MILLISECOND;
-    return iMilliseconds;
+    return (ptEnd->tv_sec - ptBegin->tv_sec) * MILLISECONDS_PER_SECOND + (ptEnd->tv_nsec - ptBegin->tv_nsec)/NANOSECONDS_PER_MILLISECOND;
 }
 
 inline
 static U64 Time_ElapsedMicroseconds(const Time *ptBegin, const Time *ptEnd) {
-    I64 iMicroseconds = (ptEnd->tv_sec - ptBegin->tv_sec) * MICROSECONDS_PER_SECOND;
-    iMicroseconds += (ptEnd->tv_nsec - ptBegin->tv_nsec) / NANOSECONDS_PER_MICROSECOND;
-    return iMicroseconds;
+    return (ptEnd->tv_sec - ptBegin->tv_sec) * MICROSECONDS_PER_SECOND + (ptEnd->tv_nsec - ptBegin->tv_nsec)/NANOSECONDS_PER_MICROSECOND;
 }
 
 inline
 static U64 Time_ElapsedNanoseconds(const Time *ptBegin, const Time *ptEnd) {
-    I64 iNanoseconds = (ptEnd->tv_sec - ptBegin->tv_sec) * NANOSECONDS_PER_SECOND;
-    iNanoseconds += ptEnd->tv_nsec - ptBegin->tv_nsec;
-    return iNanoseconds;
+    return (ptEnd->tv_sec - ptBegin->tv_sec) * NANOSECONDS_PER_SECOND + (ptEnd->tv_nsec - ptBegin->tv_nsec);
 }
+
+#else
+#endif
 
 #endif //TIME_H
