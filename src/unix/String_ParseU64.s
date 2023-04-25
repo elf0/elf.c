@@ -4,43 +4,38 @@
 String_ParseU64:
 .cfi_startproc
 movq (%rsi), %rcx
-movzbq (%rcx), %rax
-movq $0x1999999999999999, %r8
-addb $-48, %al
-movq %rax, %rdx
+movq $0x1999999999999999, %rdx
+xorq %rax, %rax
 
 .NEXT:
-addq $1, %rcx
 movb (%rcx), %al
 addb $-48, %al
 cmpb $10, %al
 jae .NOT_DIGIT
-cmpq %r8, %rdx
+cmpq %rdx, %rdi
 jae .MAYBE_OVERFLOW
-leaq (%rdx, %rdx, 4), %rdx
-leaq (%rax, %rdx, 2), %rdx
+leaq (%rdi, %rdi, 4), %rdi
+leaq (%rax, %rdi, 2), %rdi
+addq $1, %rcx
 jmp .NEXT
 
 .NOT_DIGIT:
-# cmpb $0xF7, %al
-# je .NEXT
-movq %rdx, (%rdi)
 movq %rcx, (%rsi)
-xorl	%eax, %eax
+movq %rdi, %rax
 retq
 
 .MAYBE_OVERFLOW:
 jne .OVERFLOW
 cmpb $6, %al
 jae .OVERFLOW
-movq $0xFFFFFFFFFFFFFFFA, %rdx
-addq %rax, %rdx
+movq $0xFFFFFFFFFFFFFFFA, %rdi
+addq %rax, %rdi
+addq $1, %rcx
 jmp .NEXT
 
 .OVERFLOW:
-movq %rdx, (%rdi)
 movq %rcx, (%rsi)
-movl $1, %eax
+movq $-1, %rax
 retq
 .cfi_endproc
 
