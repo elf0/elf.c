@@ -5,7 +5,7 @@ String_ParseU64:
 .cfi_startproc
 movq (%rsi), %rcx
 movq $0x1999999999999999, %rdx
-xorq %rax, %rax
+xorl %eax, %eax
 
 .NEXT:
 movb (%rcx), %al
