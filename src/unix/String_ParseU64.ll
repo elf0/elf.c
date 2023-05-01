@@ -8,8 +8,8 @@ define i64 @String_ParseU64(i64 noundef %v, ptr nocapture noundef %pp) {
   br label %.next
 
 .next:
-  %p0 = phi ptr [ %p, %.entry ], [ %p1, %.evaluate ], [ %p2, %.not_overflow ]
-  %v0 = phi i64 [ %v, %.entry ], [ %v2, %.evaluate ], [ %v3, %.not_overflow ]
+  %v0 = phi i64 [ %v, %.entry ], [ %v4, %.step ]
+  %p0 = phi ptr [ %p, %.entry ], [ %p1, %.step ]
   %c = load i8, ptr %p0, align 1
   %r = add i8 %c, -48
   %is_digit = icmp ult i8 %r, 10
@@ -23,13 +23,16 @@ define i64 @String_ParseU64(i64 noundef %v, ptr nocapture noundef %pp) {
 .evaluate:
   %v1 = mul nuw i64 %v0, 10
   %v2 = add nuw i64 %v1, %r0
+  br label %.step
+
+.step:
+  %v4 = phi i64 [ %v2, %.evaluate ], [ %v3, %.not_overflow ]
   %p1 = getelementptr inbounds i8, ptr %p0, i64 1
   br label %.next
 
 .not_overflow:
   %v3 = add nuw i64 %r0, 18446744073709551610
-  %p2 = getelementptr inbounds i8, ptr %p0, i64 1
-  br label %.next
+  br label %.step
 
 .end:
   store ptr %p0, ptr %pp, align 8
