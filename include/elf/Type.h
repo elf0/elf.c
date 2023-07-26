@@ -23,24 +23,32 @@ typedef __UINT8_TYPE__ U8;
 #else
 typedef unsigned char  U8;
 #endif
+#define U8_MAX 0xFF
 
 #if defined(__UINT16_TYPE__)
 typedef __UINT16_TYPE__ U16;
 #else
 typedef unsigned short  U16;
 #endif
+#define U16_MAX 0xFFFF
 
 #if defined(__UINT32_TYPE__)
 typedef __UINT32_TYPE__ U32;
 #else
 typedef unsigned int    U32;
 #endif
+#define U24_MAX 0xFFFFFF
+#define U32_MAX 0xFFFFFFFF
 
 #if defined(__UINT64_TYPE__)
 typedef __UINT64_TYPE__    U64;
 #else
 typedef unsigned long U64;
 #endif
+#define U40_MAX 0xFFFFFFFFFF
+#define U48_MAX 0xFFFFFFFFFFFF
+#define U56_MAX 0xFFFFFFFFFFFFFF
+#define U64_MAX 0xFFFFFFFFFFFFFFFF
 
 #if defined(__INT8_TYPE__)
 typedef __INT8_TYPE__ I8;

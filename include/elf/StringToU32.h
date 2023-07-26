@@ -142,31 +142,32 @@ static E8 String_ParseU32_8(U32 uValue, const C **ppTail, U32 *puValue) {
   return 0;
 }
 
-inline
-static E8 String_ParseU32_10(U32 uValue, const C **ppTail, U32 *puValue) {
-  const C *p = *ppTail;
-  U8 uRange;
-  while ((uRange = *p - '0') < 10) {
-    if (uValue < 0x19999999) {
-      uValue *= 10;
-      uValue += uRange;
+inline static E8 String_ParseU32_Max( U32 *pValue, const C **ppTail, U32 uMax ) {
+    E8 e = 0;
+    U32 uValue = *pValue;
+    const C *p = *ppTail;
+    const U32 uDiv = uMax / 10;
+    const U32 uMod = uMax % 10;
+    const U32 uSub = uMax - uMod;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue < uDiv)
+            uValue = uValue * 10 + uRange;
+        else if (uValue == uDiv && uRange <= uMod)
+            uValue = uSub + uRange;
+        else {
+            e = 1;
+            break;
+        }
+        ++p;
     }
-    else if (uValue > 0x19999999) {
-      *ppTail = p;
-      return 1;
-    }
-    else {
-      if (uRange > 5) {
-        *ppTail = p;
-        return 1;
-      }
-      uValue = 0xFFFFFFFA + uRange;
-    }
-    ++p;
-  }
-  *ppTail = p;
-  *puValue = uValue;
-  return 0;
+    *pValue = uValue;
+    *ppTail = p;
+    return e;
+}
+
+inline static E8 String_ParseU32(U32 *puHead, const C **ppTail) {
+    return String_ParseU32_Max(pValue, ppTail, U32_MAX);
 }
 
 //Parse '0x' prefix and first digit youself

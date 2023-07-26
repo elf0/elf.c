@@ -142,32 +142,32 @@ static E8 String_ParseU16_8(U16 uValue, const C **ppTail, U16 *puValue) {
   return 0;
 }
 
-inline
-static E8 String_ParseU16_10(U16 uValue, const C **ppTail, U16 *puValue) {
-  const C *p = *ppTail;
-  U8 uRange;
-  while ((uRange = *p - '0') < 10) {
-    if (uValue < 0x1999) {
-      uValue *= 10;
-      uValue += uRange;
+inline static E8 String_ParseU16_Max( U16 *pValue, const C **ppTail, U16 uMax ) {
+    E8 e = 0;
+    U16 uValue = *pValue;
+    const C *p = *ppTail;
+    const U16 uDiv = uMax / 10;
+    const U16 uMod = uMax % 10;
+    const U16 uSub = uMax - uMod;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue < uDiv)
+            uValue = uValue * 10 + uRange;
+        else if (uValue == uDiv && uRange <= uMod)
+            uValue = uSub + uRange;
+        else {
+            e = 1;
+            break;
+        }
+        ++p;
     }
-    else if (uValue > 0x1999) {
-      *ppTail = p;
-      return 1;
-    }
-    else {
-      if (uRange > 5) {
-        *ppTail = p;
-        return 1;
-      }
-      uValue = 0xFFFA;
-      uValue += uRange;
-    }
-    ++p;
-  }
-  *ppTail = p;
-  *puValue = uValue;
-  return 0;
+    *pValue = uValue;
+    *ppTail = p;
+    return e;
+}
+
+inline static E8 String_ParseU16(U16 *puHead, const C **ppTail) {
+    return String_ParseU16_Max(pValue, ppTail, U16_MAX);
 }
 
 //Parse '0x' prefix youself

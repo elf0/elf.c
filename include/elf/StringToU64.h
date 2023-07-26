@@ -113,22 +113,32 @@ inline static U64 String_ParseU64_8(U64 uHead, const C **ppTail) {
     return uHead;
 }
 
-inline static U64 String_ParseU64(U64 uHead, const C **ppTail) {
+inline static E8 String_ParseU64_Max( U64 *pValue, const C **ppTail, U64 uMax ) {
+    E8 e = 0;
+    U64 uValue = *pValue;
     const C *p = *ppTail;
+    const U64 uDiv = uMax / 10;
+    const U64 uMod = uMax % 10;
+    const U64 uSub = uMax - uMod;
     U8 uRange;
     while ((uRange = *p - '0') < 10) {
-        if (uHead < 0x1999999999999999)
-            uHead = uHead * 10 + uRange;
-        else if (uHead == 0x1999999999999999 && uRange < 6)
-            uHead = 0xFFFFFFFFFFFFFFFA + uRange;
+        if (uValue < uDiv)
+            uValue = uValue * 10 + uRange;
+        else if (uValue == uDiv && uRange <= uMod)
+            uValue = uSub + uRange;
         else {
-            *ppTail = p;
-            return 0xFFFFFFFFFFFFFFFF;
+            e = 1;
+            break;
         }
         ++p;
     }
+    *pValue = uValue;
     *ppTail = p;
-    return uHead;
+    return e;
+}
+
+inline static E8 String_ParseU64( U64 *pValue, const C **ppTail ) {
+    return String_ParseU64_Max(pValue, ppTail, U64_MAX);
 }
 
 //Parse '0x' prefix youself
