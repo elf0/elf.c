@@ -162,26 +162,54 @@ inline
     return uValue;
 }
 
-inline static E8 String_ParseU8(U8 *puHead, const C **ppTail) {
-    U8 uValue = *puHead;
+inline static E8 String_ParseU8_Max( U8 *pValue, const C **ppTail, U8 uMax ) {
+    E8 e = 0;
+    U8 uValue = *pValue;
     const C *p = *ppTail;
-    U8 u8;
-    while ((u8 = *p - '0') < 10) {
-#define U8_10_LIMIT (U8_MAX / 10)
-        if (uValue < U8_10_LIMIT)
+    const U8 uDiv = uMax / 10;
+    const U8 uMod = uMax % 10;
+    const U8 uSub = uMax - uMod;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue < uDiv)
             uValue = uValue * 10 + uRange;
-        else if (uValue == U8_10_LIMIT && uRange < 6)
-            uValue = U8_MAX - 5 + uRange;
+        else if (uValue == uDiv && uRange <= uMod)
+            uValue = uSub + uRange;
         else {
-            *puHead = uValue;
-            *ppTail = p;
-            return 1;
+            e = 1;
+            break;
         }
         ++p;
     }
-    *puHead = u16;
+    *pValue = uValue;
     *ppTail = p;
-    return 0;
+    return e;
+}
+
+inline static E8 String_ParseU8_Max9( U8 *pValue, const C **ppTail, U8 uMax ) {
+    E8 e = 0;
+    U8 uValue = *pValue;
+    const C *p = *ppTail;
+    const U8 uDiv = uMax / 10;
+    const U8 uMod = uMax % 10;
+    const U8 uSub = uMax - uMod;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue <= uDiv)
+            uValue = uValue * 10 + uRange;
+        else {
+            e = 1;
+            break;
+        }
+        ++p;
+    }
+    *pValue = uValue;
+    *ppTail = p;
+    return e;
+}
+
+inline static E8 String_ParseU8(U8 *puHead, const C **ppTail) {
+    return String_ParseU8_Max(pValue, ppTail, U8_MAX);
 }
 
 //Parse '0x' prefix youself

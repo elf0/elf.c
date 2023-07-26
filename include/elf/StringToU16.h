@@ -166,6 +166,28 @@ inline static E8 String_ParseU16_Max( U16 *pValue, const C **ppTail, U16 uMax ) 
     return e;
 }
 
+inline static E8 String_ParseU16_Max9( U16 *pValue, const C **ppTail, U16 uMax ) {
+    E8 e = 0;
+    U16 uValue = *pValue;
+    const C *p = *ppTail;
+    const U16 uDiv = uMax / 10;
+    const U16 uMod = uMax % 10;
+    const U16 uSub = uMax - uMod;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue <= uDiv)
+            uValue = uValue * 10 + uRange;
+        else {
+            e = 1;
+            break;
+        }
+        ++p;
+    }
+    *pValue = uValue;
+    *ppTail = p;
+    return e;
+}
+
 inline static E8 String_ParseU16(U16 *puHead, const C **ppTail) {
     return String_ParseU16_Max(pValue, ppTail, U16_MAX);
 }

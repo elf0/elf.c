@@ -166,6 +166,28 @@ inline static E8 String_ParseU32_Max( U32 *pValue, const C **ppTail, U32 uMax ) 
     return e;
 }
 
+inline static E8 String_ParseU32_Max9( U32 *pValue, const C **ppTail, U32 uMax ) {
+    E8 e = 0;
+    U32 uValue = *pValue;
+    const C *p = *ppTail;
+    const U32 uDiv = uMax / 10;
+    const U32 uMod = uMax % 10;
+    const U32 uSub = uMax - uMod;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue <= uDiv)
+            uValue = uValue * 10 + uRange;
+        else {
+            e = 1;
+            break;
+        }
+        ++p;
+    }
+    *pValue = uValue;
+    *ppTail = p;
+    return e;
+}
+
 inline static E8 String_ParseU32(U32 *puHead, const C **ppTail) {
     return String_ParseU32_Max(pValue, ppTail, U32_MAX);
 }
