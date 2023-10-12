@@ -91,6 +91,30 @@ static E8 File_CreateForWrite(File *pFile, const C *pPath){
 #endif
 }
 
+inline static int File_PreparePathAndFile(const char *pFileName, size_t uSize) {
+    char *p = (char*)pFileName;
+RETRY:
+    int fd = open(pFileName, O_CREAT | O_WRONLY, 0644);
+    if (fd >= 0)
+        return fd;
+
+    if (errno != ENOENT)
+        return -1;
+
+    const char *pEnd = pFileName + uSize;
+    while (p != pEnd) {
+        if (*p == '/') {
+            *p = 0;
+            int iResult = mkdir(pFileName, 0744);
+            *p = '/';
+            if (iResult && errno != EEXIST)
+                return -1;
+        }
+        ++p;
+    }
+    goto RETRY;
+}
+
 inline
 static E8 File_Prepare(File *pFile, const C *pPath){
 #ifdef __linux__

@@ -72,7 +72,7 @@ inline static U64 String_ParseU64_2(U64 uHead, const C **ppTail) {
     while ((uRange = *p - '0') < 2) {
         if (uHead >= 0x8000000000000000) {
             *ppTail = p;
-            return 0xFFFFFFFFFFFFFFFF;
+            return U64_MAX;
         }
         uHead = (uHead << 1) | uRange;
         ++p;
@@ -88,7 +88,7 @@ inline static U64 String_ParseU64_4(U64 uHead, const C **ppTail) {
     while ((uRange = *p - '0') < 4) {
         if (uValue >= 0x4000000000000000) {
             *ppTail = p;
-            return 0xFFFFFFFFFFFFFFFF;
+            return U64_MAX;
         }
         uHead = (uHead << 2) | uRange;
         ++p;
@@ -104,7 +104,7 @@ inline static U64 String_ParseU64_8(U64 uHead, const C **ppTail) {
     while ((uRange = *p - '0') < 8) {
         if (uHead >= 0x2000000000000000) {
             *ppTail = p;
-            return 0xFFFFFFFFFFFFFFFF;
+            return U64_MAX;
         }
         uHead = (uHead << 3) | uRange;
         ++p;
@@ -160,7 +160,24 @@ inline static E8 String_ParseU64_Max9( U64 *pValue, const C **ppTail, U64 uMax )
 }
 
 inline static E8 String_ParseU64( U64 *pValue, const C **ppTail ) {
-    return String_ParseU64_Max(pValue, ppTail, U64_MAX);
+    E8 e = 0;
+    U64 uValue = *pValue;
+    const C *p = *ppTail;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue < 0x1999999999999999)
+            uValue = uValue * 10 + uRange;
+        else if (uValue == 0x1999999999999999 && uRange < 6)
+            uValue = 0xFFFFFFFFFFFFFFFA + uRange;
+        else {
+            e = 1;
+            break;
+        }
+        ++p;
+    }
+    *pValue = uValue;
+    *ppTail = p;
+    return e;
 }
 
 //Parse '0x' prefix youself
@@ -179,7 +196,7 @@ inline static U64 String_ParseU64_16(U64 uHead, const U8 **ppTail) {
 
         if (uHead >= 0x1000000000000000) {
             *ppTail = p;
-            return 0xFFFFFFFFFFFFFFFF;
+            return U64_MAX;
         }
         uHead = (uHead << 4) | uRange;
         ++p;

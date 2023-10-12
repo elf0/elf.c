@@ -188,8 +188,25 @@ inline static E8 String_ParseU32_Max9( U32 *pValue, const C **ppTail, U32 uMax )
     return e;
 }
 
-inline static E8 String_ParseU32(U32 *puHead, const C **ppTail) {
-    return String_ParseU32_Max(pValue, ppTail, U32_MAX);
+inline static E8 String_ParseU32(U32 *pValue, const C **ppTail) {
+    E8 e = 0;
+    U32 uValue = *pValue;
+    const C *p = *ppTail;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue < 0x19999999)
+            uValue = uValue * 10 + uRange;
+        else if (uValue == 0x19999999 && uRange < 6)
+            uValue = 0xFFFFFFFA + uRange;
+        else {
+            e = 1;
+            break;
+        }
+        ++p;
+    }
+    *pValue = uValue;
+    *ppTail = p;
+    return e;
 }
 
 //Parse '0x' prefix and first digit youself

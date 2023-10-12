@@ -208,38 +208,54 @@ inline static E8 String_ParseU8_Max9( U8 *pValue, const C **ppTail, U8 uMax ) {
     return e;
 }
 
-inline static E8 String_ParseU8(U8 *puHead, const C **ppTail) {
-    return String_ParseU8_Max(pValue, ppTail, U8_MAX);
+inline static E8 String_ParseU8(U8 *pValue, const C **ppTail) {
+    E8 e = 0;
+    U8 uValue = *pValue;
+    const C *p = *ppTail;
+    U8 uRange;
+    while ((uRange = *p - '0') < 10) {
+        if (uValue < 0x19)
+            uValue = uValue * 10 + uRange;
+        else if (uValue == 0x19 && uRange < 6)
+            uValue = 0xFA + uRange;
+        else {
+            e = 1;
+            break;
+        }
+        ++p;
+    }
+    *pValue = uValue;
+    *ppTail = p;
+    return e;
 }
 
 //Parse '0x' prefix youself
-inline
-    static E8 String_ParseU8_16(U8 uValue, const C **ppTail, U8 *puValue) {
+inline static E8 String_ParseU8_16(U8 *puValue, const C **ppTail) {
+    E8 e = 0;
+    U8 uValue = *puValue;
     const C *p = *ppTail;
     while (1) {
         U8 uRange = *p - '0';
-        if (uRange > 9) {
+        if (uRange >= 10) {
             uRange &= 0xDF;
             uRange -= 0x11;
-            if (uRange > 5)
+            if (uRange >= 6)
                 break;
 
             uRange += 10;
         }
 
-        if (uValue > 0xF) {
-            *ppTail = p;
-            return 1;
+        if (uValue >= 0x10) {
+            e = 1;
+            break;
         }
-
-        uValue <<= 4;
-        uValue |= uRange;
+        uValue = (uValue << 4) | uRange;
         ++p;
     }
 
-    *ppTail = p;
     *puValue = uValue;
-    return 0;
+    *ppTail = p;
+    return e;
 }
 
 #endif // STRING_TO_U8_H

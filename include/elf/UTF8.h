@@ -13,6 +13,16 @@
 #define UNICODE_MAX 0x10FFFF
 #define UNICODE_INVALID(c32) (c32 > 0x10FFFF)
 
+//#define ERROR_UTF8 1
+#ifndef ERROR_UTF8
+#error "ERROR_UTF8 must be defined"
+#endif
+#define ERROR_UTF8_PARTIAL (ERROR_UTF8 + 0)
+#define ERROR_UTF8_HEAD (ERROR_UTF8 + 1)
+#define ERROR_UTF8_TAIL (ERROR_UTF8 + 2)
+#define ERROR_UTF8_RANGE (ERROR_UTF8 + 3)
+#define ERROR_UTF8_END (ERROR_UTF8 + 4)
+
 inline
 static const C *UTF8_Skip(const C *p) {
   U8 u8 = *p;
@@ -186,63 +196,58 @@ static B UTF8_Valid(const C *p, const C *pEnd) {
   return 1;
 }
 
-inline
-static C32 UTF8_Parse(const C **ppBegin, const C *pEnd) {
-  const C *p = *ppBegin;
-  C32 c32 = *p++;
-  if (c32 > 0x7F) { // 0xxxxxxx
-    if (c32 < 0xE0) { // 110xxxxx 10xxxxxx
-      if (c32 < 0xC2 || p == pEnd) {
-        c32 |= 0x80000000;
-        goto END;
-      }
-      c32 &= 0x1F;
-    }
-    else {
-      if (c32 < 0xF0) { // 1110xxxx 10xxxxxx 10xxxxxx
-        if (p + 1 >= pEnd) {
-          c32 |= 0x80000000;
-          goto END;
+inline static C32 UTF8_Parse(C **pp, C *pEnd) {
+    C *p = *pp;
+    C32 uCode = *p++;
+    if (uCode >= 0x80) {
+        if (uCode < 0xE0) { // 110xxxxx 10xxxxxx
+            if (uCode < 0xC2)
+                return ERROR_UTF8_HEAD;
+
+            uCode &= 0x1F;
         }
-        c32 &= 0x0F;
-      }
-      else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-        if (c32 > 0xF4 || p + 2 >= pEnd) {
-          c32 |= 0x80000000;
-          goto END;
+        else {
+            if (uCode < 0xF0) // 1110xxxx 10xxxxxx 10xxxxxx
+                uCode &= 0x0F;
+            else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                if (uCode >= 0xF8)
+                    return ERROR_UTF8_HEAD;
+
+                uCode &= 0x07;
+                if (p == pEnd)
+                    return ERROR_UTF8_PARTIAL;
+
+                C t = *p++ - 0x80;
+                if (t >= 0x40)
+                    return ERROR_UTF8_TAIL;
+
+                uCode <<= 6;
+                uCode |= t;
+                if (uCode >= 0x110)
+                    return ERROR_UTF8_RANGE;
+            }
+            if (p == pEnd)
+                return ERROR_UTF8_PARTIAL;
+
+            C t = *p++ - 0x80;
+            if (t >= 0x40)
+                return ERROR_UTF8_TAIL;
+
+            uCode <<= 6;
+            uCode |= t;
         }
-        c32 &= 0x07;
+        if (p == pEnd)
+            return ERROR_UTF8_PARTIAL;
+
         C t = *p++ - 0x80;
-        if (t > 0x3F) {
-          c32 |= 0x80000000;
-          goto END;
-        }
-        c32 <<= 6;
-        c32 |= t;
-        if (c32 > 0x10F) {
-          c32 |= 0x80000000;
-          goto END;
-        }
-      }
-      C t = *p++ - 0x80;
-      if (t > 0x3F) {
-        c32 |= 0x80000000;
-        goto END;
-      }
-      c32 <<= 6;
-      c32 |= t;
+        if (t >= 0x40)
+            return ERROR_UTF8_TAIL;
+
+        uCode <<= 6;
+        uCode |= t;
     }
-    C t = *p++ - 0x80;
-    if (t > 0x3F) {
-      c32 |= 0x80000000;
-      goto END;
-    }
-    c32 <<= 6;
-    c32 |= t;
-  }
-END:
-  *ppBegin = p;
-  return c32;
+    *pp = p;
+    return uCode;
 }
 
 inline

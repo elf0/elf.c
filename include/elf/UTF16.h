@@ -160,7 +160,7 @@ static C32 UTF16_ReadBE(const C **ppString) {
 }
 
 inline
-static U8 UTF16_NeedBytes(C32 value) {
+static U8 UTF16_Bytes(C32 value) {
   return value < 0x10000? 2 : 4;
 }
 
