@@ -18,12 +18,39 @@
 
 #endif
 
+//Boolean
+#if defined(__UINT8_TYPE__)
+typedef __UINT8_TYPE__ B;
+#else
+typedef unsigned char  B;
+#endif
+#define false 0
+#define true  1
+
 #if defined(__UINT8_TYPE__)
 typedef __UINT8_TYPE__ U8;
 #else
 typedef unsigned char  U8;
 #endif
 #define U8_MAX 0xFF
+
+// Can not overflow
+inline static U8 U8_CountInRange(U8 min, U8 max) {
+    return max - min + 1;
+}
+
+inline static U8 U8_IndexInRange(U8 value, U8 min) {
+    return value - min;
+}
+
+inline static B U8_InRange(U8 value, U8 min, U8 max){
+//    return value - min < max - min + 1; //Bug? Both gcc and clang Will optimize it to: return value < max + 1;
+    return U8_IndexInRange(value, min) < U8_CountInRange(min, max);
+}
+
+inline static B U8_NotInRange(U8 value, U8 min, U8 max){
+     return U8_IndexInRange(value, min) >= U8_CountInRange(min, max);
+}
 
 #if defined(__UINT16_TYPE__)
 typedef __UINT16_TYPE__ U16;
@@ -32,6 +59,24 @@ typedef unsigned short  U16;
 #endif
 #define U16_MAX 0xFFFF
 
+// Can not overflow
+inline static U16 U16_CountInRange(U16 min, U16 max) {
+    return max - min + 1;
+}
+
+inline static U16 U16_IndexInRange(U16 value, U16 min) {
+    return value - min;
+}
+
+inline static B U16_InRange(U16 value, U16 min, U16 max){
+//    return value - min < max - min + 1; //Bug? Both gcc and clang Will optimize it to: return value < max + 1;
+    return U16_IndexInRange(value, min) < U16_CountInRange(min, max);
+}
+
+inline static B U16_NotInRange(U16 value, U16 min, U16 max){
+     return U16_IndexInRange(value, min) >= U16_CountInRange(min, max);
+}
+
 #if defined(__UINT32_TYPE__)
 typedef __UINT32_TYPE__ U32;
 #else
@@ -39,6 +84,24 @@ typedef unsigned int    U32;
 #endif
 #define U24_MAX 0xFFFFFF
 #define U32_MAX 0xFFFFFFFF
+
+// Can not overflow
+inline static U32 U32_CountInRange(U32 min, U32 max) {
+    return max - min + 1;
+}
+
+inline static U32 U32_IndexInRange(U32 value, U32 min) {
+    return value - min;
+}
+
+inline static B U32_InRange(U32 value, U32 min, U32 max){
+//    return value - min < max - min + 1; //Bug? Both gcc and clang Will optimize it to: return value < max + 1;
+    return U32_IndexInRange(value, min) < U32_CountInRange(min, max);
+}
+
+inline static B U32_NotInRange(U32 value, U32 min, U32 max){
+     return U32_IndexInRange(value, min) >= U32_CountInRange(min, max);
+}
 
 #if defined(__UINT64_TYPE__)
 typedef __UINT64_TYPE__    U64;
@@ -49,6 +112,25 @@ typedef unsigned long U64;
 #define U48_MAX 0xFFFFFFFFFFFF
 #define U56_MAX 0xFFFFFFFFFFFFFF
 #define U64_MAX 0xFFFFFFFFFFFFFFFF
+
+// Can not overflow
+inline static U64 U64_CountInRange(U64 min, U64 max) {
+    return max - min + 1;
+}
+
+inline static U64 U64_IndexInRange(U64 value, U64 min) {
+    return value - min;
+}
+
+inline static B U64_InRange(U64 value, U64 min, U64 max){
+//    return value - min < max - min + 1; //Bug? Both gcc and clang Will optimize it to: return value < max + 1;
+    return U64_IndexInRange(value, min) < U64_CountInRange(min, max);
+}
+
+inline static B U64_NotInRange(U64 value, U64 min, U64 max){
+     return U64_IndexInRange(value, min) >= U64_CountInRange(min, max);
+}
+
 
 #if defined(__INT8_TYPE__)
 typedef __INT8_TYPE__ I8;
@@ -95,11 +177,6 @@ typedef F32 F;
 typedef U8 C;
 typedef U16 C16;
 typedef U32 C32;
-
-//Boolean
-typedef U8 B;
-#define false 0
-#define true  1
 
 typedef U8 Byte;
 

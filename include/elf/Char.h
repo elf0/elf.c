@@ -7,14 +7,21 @@
 
 #include "Type.h"
 
-inline
-static B C_InRange(C cValue, C cMin, U8 uSize){
-    return (U8)(cValue - cMin) < uSize;
+// Can not overflow
+inline static U8 C_CountInRange(C cMin, C cMax) {
+    return cMax - cMin + 1;
 }
 
-inline
-static B C_NotInRange(C cValue, C cMin, U8 uMax){
-    return (U8)(cValue - cMin) > uMax;
+inline static U8 C_IndexInRange(C c, C cMin) {
+    return c - cMin;
+}
+
+inline static B C_InRange(C c, C cMin, C cMax){
+    return C_IndexInRange(c, cMin) < C_CountInRange(cMin, cMax);
+}
+
+inline static B C_NotInRange(C c, C cMin, U8 cMax){
+     return C_IndexInRange(c, cMin) >= C_CountInRange(cMin, cMax);
 }
 
 #define CASE_CHAR_HEX_LETTER_UPPER \
@@ -45,33 +52,25 @@ static B C_NotInRange(C cValue, C cMin, U8 uMax){
 #define CASE_CHAR_DIGIT \
     '0': case CASE_CHAR_NONZERODIGIT
 
-inline
-static B C_IsUpper(C c){
-    return C_InRange(c, (C)'A', 26);
+inline static B C_IsUpper(C c){
+    return C_InRange(c, 'A', 'Z');
 }
 
-inline
-static B C_IsLower(C c){
-    return C_InRange(c, (C)'a', 26);
+inline static B C_IsLower(C c){
+    return C_InRange(c, 'a', 'z');
 }
 
 inline
 static B C_IsAlpha(C c){
-    switch(c){
-    case CASE_CHAR_UPPER: case CASE_CHAR_LOWER:
-        return true;
-    }
-    return false;
+    return C_InRange(c | 0x20, 'a', 'z');
 }
 
-inline
-static B C_IsDigit(C c){
-    return (U8)(c - (C)'0') < 10;
+inline static B C_IsDigit(C c){
+    return C_InRange(c, '0', '9');
 }
 
-inline
-static B C_IsNotDigit(C c){
-    return (U8)(c - (C)'0') > 9;
+inline static B C_IsNotDigit(C c){
+    return C_NotInRange(c, '0', '9');
 }
 
 inline
