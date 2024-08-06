@@ -410,7 +410,7 @@ NEXT:
     return NULL;
 }
 
-inline static const C *String_FindCI(const C *p, const C *pEnd, U32 uBytes, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
+inline static const C *String_FindCI(const C *p, const C *pEnd, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
     pEnd -= uKeyword - 1;
     C k0 = *pKeyword++ | 0x20;
 NEXT:
@@ -428,7 +428,7 @@ NEXT:
     return NULL;
 }
 
-inline static const C *String_FindCIL(const C *p, const C *pEnd, U32 uBytes, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
+inline static const C *String_FindCIL(const C *p, const C *pEnd, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
     pEnd -= uKeyword - 1;
     C k0 = *pKeyword++;
 NEXT:
