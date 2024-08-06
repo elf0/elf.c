@@ -8,7 +8,28 @@
 #include "UTF8.h"
 #include "UTF16.h"
 
-static C16 *UTF_8To16(C16 *p16, const C16 *p16End, const C **pp8, const C *p8End) {
+inline static U16 UTF_Bytes8To16(const C *p, const C *pEnd) {
+    U32 uBytes = 0;
+    while (p != pEnd) {
+        C c = *p;
+        if (c < 0xF0) {
+            uBytes += 2;
+            if (c < 0x80) // 0xxxxxxx
+                ++p;
+            else if (c < 0xE0) // 110xxxxx 10xxxxxx
+                p += 2;
+            else if (c < 0xF0) // 1110xxxx 10xxxxxx 10xxxxxx
+                p += 3;
+        }
+        else {
+            uBytes += 4;
+            p += 4; // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+        }
+    }
+    return uBytes;
+}
+
+inline static C16 *UTF_8To16(C16 *p16, const C16 *p16End, const C **pp8, const C *p8End) {
     const C *p8 = *pp8;
     while (p8 != p8End) {
         const C *p8Begin = p8;
@@ -23,8 +44,7 @@ static C16 *UTF_8To16(C16 *p16, const C16 *p16End, const C **pp8, const C *p8End
     return p16;
 }
 
-inline
-static C *UTF_16To8(C *p8, const C *p8End, const C16 **pp16, const C16 *p16End) {
+inline static C *UTF_16To8(C *p8, const C *p8End, const C16 **pp16, const C16 *p16End) {
     const C16 *p16 = *pp16;
     while (p16 != p16End) {
         const C16 *p16Begin = p16;

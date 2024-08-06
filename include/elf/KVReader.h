@@ -3,16 +3,8 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@iamelf.com
+//EMail:
 
-//Structure: "Key0:Value0\nKey1:Value1\nKey2:Value2\n:\n"
-//Buffer must ends with ":\n"
-
-#include "String.h"
-
-#ifndef KVReader_FILE_END
-#define KVReader_FILE_END ":\n"
-#endif
 
 #ifndef KVReader_KEY_END_CHAR
 #define KVReader_KEY_END_CHAR ':'
@@ -26,31 +18,49 @@
 typedef E8 (*KVReader_Handler)(void *pContext, const C *pKey, const C *pKeyEnd, const C *pValue, const C *pValueEnd);
 
 static inline E8 KVReader_Parse(void *pContext, const C *pBegin, const C *pEnd, KVReader_Handler onKV){
-  if((pEnd - pBegin) < 2 || *(U16*)(pEnd - 2) != *(U16*)KVReader_FILE_END)
-    return 1;
-  --pEnd;
+    const C *pREnd = pBegin - 1;
+    const C *pLastKeyEnd = --pEnd;
+    while (1) {
+        if (pEnd == pREnd)
+            return 1;
 
-  E8 e;
-  const C *pKey, *pKeyEnd, *pValue;
-  const C *p = pBegin;
-  while(1){
-#ifndef KVReader_FORBID_EMPTY_RECORD
-    p = String_Skip(p, (C)KVReader_VALUE_END_CHAR);
-#endif
+        if (*pEnd == KVReader_VALUE_END_CHAR)
+            break;
 
-    p = String_SkipUntil(pKey = p, (C)KVReader_KEY_END_CHAR);
-    pKeyEnd = p++;
+        --pEnd;
+    }
 
-    p = String_SkipUntil(pValue = p, (C)KVReader_VALUE_END_CHAR);
-    if(p == pEnd)
-      break;
+    while (1) {
+        if (pLastKeyEnd == pREnd)
+            return 1;
 
-    e = onKV(pContext, pKey, pKeyEnd, pValue, p++);
-    if(e)
-      return e;
-  }
+        if (*pLastKeyEnd == KVReader_KEY_END_CHAR)
+            break;
 
-  return 0;
+        --pLastKeyEnd;
+    }
+
+    if (pEnd <= pLastKeyEnd)
+        return 1;
+
+    E8 e;
+    const C *pKey, *pKeyEnd, *pValue;
+    const C *p = pBegin;
+    do {
+        pKey = p;
+        while (*p != KVReader_KEY_END_CHAR)
+            ++p;
+
+        pKeyEnd = p++;
+        pValue = p;
+        while (*p != KVReader_VALUE_END_CHAR)
+            ++p;
+
+        e = onKV(pContext, pKey, pKeyEnd, pValue, p);
+        if(e)
+            return e;
+    } while (p++ != pEnd);
+    return 0;
 }
 
 #endif // KVREADER_H

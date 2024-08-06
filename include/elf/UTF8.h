@@ -94,15 +94,18 @@ static C32 UTF8_ReadTail(C32 cHead, const C **ppTail) {
 inline
 static C32 UTF8_Read(const C **ppString) {
   const C *p = *ppString;
-  C32 c32 = *p++;
-  if (c32 > 0x7F) { // 0xxxxxxx
-    if (c32 < 0xE0) // 110xxxxx 10xxxxxx
-      c32 &= 0x1F;
+  C32 c32;
+  C c = *p++;
+  if (c < 0x80) // 0xxxxxxx
+    c32 = c;
+  else {
+    if (c < 0xE0) // 110xxxxx 10xxxxxx
+      c32 = c & 0x1F;
     else {
-      if (c32 < 0xF0) // 1110xxxx 10xxxxxx 10xxxxxx
-        c32 &= 0x0F;
+      if (c < 0xF0) // 1110xxxx 10xxxxxx 10xxxxxx
+        c32 = c & 0x0F;
       else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-        c32 &= 0x07;
+        c32 = c & 0x07;
         c32 <<= 6;
         c32 |= *p++ & 0x3F;
       }
@@ -114,6 +117,38 @@ static C32 UTF8_Read(const C **ppString) {
   }
   *ppString = p;
   return c32;
+}
+
+inline static C32 UTF8_LowerRead(const C **ppString) {
+    const C *p = *ppString;
+    C32 c32;
+    C c = *p++;
+    if (c < 0x80) { // 0xxxxxxx
+        U8 r = c - 'A';
+        if (r < 26)
+            c |= 0x20;
+
+        c32 = c;
+    }
+    else {
+        if (c < 0xE0) // 110xxxxx 10xxxxxx
+            c32 = c & 0x1F;
+        else {
+            if (c < 0xF0) // 1110xxxx 10xxxxxx 10xxxxxx
+                c32 = c & 0x0F;
+            else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                c32 = c & 0x07;
+                c32 <<= 6;
+                c32 |= *p++ & 0x3F;
+            }
+            c32 <<= 6;
+            c32 |= *p++ & 0x3F;
+        }
+        c32 <<= 6;
+        c32 |= *p++ & 0x3F;
+    }
+    *ppString = p;
+    return c32;
 }
 
 inline
