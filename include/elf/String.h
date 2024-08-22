@@ -557,71 +557,73 @@ inline static B String_Equal8(const C *pLeft, const C *pRight) {
     return *(const U64*)pLeft == *(const U64*)pRight;
 }
 
-inline static B String_Equal(const C *pLeft, U32 uLeft, const C *pRight, const C *pRightEnd, U32 uRight) {
+inline static B String_Equal(U32 uLeft, const C *pLeft, U32 uRight, const C *pRight, const C *pRightEnd) {
     if (uLeft != uRight)
         return 0;
 
     const C *pREnd = pRight + (uRight & 0xFFFFFFF8);
-    while (pRight != pREnd) {
-        if (*(U64*)pLeft != *(U64*)pRight)
+    const C *pR = pRight;
+    while (pR != pREnd) {
+        if (*(U64*)pLeft != *(U64*)pR)
             return 0;
 
         pLeft += 8;
-        pRight += 8;
+        pR += 8;
     }
     pREnd = pRight + (uRight & 0xFFFFFFFC);
-    if (pRight != pREnd) {
-        if (*(U32*)pLeft != *(U32*)pRight)
+    if (pR != pREnd) {
+        if (*(U32*)pLeft != *(U32*)pR)
             return 0;
 
         pLeft += 4;
-        pRight += 4;
+        pR += 4;
     }
     pREnd = pRight + (uRight & 0xFFFFFFFE);
-    if (pRight != pREnd) {
-        if (*(U16*)pLeft != *(U16*)pRight)
+    if (pR != pREnd) {
+        if (*(U16*)pLeft != *(U16*)pR)
             return 0;
 
         pLeft += 2;
-        pRight += 2;
+        pR += 2;
     }
-    if (pRight != pRightEnd) {
-        if (*pLeft++ != *pRight++)
+    if (pR != pRightEnd) {
+        if (*pLeft++ != *pR++)
             return 0;
     }
     return 1;
 }
 
-inline static B String_EqualCI(const C *pLeft, U32 uLeft, const C *pRight, const C *pRightEnd, U32 uRight) {
+inline static B String_EqualCI(U32 uLeft, const C *pLeft, U32 uRight, const C *pRight, const C *pRightEnd) {
     if (uLeft != uRight)
         return 0;
 
     const C *pREnd = pRight + (uRight & 0xFFFFFFF8);
-    while (pRight != pREnd) {
-        if ((*(U64*)pLeft | 0x2020202020202020) != (*(U64*)pRight | 0x2020202020202020))
+    const C *pR = pRight;
+    while (pR != pREnd) {
+        if ((*(U64*)pLeft | 0x2020202020202020) != (*(U64*)pR | 0x2020202020202020))
             return 0;
 
         pLeft += 8;
-        pRight += 8;
+        pR += 8;
     }
     pREnd = pRight + (uRight & 0xFFFFFFFC);
-    while (pRight != pREnd) {
-        if ((*(U32*)pLeft | 0x20202020) != (*(U32*)pRight | 0x20202020))
+    if (pR != pREnd) {
+        if ((*(U32*)pLeft | 0x20202020) != (*(U32*)pR | 0x20202020))
             return 0;
 
         pLeft += 4;
-        pRight += 4;
+        pR += 4;
     }
     pREnd = pRight + (uRight & 0xFFFFFFFE);
-    while (pRight != pREnd) {
-        if ((*(U16*)pLeft | 0x2020) != (*(U16*)pRight | 0x2020))
+    if (pR != pREnd) {
+        if ((*(U16*)pLeft | 0x2020) != (*(U16*)pR | 0x2020))
             return 0;
 
         pLeft += 2;
-        pRight += 2;
+        pR += 2;
     }
-    while (pRight != pRightEnd) {
-        if ((*pLeft++ | 0x20) != (*pRight++ | 0x20))
+    if (pR != pRightEnd) {
+        if ((*pLeft++ | 0x20) != (*pR++ | 0x20))
             return 0;
     }
     return 1;
