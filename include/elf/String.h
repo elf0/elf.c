@@ -570,16 +570,14 @@ inline static B String_Equal(U32 uLeft, const C *pLeft, U32 uRight, const C *pRi
         pLeft += 8;
         pR += 8;
     }
-    pREnd = pRight + (uRight & 0xFFFFFFFC);
-    if (pR != pREnd) {
+    if (pR + 4 <= pRightEnd) {
         if (*(U32*)pLeft != *(U32*)pR)
             return 0;
 
         pLeft += 4;
         pR += 4;
     }
-    pREnd = pRight + (uRight & 0xFFFFFFFE);
-    if (pR != pREnd) {
+    if (pR + 2 <= pRightEnd) {
         if (*(U16*)pLeft != *(U16*)pR)
             return 0;
 
@@ -606,16 +604,14 @@ inline static B String_EqualCI(U32 uLeft, const C *pLeft, U32 uRight, const C *p
         pLeft += 8;
         pR += 8;
     }
-    pREnd = pRight + (uRight & 0xFFFFFFFC);
-    if (pR != pREnd) {
+    if (pR + 4 <= pRightEnd) {
         if ((*(U32*)pLeft | 0x20202020) != (*(U32*)pR | 0x20202020))
             return 0;
 
         pLeft += 4;
         pR += 4;
     }
-    pREnd = pRight + (uRight & 0xFFFFFFFE);
-    if (pR != pREnd) {
+    if (pR + 2 <= pRightEnd) {
         if ((*(U16*)pLeft | 0x2020) != (*(U16*)pR | 0x2020))
             return 0;
 
