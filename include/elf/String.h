@@ -336,7 +336,7 @@ inline static const C *String_Find32(const C *pBegin, const C *pEnd, U64 v0, U64
 inline static const C *String_Find(const C *p, const C *pEnd, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
     const C *pK8End = pKeyword + (uKeyword & 0xFFFFFFF8);
     pEnd -= uKeyword - 1;
-    while (pBegin != pEnd) {
+    while (pBegin < pEnd) {
         const C *p = pBegin;
         const C *pK = pKeyword;
         while (pK != pK8End) {
@@ -372,7 +372,7 @@ inline static const C *String_Find(const C *p, const C *pEnd, const C *pKeyword,
 inline static const C *String_FindCI(const C *p, const C *pEnd, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
     const C *pK8End = pKeyword + (uKeyword & 0xFFFFFFF8);
     pEnd -= uKeyword - 1;
-    while (pBegin != pEnd) {
+    while (pBegin < pEnd) {
         const C *p = pBegin;
         const C *pK = pKeyword;
         while (pK != pK8End) {
@@ -408,7 +408,7 @@ inline static const C *String_FindCI(const C *p, const C *pEnd, const C *pKeywor
 inline static const C *String_FindCIL(const C *p, const C *pEnd, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
     const C *pK8End = pKeyword + (uKeyword & 0xFFFFFFF8);
     pEnd -= uKeyword - 1;
-    while (pBegin != pEnd) {
+    while (pBegin < pEnd) {
         const C *p = pBegin;
         const C *pK = pKeyword;
         while (pK != pK8End) {
