@@ -32,7 +32,7 @@ inline static B String_Equal2(const C *pLeft, const C *pRight);
 inline static B String_Equal4(const C *pLeft, const C *pRight);
 inline static B String_Equal6(const C *pLeft, const C *pRight4, const C *pRight2);
 inline static B String_Equal8(const C *pLeft, const C *pRight);
-inline static B String_Equal(const C *pLeft, U32 uLeft, const C *pRight, const C *pRightEnd, U32 uRight);
+inline static B String_Equal(U32 uBytes, const C *pLeft, const C *pRight, const C *pRightEnd);
 inline static B String_EqualCI(const C *pLeft, U32 uLeft, const C *pRight, const C *pRightEnd, U32 uRight);
 
 inline static C *String_Hex8(U8 uValue, C *pBuffer);
@@ -557,11 +557,8 @@ inline static B String_Equal8(const C *pLeft, const C *pRight) {
     return *(const U64*)pLeft == *(const U64*)pRight;
 }
 
-inline static B String_Equal(U32 uLeft, const C *pLeft, U32 uRight, const C *pRight, const C *pRightEnd) {
-    if (uLeft != uRight)
-        return 0;
-
-    const C *pREnd = pRight + (uRight & 0xFFFFFFF8);
+inline static B String_Equal(U32 uBytes, const C *pLeft, const C *pRight, const C *pRightEnd) {
+    const C *pREnd = pRight + (uBytes & 0xFFFFFFF8);
     const C *pR = pRight;
     while (pR != pREnd) {
         if (*(U64*)pLeft != *(U64*)pR)
@@ -584,18 +581,11 @@ inline static B String_Equal(U32 uLeft, const C *pLeft, U32 uRight, const C *pRi
         pLeft += 2;
         pR += 2;
     }
-    if (pR != pRightEnd) {
-        if (*pLeft++ != *pR++)
-            return 0;
-    }
-    return 1;
+    return pR == pRightEnd || *pLeft == *pR;
 }
 
-inline static B String_EqualCI(U32 uLeft, const C *pLeft, U32 uRight, const C *pRight, const C *pRightEnd) {
-    if (uLeft != uRight)
-        return 0;
-
-    const C *pREnd = pRight + (uRight & 0xFFFFFFF8);
+inline static B String_EqualCI(U32 uBytes, const C *pLeft, const C *pRight, const C *pRightEnd) {
+    const C *pREnd = pRight + (uBytes & 0xFFFFFFF8);
     const C *pR = pRight;
     while (pR != pREnd) {
         if ((*(U64*)pLeft | 0x2020202020202020) != (*(U64*)pR | 0x2020202020202020))
@@ -618,11 +608,7 @@ inline static B String_EqualCI(U32 uLeft, const C *pLeft, U32 uRight, const C *p
         pLeft += 2;
         pR += 2;
     }
-    if (pR != pRightEnd) {
-        if ((*pLeft++ | 0x20) != (*pR++ | 0x20))
-            return 0;
-    }
-    return 1;
+    return pR == pRightEnd || (*pLeft | 0x20) == (*pR | 0x20);
 }
 
 #define HEXCHARS "0123456789ABCDEF"
