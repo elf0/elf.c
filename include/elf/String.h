@@ -332,57 +332,110 @@ inline static const C *String_Find32(const C *pBegin, const C *pEnd, U64 v0, U64
 }
 
 
-//(pEnd - pBegin) >= uKey && uKey >  0
+//pEnd >= pBegin && uKeyword >  0
 inline static const C *String_Find(const C *p, const C *pEnd, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
+    const C *pK8End = pKeyword + (uKeyword & 0xFFFFFFF8);
     pEnd -= uKeyword - 1;
-    C k0 = *pKeyword++;
-NEXT:
-    while (p < pEnd) {
-        if (*p++ == k0) {
-            const C *pS = p;
-            const C *pK = pKeyword;
-            while (pK != pKeywordEnd) {
-                if (*pS++ != *pK++)
-                    goto NEXT;
-            }
-            return p - 1;
+    while (pBegin != pEnd) {
+        const C *p = pBegin;
+        const C *pK = pKeyword;
+        while (pK != pK8End) {
+            if (*(U64*)p != *(U64*)pK)
+                goto NEXT;
+
+            p += 8;
+            pK += 8;
         }
+        if (pK + 4 <= pKeywordEnd) {
+            if (*(U32*)p != *(U32*)pK)
+                goto NEXT;
+
+            p += 4;
+            pK += 4;
+        }
+        if (pK + 2 <= pKeywordEnd) {
+            if (*(U16*)p != *(U16*)pK)
+                goto NEXT;
+
+            p += 2;
+            pK += 2;
+        }
+        if (pK == pKeywordEnd || *p == *pK)
+            return pBegin;
+    NEXT:
+        ++pBegin;
     }
     return NULL;
 }
 
+//pEnd >= pBegin && uKeyword >  0
 inline static const C *String_FindCI(const C *p, const C *pEnd, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
+    const C *pK8End = pKeyword + (uKeyword & 0xFFFFFFF8);
     pEnd -= uKeyword - 1;
-    C k0 = *pKeyword++ | 0x20;
-NEXT:
-    while (p < pEnd) {
-        if ((*p++ | 0x20) == k0) {
-            const C *pS = p;
-            const C *pK = pKeyword;
-            while (pK != pKeywordEnd) {
-                if ((*pS++ | 0x20) != (*pK++ | 0x20))
-                    goto NEXT;
-            }
-            return p - 1;
+    while (pBegin != pEnd) {
+        const C *p = pBegin;
+        const C *pK = pKeyword;
+        while (pK != pK8End) {
+            if ((*(U64*)p | 0x2020202020202020) != (*(U64*)pK | 0x2020202020202020))
+                goto NEXT;
+
+            p += 8;
+            pK += 8;
         }
+        if (pK + 4 <= pKeywordEnd) {
+            if ((*(U32*)p | 0x20202020) != (*(U32*)pK | 0x20202020))
+                goto NEXT;
+
+            p += 4;
+            pK += 4;
+        }
+        if (pK + 2 <= pKeywordEnd) {
+            if ((*(U16*)p | 0x2020) != (*(U16*)pK | 0x2020))
+                goto NEXT;
+
+            p += 2;
+            pK += 2;
+        }
+        if (pK == pKeywordEnd || (*p | 0x20) == (*pK | 0x20))
+            return pBegin;
+    NEXT:
+        ++pBegin;
     }
     return NULL;
 }
 
+//pEnd >= pBegin && uKeyword >  0
 inline static const C *String_FindCIL(const C *p, const C *pEnd, const C *pKeyword, const C *pKeywordEnd, U32 uKeyword) {
+    const C *pK8End = pKeyword + (uKeyword & 0xFFFFFFF8);
     pEnd -= uKeyword - 1;
-    C k0 = *pKeyword++;
-NEXT:
-    while (p < pEnd) {
-        if ((*p++ | 0x20) == k0) {
-            const C *pS = p;
-            const C *pK = pKeyword;
-            while (pK != pKeywordEnd) {
-                if ((*pS++ | 0x20) != *pK++)
-                    goto NEXT;
-            }
-            return p - 1;
+    while (pBegin != pEnd) {
+        const C *p = pBegin;
+        const C *pK = pKeyword;
+        while (pK != pK8End) {
+            if ((*(U64*)p | 0x2020202020202020) != *(U64*)pK)
+                goto NEXT;
+
+            p += 8;
+            pK += 8;
         }
+        if (pK + 4 <= pKeywordEnd) {
+            if ((*(U32*)p | 0x20202020) != *(U32*)pK)
+                goto NEXT;
+
+            p += 4;
+            pK += 4;
+        }
+        if (pK + 2 <= pKeywordEnd) {
+            if ((*(U16*)p | 0x2020) != *(U16*)pK)
+                goto NEXT;
+
+            p += 2;
+            pK += 2;
+        }
+        if (pK == pKeywordEnd || (*p | 0x20) == *pK)
+            return pBegin;
+    NEXT:
+        ++pBegin;
     }
     return NULL;
 }
