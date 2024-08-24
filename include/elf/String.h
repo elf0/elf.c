@@ -282,9 +282,25 @@ inline static const C *String_Find10CI(const C *pBegin, const C *pEnd, U64 lv0, 
     return 0;
 }
 
+inline static const C *String_Find11(const C *pBegin, const C *pEnd, U64 v0, U16 v1, U8 v2) {
+    do {
+        if(*(U64*)pBegin == v0 && *(U16*)(pBegin + 8) == v1 && pBegin[10] == v2)
+            return pBegin;
+    } while (++pBegin != pEnd);
+    return 0;
+}
+
+inline static const C *String_Find11CI(const C *pBegin, const C *pEnd, U64 lv0, U16 lv1, U8 lv2) {
+    do {
+        if((*(U64*)pBegin | 0x2020202020202020) == lv0 && (*(U16*)(pBegin + 8) | 0x2020) == lv1 && (pBegin[10] | 0x20) == lv2)
+            return pBegin;
+    } while (++pBegin != pEnd);
+    return 0;
+}
+
 inline static const C *String_Find12(const C *pBegin, const C *pEnd, U64 v0, U32 v1) {
     do {
-        if(*(U64*)pBegin == v0 && *(U32*)(pBegin + 8) == lv1)
+        if(*(U64*)pBegin == v0 && *(U32*)(pBegin + 8) == v1)
             return pBegin;
     } while (++pBegin != pEnd);
     return 0;
@@ -293,6 +309,54 @@ inline static const C *String_Find12(const C *pBegin, const C *pEnd, U64 v0, U32
 inline static const C *String_Find12CI(const C *pBegin, const C *pEnd, U64 lv0, U32 lv1) {
     do {
         if((*(U64*)pBegin | 0x2020202020202020) == lv0 && (*(U32*)(pBegin + 8) | 0x20202020) == lv1)
+            return pBegin;
+    } while (++pBegin != pEnd);
+    return 0;
+}
+
+inline static const C *String_Find13(const C *pBegin, const C *pEnd, U64 v0, U32 v1, U8 v2) {
+    do {
+        if(*(U64*)pBegin == v0 && *(U32*)(pBegin + 8) == v1 && pBegin[12] == v2)
+            return pBegin;
+    } while (++pBegin != pEnd);
+    return 0;
+}
+
+inline static const C *String_Find13CI(const C *pBegin, const C *pEnd, U64 lv0, U32 lv1, U8 lv2) {
+    do {
+        if((*(U64*)pBegin | 0x2020202020202020) == lv0 && (*(U32*)(pBegin + 8) | 0x2020) == lv1 && (pBegin[12] | 0x20) == lv2)
+            return pBegin;
+    } while (++pBegin != pEnd);
+    return 0;
+}
+
+inline static const C *String_Find14(const C *pBegin, const C *pEnd, U64 v0, U32 v1, U16 v2) {
+    do {
+        if(*(U64*)pBegin == v0 && *(U32*)(pBegin + 8) == v1 && *(U16*)(pBegin + 12) == v2)
+            return pBegin;
+    } while (++pBegin != pEnd);
+    return 0;
+}
+
+inline static const C *String_Find14CI(const C *pBegin, const C *pEnd, U64 lv0, U32 lv1, U16 lv2) {
+    do {
+        if((*(U64*)pBegin | 0x2020202020202020) == lv0 && (*(U32*)(pBegin + 8) | 0x2020) == lv1 && (*(U16*)(pBegin + 12) | 0x20) == lv2)
+            return pBegin;
+    } while (++pBegin != pEnd);
+    return 0;
+}
+
+inline static const C *String_Find15(const C *pBegin, const C *pEnd, U64 v0, U32 v1, U16 v2, U8 v3) {
+    do {
+        if(*(U64*)pBegin == v0 && *(U32*)(pBegin + 8) == v1 && *(U16*)(pBegin + 12) == v2 && pBegin[14] == v3)
+            return pBegin;
+    } while (++pBegin != pEnd);
+    return 0;
+}
+
+inline static const C *String_Find15CI(const C *pBegin, const C *pEnd, U64 lv0, U32 lv1, U16 lv2, U8 lv3) {
+    do {
+        if((*(U64*)pBegin | 0x2020202020202020) == lv0 && (*(U32*)(pBegin + 8) | 0x2020) == lv1 && (*(U16*)(pBegin + 12) | 0x20) == lv2 && (pBegin[14] | 0x20) == lv3)
             return pBegin;
     } while (++pBegin != pEnd);
     return 0;
