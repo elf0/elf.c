@@ -5,8 +5,10 @@
 //Author: elf
 //EMail: elf@iamelf.com
 
-// Max utf8: F4 8F BF BF
-// Unicode: [0, 0x10FFFF]
+// Utf-8 max: F4 8F BF BF
+// Utf-8 end: F4 90 80 80
+// Unicode max: 0x10FFFF
+// Unicode end: 0x110000
 // Surrogate: [0xD800, 0xDFFF]
 // BOM: EF BB BF
 
@@ -22,6 +24,42 @@
 #define ERROR_UTF8_TAIL (ERROR_UTF8 + 2)
 #define ERROR_UTF8_RANGE (ERROR_UTF8 + 3)
 #define ERROR_UTF8_END (ERROR_UTF8 + 4)
+
+inline static B UTF8_ValidTail(C tail) {
+    return (tail & 0xC0) == 0x80;
+}
+
+inline static B UTF8_InvalidTail(C tail) {
+    return (tail & 0xC0) != 0x80;
+}
+
+inline static U32 UTF8_Code2(C c0, C c1) {
+    U32 c32;
+    c32 = c0 & 0x1F;
+    c32 <<= 6;
+    c32 |= c1 & 0x3F;
+    return c32;
+}
+
+inline static U32 UTF8_Code3(C c0, C c1, C c2) {
+    U32 c32 = U32(c0 & 0x0F);
+    c32 <<= 6;
+    c32 |= U32(c1 & 0x3F);
+    c32 <<= 6;
+    c32 |= U32(c2 & 0x3F);
+    return c32;
+}
+
+inline static U32 UTF8_Code4(C c0, C c1, C c2, C c3) {
+    U32 c32 = U32(c0 & 0x0F);
+    c32 <<= 6;
+    c32 |= U32(c1 & 0x3F);
+    c32 <<= 6;
+    c32 |= U32(c2 & 0x3F);
+    c32 <<= 6;
+    c32 |= U32(c3 & 0x3F);
+    return c32;
+}
 
 inline
 static const C *UTF8_Skip(const C *p) {

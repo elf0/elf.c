@@ -208,25 +208,22 @@ inline static E8 String_ParseU8_Max9( U8 *pValue, const C **ppTail, U8 uMax ) {
     return e;
 }
 
-inline static E8 String_ParseU8(U8 *pValue, const C **ppTail) {
-    E8 e = 0;
-    U8 uValue = *pValue;
+inline static U8 String_ParseU8(U8 uHead, const C **ppTail) {
     const C *p = *ppTail;
     U8 uRange;
     while ((uRange = *p - '0') < 10) {
-        if (uValue < 0x19)
-            uValue = uValue * 10 + uRange;
-        else if (uValue == 0x19 && uRange < 6)
-            uValue = 0xFA + uRange;
+        if (uHead < 0x19)
+            uHead = uHead * 10 + uRange;
+        else if (uHead == 0x19 && uRange < 6)
+            uHead = 0xFA + uRange;
         else {
-            e = 1;
-            break;
+            *ppTail = p;
+            return 0;
         }
         ++p;
     }
-    *pValue = uValue;
     *ppTail = p;
-    return e;
+    return uHead;
 }
 
 //Parse '0x' prefix youself

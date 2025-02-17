@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@iamelf.com
+//EMail:
 
 #ifdef __linux__
 
@@ -12,6 +12,7 @@ static U64 Time_Tick() {
     U64 uTick;
     asm volatile(
         "mfence\n\t"
+        "lfence\n\t"
         "rdtsc\n\t"
         "lfence\n\t"
         "shl $32, %%rdx\n\t"

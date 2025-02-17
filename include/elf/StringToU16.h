@@ -188,25 +188,22 @@ inline static E8 String_ParseU16_Max9( U16 *pValue, const C **ppTail, U16 uMax )
     return e;
 }
 
-inline static E8 String_ParseU16(U16 *pValue, const C **ppTail) {
-    E8 e = 0;
-    U16 uValue = *pValue;
+inline static E8 String_ParseU16(U16 uHead, const C **ppTail) {
     const C *p = *ppTail;
     U8 uRange;
     while ((uRange = *p - '0') < 10) {
-        if (uValue < 0x1999)
-            uValue = uValue * 10 + uRange;
-        else if (uValue == 0x1999 && uRange < 6)
-            uValue = 0xFFFA + uRange;
+        if (uHead < 0x1999)
+            uHead = uHead * 10 + uRange;
+        else if (uHead == 0x1999 && uRange < 6)
+            uHead = 0xFFFA + uRange;
         else {
-            e = 1;
-            break;
+            *ppTail = p;
+            return 0;
         }
         ++p;
     }
-    *pValue = uValue;
     *ppTail = p;
-    return e;
+    return uHead;
 }
 
 //Parse '0x' prefix youself
