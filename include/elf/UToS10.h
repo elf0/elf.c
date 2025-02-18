@@ -1,63 +1,55 @@
-// pEnd - pBegin should be 3
-inline static C *U8ToS10(C *pBegin, C *pEnd, U8 u8) {
+// pTo should have 3 bytes space
+inline static C *U8ToS10(C *pTo, U8 u8) {
+    C szBuffer[3];
+    C *pEnd = szBuffer + 3;
     C *p = pEnd;
     do
         *--p = u8 % 10 | '0';
     while (u8 /= 10);
-    if (p != pBegin) {
-        C *pD = pBegin;
-        do
-            *pD++ = *p++;
-        while (p != pEnd);
-        return pD;
-    }
-    return pEnd;
+    do
+        *pTo++ = *p++;
+    while (p != pEnd);
+    return pTo;
 }
 
-// pEnd - pBegin should be 5
-inline static C *U16ToS10(C *pBegin, C *pEnd, U16 u16) {
+// pTo should have 5 bytes space
+inline static C *U16ToS10(C *pTo, U16 u16) {
+    C szBuffer[5];
+    C *pEnd = szBuffer + 5;
     C *p = pEnd;
     do
         *--p = (U8)(u16 % 10) | '0';
     while (u16 /= 10);
-    if (p != pBegin) {
-        C *pD = pBegin;
-        do
-            *pD++ = *p++;
-        while (p != pEnd);
-        return pD;
-    }
-    return pEnd;
+    do
+        *pTo++ = *p++;
+    while (p != pEnd);
+    return pTo;
 }
 
-// pEnd - pBegin should be 10
-inline static C *U32ToS10(C *pBegin, C *pEnd, U32 u32) {
+// pTo should have 10 bytes space
+inline static C *U32ToS10(C *pTo, U32 u32) {
+    C szBuffer[10];
+    C *pEnd = szBuffer + 10;
     C *p = pEnd;
     do
         *--p = (U8)(u32 % 10) | '0';
     while (u32 /= 10);
-    if (p != pBegin) {
-        C *pD = pBegin;
-        do
-            *pD++ = *p++;
-        while (p != pEnd);
-        return pD;
-    }
-    return pEnd;
+    do
+        *pTo++ = *p++;
+    while (p != pEnd);
+    return pTo;
 }
 
-// pEnd - pBegin should be 20
-inline static C *U64ToS10(C *pBegin, C *pEnd, U64 u64) {
+// pTo should have 20 bytes space
+inline static C *U64ToS10(C *pTo, U64 u64) {
+    C szBuffer[20];
+    C *pEnd = szBuffer + 20;
     C *p = pEnd;
     do
         *--p = (U8)(u64 % 10) | '0';
     while (u64 /= 10);
-    if (p != pBegin) {
-        C *pD = pBegin;
-        do
-            *pD++ = *p++;
-        while (p != pEnd);
-        return pD;
-    }
-    return pEnd;
+    do
+        *pTo++ = *p++;
+    while (p != pEnd);
+    return pTo;
 }
