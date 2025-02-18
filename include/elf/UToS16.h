@@ -4,12 +4,18 @@
 inline static C *U8ToS16(C *pBegin, C *pEnd, U8 u8, const C szChars[16]) {
     C *p = pEnd;
     *--p = szChars[u8 & 0xF];
-    if (u8 >>= 4) {
+    if (u8 >>= 4)
         *--p = szChars[u8];
-        return pEnd;
+
+    if (p != pBegin) {
+        C *pD = pBegin;
+        *pD++ = *p++;
+        if (p != pEnd)
+            *pD++ = *p;
+
+        return pD;
     }
-    *pBegin = *p;
-    return p;
+    return pEnd;
 }
 
 // pEnd - pBegin should be 4
