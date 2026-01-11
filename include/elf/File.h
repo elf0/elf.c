@@ -313,6 +313,27 @@ static U64 File_GetSize(File *pFile){
 #endif
 }
 
+inline static E8 File_GetSizeByName(const char *pFileName, U64 *puBytes) {
+#ifdef __linux__
+    int fd = open(pFileName, O_RDONLY);
+    if (fd >= 0) {
+        E8 e;
+        struct stat meta;
+        if (!fstat(fd, &meta)) {
+            *puBytes = meta.st_size;
+            e = eOk;
+        }
+        else
+            e = eIoStatus;
+
+        close(fd);
+        return e;
+    }
+    return eIoOpen;
+#else
+#endif
+}
+
 inline
 static E8 File_SetSize(File *pFile, U64 uSize){
 #ifdef __linux__

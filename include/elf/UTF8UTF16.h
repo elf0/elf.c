@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@iamelf.com
+//EMail: elf000@zoho.com
 
 #include "UTF8.h"
 #include "UTF16.h"

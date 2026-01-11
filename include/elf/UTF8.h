@@ -3,7 +3,7 @@
 
 //License: Public Domain
 //Author: elf
-//EMail: elf@iamelf.com
+//EMail: elf000@zoho.com
 
 // Utf-8 max: F4 8F BF BF
 // Utf-8 end: F4 90 80 80
@@ -85,6 +85,11 @@ static const C *UTF8_SkipTail(C cHead, const C *pTail) {
     return pTail + 2;
 
   return pTail + 3; // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+}
+
+inline static const C *UTF8_SkipBackward(const C *pBegin, const C *pEnd) {
+    while ((*--pEnd & 0xC0) == 0x80 && pEnd != pBegin);
+    return pEnd;
 }
 
 inline
@@ -187,6 +192,41 @@ inline static C32 UTF8_LowerRead(const C **ppString) {
     }
     *ppString = p;
     return c32;
+}
+
+inline static U32 UTF8_ReadZh(const C **pp) {
+  const C *p = *pp;
+  U32 uCode = *p;
+  // 0xE3-0xEF
+  if ((uCode - 0xE3) < 0xD) {
+    uCode &= 0x0F;
+    uCode <<= 6;
+    uCode |= *++p & 0x3F;
+    uCode <<= 6;
+    uCode |= *++p & 0x3F;
+    // if (uCode >= 0x4E00 && uCode < 0xA000 ||
+    //     uCode >= 0x3400 && uCode < 0x4DC0 ||
+    //     uCode >= 0xF900 && uCode < 0xFADA) {
+    if ((uCode - 0x4E00) < 0x5200 || (uCode - 0x3400) < 0x19C0 ||
+        (uCode - 0xF900) < 0x01DA) {
+      *pp = ++p;
+      return uCode;
+    } else
+      return 0;
+  } else if (uCode == 0xF0) {
+    uCode = *++p & 0x3F;
+    uCode <<= 6;
+    uCode |= *++p & 0x3F;
+    uCode <<= 6;
+    uCode |= *++p & 0x3F;
+    // if (uCode >= 0x20000 && uCode < 0x323B0) {
+    if ((uCode - 0x20000) < 0x123B0) {
+      *pp = ++p;
+      return uCode;
+    } else
+      return 0;
+  } else
+    return 0;
 }
 
 inline

@@ -197,6 +197,10 @@ typedef I32 R32;
 typedef I64 R64;
 typedef I R;
 
+#define U32_Align(v, a) ((v + ((U32)a - 1)) & ~(U32)a)
+
+#define OffsetOf(Member, Type) ((size_t)&((Type*)0)->Member)
+
 #define ContainerOf(pointer, Member, Container) \
     ((Container*)((P)(pointer) - (P)&((Container*)0)->Member))
 
