@@ -13,39 +13,44 @@
 // BE: FE FF
 // LE: FF FE
 inline
-    static B UTF16_IsBasic(C32 c) {
+    static B UTF16_IsBasic(C16 c) {
   return c >> 11 != 0x1B;
 }
 
 inline
-    static B UTF16_IsHigh(C32 c) {
+    static B UTF16_IsHigh(C16 c) {
   return c >> 10 == 0x36;
 }
 
 inline
-    static B UTF16_NotHigh(C32 c) {
+    static B UTF16_NotHigh(C16 c) {
   return c >> 10 != 0x36;
 }
 
 inline
-    static B UTF16_IsLow(C32 c) {
+    static B UTF16_IsLow(C16 c) {
   return c >> 10 == 0x37;
 }
 
 inline
-    static B UTF16_NotLow(C32 c) {
+    static B UTF16_NotLow(C16 c) {
   return c >> 10 != 0x37;
 }
 
 inline
-    static bool UTF16_IsSurrogate(C32 c) {
+    static bool UTF16_IsSurrogate(C16 c) {
   return c >> 11 == 0x1B;
 }
 
 inline
-    static C32 UTF16_Surrogate(C32 c0, C32 c1) {
-  return c0 << 10 ^ c1 ^ 0x360DC00;
+    static bool UTF16_NotSurrogate(C16 c) {
+  return c >> 11 != 0x1B;
 }
+
+inline static C32 UTF16_Surrogate(C16 c0, C16 c1) {
+  return (C32)c0 << 10 ^ (C32)c1 ^ 0x360DC00;
+}
+
 
 inline
     static U64 UTF16_Count(const C16 *p, const C16 *pEnd) {
