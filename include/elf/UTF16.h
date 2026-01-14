@@ -7,120 +7,105 @@
 
 // Unicode: [0, 0x10FFFF]
 // Surrogate: [0xD800, 0xDFFF]
-// High surrogate: [0xD800, 0xDBFF]
-// Low surrogate: [0xDC00, 0xDFFF]
+// Lead/High/C0 surrogate: [0xD800, 0xDBFF]
+// Trail/Low/C1 surrogate: [0xDC00, 0xDFFF]
 // BOM:
 // BE: FE FF
 // LE: FF FE
-inline
-    static B UTF16_IsBasic(C16 c) {
+
+// c < 0xD800 || c >= 0xE000
+inline static B UTF16_IsBasic(C16 c) {
   return c >> 11 != 0x1B;
 }
 
-inline
-    static B UTF16_IsHigh(C16 c) {
+// Lead/High
+// c >= 0xD800 && c < 0xDC00
+inline static B UTF16_IsC0(C16 c) {
   return c >> 10 == 0x36;
 }
 
-inline
-    static B UTF16_NotHigh(C16 c) {
+inline static B UTF16_NotC0(C16 c) {
   return c >> 10 != 0x36;
 }
 
-inline
-    static B UTF16_IsLow(C16 c) {
+// Trail/Low
+// c >= 0xDC00 && c < 0xE000
+inline static B UTF16_IsC1(C16 c) {
   return c >> 10 == 0x37;
 }
 
-inline
-    static B UTF16_NotLow(C16 c) {
+inline static B UTF16_NotC1(C16 c) {
   return c >> 10 != 0x37;
 }
 
-inline
-    static bool UTF16_IsSurrogate(C16 c) {
+// c >= 0xD800 && c < 0xE000
+inline static B UTF16_IsSurrogate(C16 c) {
   return c >> 11 == 0x1B;
 }
 
-inline
-    static bool UTF16_NotSurrogate(C16 c) {
+inline static B UTF16_NotSurrogate(C16 c) {
   return c >> 11 != 0x1B;
 }
 
 inline static C32 UTF16_Surrogate(C16 c0, C16 c1) {
-  return (C32)c0 << 10 ^ (C32)c1 ^ 0x360DC00;
+  return (((C32)c0 - 0xD7F7) << 10) + (C32)c1;
 }
 
-
-inline
-    static U64 UTF16_Count(const C16 *p, const C16 *pEnd) {
+inline static U64 UTF16_Count(const C16 *p, const C16 *pEnd) {
   U64 uCount = 0;
   while (p != pEnd) {
-      ++uCount;
-      if (*p++ >> 11 == 0x1B)
+      if (*p >> 11 != 0x1B)
         ++p;
+      else
+        p += 2;
+      ++uCount;
     }
   return uCount;
 }
 
-inline
-    static B UTF16_Valid(const C16 *p, const C16 *pEnd) {
+inline static B UTF16_Valid(const C16 *p, const C16 *pEnd) {
   while(p != pEnd) {
-      C16 c16 = *p++;
-      if (c16 >> 11 == 0x1B) {
-          if (c16 > 0xDBFF || p == pEnd || *p++ >> 10 != 0x37)
+      C16 c0 = *p++ >> 10;
+      if (c0 == 0x36) {
+          if (p == pEnd || *p++ >> 10 != 0x37)
             return 0;
         }
-      else if (c16 == 0x0A00)
+      else if (c0 == 0x37)
         return 0;
     }
   return 1;
 }
 
-inline
-    static C32 UTF16_Parse(const C16 **ppBegin, const C16 *pEnd) {
+inline static C32 UTF16_Parse(const C16 **ppBegin, const C16 *pEnd) {
   const C16 *p = *ppBegin;
-  C32 c = *p++;
-  if (c >> 11 == 0x1B) {
-      if (c > 0xDBFF || p == pEnd)
-        c |= 0x80000000;
-      else {
-          C32 c1 = *p++;
-          if (c1 >> 10 == 0x37)
-            c = UTF16_Surrogate(c, c1);
-          else {
-              --p;
-              c |= 0x80000000;
-            }
+  C16 c0 = *p++;
+  if (c0 >> 11 != 0x1B) {
+      *ppBegin = p;
+      return (C32)c0;
+    }
+  if (c0 < 0xDC00 && p != pEnd) {
+      C16 c1 = *p++;
+      if (c1 >> 10 == 0x37) {
+          *ppBegin = p;
+          return UTF16_Surrogate(c0, c1);
         }
     }
-  else if (c == 0x0A00)
-    c |= 0x80000000;
   *ppBegin = p;
-  return c;
+  return 0x80000000;
 }
-inline
-    static U64 UTF16_ParseCount(const C16 **ppBegin, const C16 *pEnd) {
+
+inline static U64 UTF16_ParseCount(const C16 **ppBegin, const C16 *pEnd) {
   U64 uCount = 0;
   const C16 *p = *ppBegin;
   while (p != pEnd) {
-      C32 c32 = *p++;
-      if (c32 >> 11 == 0x1B) {
-          if (c32 > 0xDBFF || p == pEnd) {
-              --p;
-              uCount |= 0x8000000000000000;
-              break;
+      C16 c0 = *p++;
+      if (c0 >> 11 == 0x1B) {
+          if (c0 < 0xDC00 || p != pEnd) {
+              if (*p++ >> 10 != 0x37)
+                uCount |= 0x8000000000000000;
             }
-          else if (*p++ >> 10 != 0x37) {
-              p -= 2;
-              uCount |= 0x8000000000000000;
-              break;
-            }
-        }
-      else if (c32 == 0x0A00) {
-          --p;
-          uCount |= 0x8000000000000000;
-          break;
+          else
+            uCount |= 0x8000000000000000;
         }
       ++uCount;
     }
@@ -129,57 +114,58 @@ inline
 }
 
 //caller must input valid utf-16 string
-inline
-    static C32 UTF16_Read(const C16 **ppString) {
+inline static C32 UTF16_Read(const C16 **ppString) {
   const C16 *p = *ppString;
-  C32 c = *p++;
-  if (c >> 11 == 0x1B)
-    c = UTF16_Surrogate(c, *p++);
+  C16 c0 = *p++;
+  if (c0 >> 11 != 0x1B) {
+      *ppString = p;
+      return c0;
+    }
+
+  C32 c32 = UTF16_Surrogate(c0, *p++);
   *ppString = p;
-  return c;
+  return c32;
 }
 
-inline
-    static C32 UTF16_ReadLE(const C **ppString) {
+inline static C32 UTF16_ReadLE(const C **ppString) {
   const C *p = *ppString;
-  C32 c = *p++;
-  c |= *p++ << 8;
-  if (c >> 11 == 0x1B)
-    c = UTF16_Surrogate(c, *p++ | *p++ << 8);
-  *ppString = p;
-  return c;
+  C16 c0 = U16_LE(p);
+  p += 2;
+  if (c0 >> 11 != 0x1B) {
+      *ppString = p;
+      return c0;
+    }
+  C32 c32 = UTF16_Surrogate(c0, U16_LE(p));
+  *ppString = p + 2;
+  return c32;
 }
 
-inline
-    static C32 UTF16_ReadBE(const C **ppString) {
+inline static C32 UTF16_ReadBE(const C **ppString) {
   const C *p = *ppString;
-  C32 c = *p++ << 8;
-  c |= *p++;
-  if (c >> 11 == 0x1B)
-    c = UTF16_Surrogate(c, *p++ << 8 | *p++);
-  *ppString = p;
-  return c;
+  C16 c0 = U16_BE(p);
+  p += 2;
+  if (c0 >> 11 != 0x1B) {
+      *ppString = p;
+      return c0;
+    }
+  C32 c32 = UTF16_Surrogate(c0, U16_BE(p));
+  *ppString = p + 2;
+  return c32;
 }
 
-inline
-    static U8 UTF16_Bytes(C32 value) {
+inline static U8 UTF16_Bytes(C32 value) {
   return value < 0x10000? 2 : 4;
 }
 
 //caller must input valid utf value
-inline
-    static C16 *UTF16_Write(C16 *pBuffer, C32 value) {
-  if (value < 0x10000) {
-      //        assert(value < 0xD800 || value > 0xDFFF);
-      *pBuffer = value;
-    }
-  else{
+inline static C16 *UTF16_Write(C16 *pBuffer, C32 value) {
+  if (value < 0x10000)
+    *pBuffer = value;
+  else {
       //        assert(value < 0x110000);
-      value -= 0x10000;
-      *pBuffer++ = 0xD800 | value >> 10;
-      *pBuffer = 0xDC00 | value & 0x03FF;
+      *pBuffer++ = (value >> 10) + 0xD7C0;
+      *pBuffer = value & 0x3FF | 0xDC00;
     }
-
   return ++pBuffer;
 }
 
