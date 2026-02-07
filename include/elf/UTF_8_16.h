@@ -31,18 +31,54 @@ inline static C32 UTF16_Read_UTF8_Bytes(const C16 **ppString, U8 *puUTF8Bytes) {
   return c32;
 }
 
-inline static C8 *UTF8_From16(C8 *p8, const C8 *p8End, const C16 **pp16, const C16 *p16End) {
+inline static C8 *UTF8_From16(C8 *p8, const C16 **pp16) {
   const C16 *p16 = *pp16;
-  while (p16 != p16End) {
-      const C16 *p16Begin = p16;
-      U8 uUtf8Bytes;
-      C32 code = UTF16_Read_UTF8_Bytes(&p16, &uUtf8Bytes);
-      if (p8 + uUtf8Bytes > p8End) {
-          *pp16 = p16Begin;
-          return p8;
+  C32 c32 = *p16++;
+  if (c32 >= 0x0800) {
+      if (c32 < 0x10000) { // 1110xxxx 10xxxxxx 10xxxxxx
+          //            assert(c0 < 0xD800 || c0 > 0xDFFF);
+          *p8++ = 0xE0 | (c32 >> 12);
+          *p8++ = 0x80 | ((c32 >> 6) & 0x3F);
+          *p8++ = 0x80 | (c32 & 0x3F);
         }
-      p8 = UTF8_Write(p8, code);
+      else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+          //            assert(c32 < 0x110000);
+          c32 = (((C32)c32 - 0xD7F7) << 10) + (C32)*p16++;
+          *p8++ = 0xF0 | (c32 >> 18);
+          *p8++ = 0x80 | ((c32 >> 12) & 0x3F);
+          *p8++ = 0x80 | ((c32 >> 6) & 0x3F);
+          *p8++ = 0x80 | (c32 & 0x3F);
+        }
     }
+  else {
+      if (c32 >= 0x80)  { // 110xxxxx 10xxxxxx
+          *p8++ = 0xC0 | (c32 >> 6);
+          *p8++ = 0x80 | (c32 & 0x3F);
+        }
+      else // 0xxxxxxx
+        *p8++ = c32;
+    }
+  *pp16 = p16;
+  return p8;
+}
+
+inline static C8 *UTF8_TryFrom16(C8 *p8, const C8 *p8End, const C16 **pp16, const C16 *p16End) {
+  const C16 *p16 = *pp16;
+  const C8 *p8PromisedSpaceEnd = p8End - 3;
+  do {
+      if (p8 < p8PromisedSpaceEnd)
+        p8 = UTF8_From16(p8, &p16);
+      else {
+          const C16 *p16Begin = p16;
+          U8 uUtf8Bytes;
+          C32 code = UTF16_Read_UTF8_Bytes(&p16, &uUtf8Bytes);
+          if (p8 + uUtf8Bytes > p8End) {
+              *pp16 = p16Begin;
+              return p8;
+            }
+          p8 = UTF8_Write(p8, code);
+        }
+    } while (p16 != p16End);
   *pp16 = p16;
   return p8;
 }

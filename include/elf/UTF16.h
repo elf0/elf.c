@@ -121,7 +121,6 @@ inline static C32 UTF16_Read(const C16 **ppString) {
       *ppString = p;
       return c0;
     }
-
   C32 c32 = UTF16_Surrogate(c0, *p++);
   *ppString = p;
   return c32;
