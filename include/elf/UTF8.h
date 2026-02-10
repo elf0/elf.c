@@ -138,7 +138,7 @@ inline static C32 UTF8_ReadTail(C32 cHead, const C **ppTail) {
 }
 
 //caller must input valid utf-8 string
-inline static C32 UTF8_Read(const C8 **ppString) {
+C32 UTF8_Read1(const C8 **ppString) {
   C32 c32;
   const C8 *p = *ppString;
   C8 c = *p++;
@@ -147,28 +147,99 @@ inline static C32 UTF8_Read(const C8 **ppString) {
   else {
       if (c < 0xE0) { // 110xxxxx 10xxxxxx
           c32 = c & 0x1F;
+
           c32 <<= 6;
-          c32 |= *p++ & 0x3F;
+          c = *p++;
+          c &= 0x3F;
+          c32 |= c;
         }
       else {
           if (c < 0xF0) { // 1110xxxx 10xxxxxx 10xxxxxx
               c32 = c & 0x0F;
+
               c32 <<= 6;
-              c32 |= *p++ & 0x3F;
+              c = *p++;
+              c &= 0x3F;
+              c32 |= c;
+
               c32 <<= 6;
-              c32 |= *p++ & 0x3F;
+              c = *p++;
+              c &= 0x3F;
+              c32 |= c;
             }
           else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
               c32 = c & 0x07;
+
               c32 <<= 6;
-              c32 |= *p++ & 0x3F;
+              c = *p++;
+              c &= 0x3F;
+              c32 |= c;
+
               c32 <<= 6;
-              c32 |= *p++ & 0x3F;
+              c = *p++;
+              c &= 0x3F;
+              c32 |= c;
+
               c32 <<= 6;
-              c32 |= *p++ & 0x3F;
+              c = *p++;
+              c &= 0x3F;
+              c32 |= c;
             }
         }
     }
+  *ppString = p;
+  return c32;
+}
+
+C32 UTF8_Read3(const C8 **ppString) {
+  C32 c32;
+  const C8 *p = *ppString;
+  C8 c = *p++;
+  if (c >= 0xE0) {
+      if (c < 0xF0) { // 1110xxxx 10xxxxxx 10xxxxxx
+          //            assert(c0 < 0xD800 || c0 > 0xDFFF);
+          c32 = c & 0x0F;
+
+          c32 <<= 6;
+          c = *p++;
+          c &= 0x3F;
+          c32 |= c;
+
+          c32 <<= 6;
+          c = *p++;
+          c &= 0x3F;
+          c32 |= c;
+        }
+      else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+          //            assert(c32 < 0x110000);
+          c32 = c & 0x07;
+
+          c32 <<= 6;
+          c = *p++;
+          c &= 0x3F;
+          c32 |= c;
+
+          c32 <<= 6;
+          c = *p++;
+          c &= 0x3F;
+          c32 |= c;
+
+          c32 <<= 6;
+          c = *p++;
+          c &= 0x3F;
+          c32 |= c;
+        }
+    }
+  else if (c >= 0x80)  { // 110xxxxx 10xxxxxx
+      c32 = c & 0x1F;
+
+      c32 <<= 6;
+      c = *p++;
+      c &= 0x3F;
+      c32 |= c;
+    }
+  else
+    c32 = c;
   *ppString = p;
   return c32;
 }
