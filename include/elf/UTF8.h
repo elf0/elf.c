@@ -13,7 +13,8 @@
 // BOM: EF BB BF
 
 #define UNICODE_MAX 0x10FFFF
-#define UNICODE_INVALID(c32) (c32 > 0x10FFFF)
+#define UNICODE_VALID(c32)   (c32 < 0x110000)
+#define UNICODE_INVALID(c32) (c32 >= 0x110000)
 
 //#define ERROR_UTF8 1
 #ifndef ERROR_UTF8
@@ -25,12 +26,30 @@
 #define ERROR_UTF8_RANGE (ERROR_UTF8 + 3)
 #define ERROR_UTF8_END (ERROR_UTF8 + 4)
 
+inline static B UTF8_Valid0(C c0) {
+  return c0 < 0x80 || c0 >= 0xC0 && c0 < 0xF5;
+}
+
+inline static B UTF8_Invalid0(C c0) {
+  return c0 >= 0x80 && c0 < 0xC0 || c0 >= 0xF5;
+}
+
+// tail >= 0x80 && tail < 0xC0
 inline static B UTF8_ValidTail(C tail) {
   return (tail & 0xC0) == 0x80;
 }
 
 inline static B UTF8_InvalidTail(C tail) {
   return (tail & 0xC0) != 0x80;
+}
+
+// c1 >= 0x80 && c1 < 0x90
+inline static B UTF8_F4_Valid1(C c1) {
+  return (c1 & 0xF0) == 0x80;
+}
+
+inline static B UTF8_F4_Invalid1(C c1) {
+  return (c1 & 0xF0) != 0x80;
 }
 
 inline static U32 UTF8_Code2(C c0, C c1) {
@@ -145,7 +164,7 @@ C32 UTF8_Read1(const C8 **ppString) {
   if (c < 0x80) // 0xxxxxxx
     c32 = c;
   else {
-      if (c < 0xE0) { // 110xxxxx 10xxxxxx
+      if (c < 0xE0) { // 110xxxxx 10xxxxxx(0x80 - 0x7FF)
           c32 = c & 0x1F;
 
           c32 <<= 6;
@@ -154,7 +173,7 @@ C32 UTF8_Read1(const C8 **ppString) {
           c32 |= c;
         }
       else {
-          if (c < 0xF0) { // 1110xxxx 10xxxxxx 10xxxxxx
+          if (c < 0xF0) { // 1110xxxx 10xxxxxx 10xxxxxx(0x800 - 0xFFFF)
               c32 = c & 0x0F;
 
               c32 <<= 6;
@@ -167,7 +186,7 @@ C32 UTF8_Read1(const C8 **ppString) {
               c &= 0x3F;
               c32 |= c;
             }
-          else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+          else { // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx(0x10000 - 0x10FFFF)
               c32 = c & 0x07;
 
               c32 <<= 6;
@@ -352,6 +371,65 @@ inline static C8 *UTF8_Write(C8 *pBuffer, C32 code) {
             }
         }
     }
+  return p;
+}
+
+inline static C *UTF8_WriteU8_10(C *p, U8 u8) {
+  do
+    *--p = (u8 % 10) | '0';
+  while (u8 /= 10);
+  return p;
+}
+
+inline static C *UTF8_WriteU16_10(C *p, U16 u16) {
+  do
+    *--p = (U8)(u16 % 10) | '0';
+  while (u16 /= 10);
+  return p;
+}
+
+inline static C *UTF8_WriteU32_10(C *p, U32 u32) {
+  do
+    *--p = (U8)(u32 % 10) | '0';
+  while (u32 /= 10);
+  return p;
+}
+
+inline static C *UTF8_WriteU64_10(C *p, U64 u64) {
+  do
+    *--p = (U8)(u64 % 10) | '0';
+  while (u64 /= 10);
+  return p;
+}
+
+#define HEX_CHARS_UPPER "0123456789ABCDEF"
+#define HEX_CHARS_LOWER "0123456789abcdef"
+
+inline static C *UTF8_WriteU8_16(C *p, U8 u8, const C *szCharTable) {
+  do
+    *--p = szCharTable[u8 & 0xF];
+  while (u8 >>= 4);
+  return p;
+}
+
+inline static C *UTF8_WriteU16_16(C *p, U16 u16, const C *szCharTable) {
+  do
+    *--p = szCharTable[u16 & 0xF];
+  while (u16 >>= 4);
+  return p;
+}
+
+inline static C *UTF8_WriteU32_16(C *p, U32 u32, const C *szCharTable) {
+  do
+    *--p = szCharTable[u32 & 0xF];
+  while (u32 >>= 4);
+  return p;
+}
+
+inline static C *UTF8_WriteU64_16(C *p, U64 u64, const C *szCharTable) {
+  do
+    *--p = szCharTable[u64 & 0xF];
+  while (u64 >>= 4);
   return p;
 }
 
